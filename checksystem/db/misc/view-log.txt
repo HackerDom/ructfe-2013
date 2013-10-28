@@ -1,0 +1,5 @@
+select time, round, team_id, services.name, duration, args, retval, stdout, stderr
+from checker_run_log join services on services.id=service_id
+where service_id=1
+order by round desc, team_id, name, time desc
+limit 100;

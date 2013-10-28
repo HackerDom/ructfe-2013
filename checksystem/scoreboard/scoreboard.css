@@ -1,0 +1,143 @@
+body {margin:0; padding:0; font-family:Tahoma, Arial, Helvetica, sans-serif; color:#222; background:#ECECEC url(img/bg.png) repeat-y 50% 0; min-width:771px; font-size:78%; text-align:center;}
+html, body {height:100%;}
+div,dl,dt,dd,ol,ul,li,form,td,th,p {margin:0; padding:0;}
+table, th, td {font-size:100%;}
+table,img {border:0;}
+input, select, option, textarea {font-family:Tahoma, Arial, Helvetica, sans-serif; font-size:11px;}
+p {padding:0 0 10px; text-align: justify;}
+a {color:#0050A1; text-decoration:underline;}
+a:hover {color:#A11919; text-decoration:none;}
+h1,h2,h3,h4 {margin:0; padding:0; color:#0050A1; font-family:Arial, sans-serif; font-weight:normal;}
+h1 {font-size:170%; padding:10px 0;}
+h2 {font-size:150%; padding:10px 0;}
+h3 {font-size:130%; padding:10px 0;}
+h4 {font-size:100%; padding:10px 0; font-weight:bold;}
+h5 {font-size:110%; color:#0050A1; font-weight : normal;}
+ol, ul {padding:0 0 10px 20px;}
+em {color:#A11919; font-style: normal;}
+object {display: block;}
+
+#mainWrapper {position:relative; min-height:100%; width:995px; margin:0 auto; text-align:left; background:#DFDFDF;}
+* html #mainWrapper {height:100%;}
+
+#header {height:150px; background:#DFDFDF url(img/header.png) no-repeat 0 0;} /* типа если флэша не будет */
+
+#in {padding:20px 0 0;}
+#inTable {width:100%; border-collapse:collapse;}
+#inSpacer1 {width:40px; background:url(img/inspacer1_bg.png) no-repeat 100% 0;}
+#inContent {background:#FFF url(img/incontent_bg.jpg) no-repeat 0 0; padding:30px;}
+#inSpacer2 {width:20px;}
+#inRight {width:195px; background:#ECECEC;}
+#inRight h3 {padding: 0;}
+#inRight h3 img {display:block;}
+#inRight dl {text-align:center;}
+#inRight dl dt {padding:0 0 20px;}
+#inRight dl a img {opacity:0.6; -moz-opacity:0.6; filter:alpha(opacity=60);}
+#inRight dl a:hover img {opacity:1.0; -moz-opacity:1.0; filter:alpha(opacity=100);}
+#inRight ul li {padding:5px 0px;}
+#inSpacer3 {width:40px;}
+
+#footWrap {height:60px;}
+#footer {position:relative; margin:-60px auto 0; height:60px; width:995px; z-index:200; text-align:left;}
+#footer2 {position:absolute; top:0; left:0; width:100%; height:60px; z-index:300; color:#404040;}
+#contacts {float:left; padding:9px 40px;}
+#copyright {float:right; padding:23px 40px;}
+
+#centeredTitle {padding:10px 0 20px; color:#0050A1; text-transform:none; font-weight:normal; text-align:center;}
+#centeredImage {background:#404040 url(img/header.png) repeat-y 50%; width:995px; height:89px}
+#clearURL {text-decoration:none}
+
+#title {padding:0 0 20px; color:#0050A1; text-transform:none; font-size:170%; font-weight:normal; text-align:right;}
+
+.scoreboard {text-align:center}
+.inSelectedScoreboard {display:none}
+.inFullScoreboard {}
+
+
+#inTable table.scoreboard {border-collapse:collapse; margin:0 0 10px;}
+#inTable table.scoreboard th, #inTable table.scoreboard td {padding:3px 7px 5px; border:1px solid #A3A3A3;}
+#inTable table.scoreboard th {background:#DFDFDF; text-align:center;}
+
+/* dirty hack */
+#inTable .ructfteam td, #inTable .sitemap td {vertical-align: top; border:0;}
+#inTable .presentations td {text-align:center;}
+#inTable .winner td {background:#E1F5FF;}
+
+
+.serviceUp {background:#00FF00;}
+.serviceDown {background:#FF4040;}
+.serviceCorrupt {background:#FFFF99;}
+.serviceMumble {background:#E1F5FF;}
+.serviceCheckerError {background:#DFDFDF;}
+
+.info
+{
+	position:relative;
+	z-index:24;
+	text-decoration:none;
+	color:Black;
+}
+.info span { display: none; }
+ /*background:; ie hack, something must be changed in a for ie to execute it*/
+.info:hover{ z-index:25; color: black; background:;}
+.info:hover span.tooltip
+{
+    display:block;
+	position:absolute;
+	top:15px; left:20px;
+	padding: 0px 0px 0 0;
+    width:200px;
+    color: black;
+    text-align: center;
+    filter: alpha(opacity:90);
+    KHTMLOpacity: 0.90;
+    MozOpacity: 0.90;
+    opacity: 0.90;
+}
+.info:hover span.top
+{
+    display: block;
+    height:30px;
+/*    padding: 30px 0px 0 ;*/
+    background: url(img/info.png) no-repeat top;
+}
+.info:hover span.middle
+{
+	/* different middle bg for stretch */
+    display: block;
+    padding: 0 8px; 
+    background: url(img/info_filler.png) repeat bottom; 
+}
+.info:hover span.bottom
+{
+	height: 13px;
+    display: block;
+/*    padding: 3px 0px 10px;*/
+    background: url(img/info.png) no-repeat bottom;
+}/*.booster {color:#222; font-size:50%; vertical-align: middle;}
+.classified {display:none;}
+
+.icon {float:left; margin:10px 5px 5px 0px; border: 2px solid #222;}*/
+
+
+/*
+  QServer specific
+*/
+.error {color: #ff8800} 
+a.menulink {margin: 5px}
+a.selected {margin: 5px; font-weight: bold}
+
+form#login-form {margin: 0 auto;}
+form#login-form label {font-weight: bold; margin: 5px 0px 5px 5px}
+form#login-form input.password {width: 200px; margin: 5px 0px 5px 5px; }
+
+table.quest-selector {border-collapse: collapse; width: 80%; margin: 10px auto;}
+table.quest-selector td {width:12.5%; margin: 0; padding: 10px; vertical-align: top}
+table.quest-selector td > ul {margin: 0px; padding: 10px 0; list-style: none; text-align: center; width:100%;}
+table.quest-selector td > ul > span.catname {font-weight: bold}
+table.quest-selector td > ul > li {margin:10px 0px; white-space: nowrap}
+table.quest-selector td > ul > li.available {color: blue; border: 1px dashed blue; cursor: pointer}
+table.quest-selector td > ul > li.unavailable {color: gray; border: 1px dashed gray}
+table.quest-selector td > ul > li.completed {color: blue; border: 1px solid blue}
+
+div.page-inform {width: 80%; margin: 5% 0 0 5%; border: 0px; padding: 5px}

@@ -1,0 +1,33 @@
+1. INSTALL REQUIRED PACKETS
+---------------------------
+
+# Install Sun Java, PosgreSQL Server, PosgreSQL libs for perl, make
+
+apt-get install python-software-properties
+add-apt-repository ppa:upubuntu-com/java
+apt-get update
+apt-get install oracle-java7-installer
+apt-get install postgresql-9.1 libdbi-perl libdbd-pg-perl
+apt-get install make
+
+2. CONFIGURE POSTGRESQL
+-----------------------
+
+# Edit files:
+
+#    /etc/postgresql/9.1/main/postgresql.conf
+#    Change:   
+#        listen_addresses = '*'  
+
+#    /etc/postgresql/9.1/main/pg_hba.conf
+#    Add line:   
+#        host    ructfe          ructfe          172.16.201.0/24         md5
+
+# Restart server:
+service postgresql restart
+
+
+3. DB INSTALL 
+-------------
+
+cd db && ./init-db.sh db.config && make main-db

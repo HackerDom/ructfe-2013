@@ -1,0 +1,39 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=<% settings.charset %>" />
+	<title>Checksystem</title>
+	<link rel="stylesheet" href="<% request.uri_base %>/css/style.css" />
+	<script type="text/javascript" src="<% request.uri_base %>/js/jquery.js"></script> 
+	<script type="text/javascript" src="<% request.uri_base %>/js/checksystem.js"></script> 
+</head>
+
+<body>
+<div id="container">
+<div id="header"><h1>Checksystem control panel</h1></div>
+
+<div id="wrapper">
+	<div id="content">
+		<% content %>	
+	</div>
+</div>
+
+<div id="navigation">
+	<a href="/">Home</a> <br/>
+	<a href="/teams">Teams</a> <br/>
+	<a href="/services">Services</a> <br/>
+	<a href="/logs">Logs</a> <br/>
+</div>
+
+<!--
+<div id="extra">
+	<p>Extra</p>
+</div> -->
+
+<!-- <div id="footer"><p>Here it goes the footer</p></div> -->
+</div>
+
+</body>
+</html>
+

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>RuCTFE 2012 - scoreboard</title>
+		<link rel="home" href="http://test_ructf.org/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<script> /* Provisory for dev environment: */ localStorage.clear(); </script>
+		<link rel="stylesheet/less" href="less/bootstrap.less">
+		<script src="less.js"></script>
+    <link rel="stylesheet/less" href="less/responsive.less">
+		<script type="text/javascript" src="js/jquery.js"></script>
+		<script type="text/javascript" src="js/scoreboard.js"></script>
+		<script type="text/javascript" src="js/jquery.tablesorter.min.js"></script>
+		<style>
+			html,
+			body {
+				height: 100%;
+			}
+
+			#wrap {
+				min-height: 100%;
+				height: auto !important;
+				height: 100%;
+				margin: 0 auto -60px;
+			}
+			#push,
+			#footer {
+				height: 60px;
+				padding-left: 40px;
+				padding-right: 40px;
+			}
+
+			table#scoreboard td.p10 { background-color: rgba(255, 165, 0, 1);}
+			table#scoreboard td.p9 { background-color: rgba(255, 165, 0, 0.9);}
+			table#scoreboard td.p8 { background-color: rgba(255, 165, 0, 0.8);}
+			table#scoreboard td.p7 { background-color: rgba(255, 165, 0, 0.7);}
+			table#scoreboard td.p6 { background-color: rgba(255, 165, 0, 0.6);}
+			table#scoreboard td.p5 { background-color: rgba(255, 165, 0, 0.5);}
+			table#scoreboard td.p4 { background-color: rgba(255, 165, 0, 0.4);}
+			table#scoreboard td.p3 { background-color: rgba(255, 165, 0, 0.3);}
+			table#scoreboard td.p2 { background-color: rgba(255, 165, 0, 0.2);}
+			table#scoreboard td.p1 { background-color: rgba(255, 165, 0, 0.1);}
+			table#scoreboard td.p0 { background-color: rgba(255, 165, 0, 0);}
+
+
+			table#scoreboard img {
+				width: 48px;
+				height: 48px;
+			}
+			table#scoreboard td, table#scoreboard th {
+				vertical-align: middle;
+				text-align: center;
+			}
+			table#scoreboard td.name {
+				text-align: left;
+			}
+			table#scoreboard td.up		{ background-color: #00ff00; }
+			table#scoreboard td.corrupt	{ background-color: #ffff99; }
+			table#scoreboard td.mumble	{ background-color: #e1f5ff; }
+			table#scoreboard td.down	{ background-color: #ff4040; }
+		</style>
+</head>
+
+<body>
+
+    <div class="container">
+<!-- head -->
+	<div id="head">
+		<h1>RuCTFE 2012</h1>
+		<h2>Scoreboard</h2>
+	</div>
+  <div id="wrap">
+		<div class="inner_container">
+			<div id="info">Round: 121, started 24.11.2012 21:00 UTC</div>
+			<input type="button" value="Update" id="btn_Update" onclick="Update_Click()"><text id="statusText">Sat Nov 24 2012 13:49:46 UTC</text>
+			
+			<div class="tabbable">
+				<ul class="nav nav-tabs" id="tabs">
+				</ul>
+				<div class="tab-content">
+					<div class="tab-pane active" id="tab1">
+						<table class="table table-bordered table-condensed" id="scoreboard">
+							<thead>
+								<tr>
+									<th>#</th>
+				        	<th>Logo</th>
+				        	<th>Name</th>
+									<th>Rating</th>
+									<th>Defense</th>
+									<th>Attack</th>
+									<th>Ping (r/v/t)</th>
+					    	</tr>
+					    </thead>
+					    <tbody>
+					    </tbody>
+    				</table>
+		    	</div>
+			</div>
+		</div>
+
+   </div>
+      <div id="push"></div>
+  </div>
+</div>
+
+
+<!--
+<div id="mainWrapper">
+	<div id="teamGroups"></div>
+	<div id="selectedGroup"></div>
+	<div id="info"></div>
+	
+	<input type="button" value="Update" id="btn_Update" onclick="Update_Click()"/>
+	<text id="statusText">...</text>
+	<table class="scoreboard" border="1" cellSpacing="0" cellPadding="10">
+	<colgroup>
+		<col width=30/>
+		<col width=60/>
+		<col width=200/>
+		<col width=80/>
+		<col width=80/>
+		<col width=80/>
+		<col width=80/>
+		<col width=50/>
+		<col width=50/>
+		<col width=50/>
+		<col width=50/>
+		<col width=50/>
+		<col width=50/>
+		<col width=50/>
+		<col width=50/>
+		<col width=50/>
+		<col width=50/>
+	</colgroup>
+	<tr>
+		<th>#</th>
+		<th>Logo </th>
+		<th>Team</th>
+		<th>Rating</th>
+		<th>Defense</th>
+		<th>Attack</th>
+		<th>Advisory</th>
+		<th>Ping (r/v/t)</th>
+	</tr>
+	</table>
+</div>
+-->
+</body>
+
+</html>

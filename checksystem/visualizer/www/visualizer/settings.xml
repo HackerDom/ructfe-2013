@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<settings>
+  <monitor url="http://172.16.12.42:8080" interval="10" />
+  <realtime />
+</settings>

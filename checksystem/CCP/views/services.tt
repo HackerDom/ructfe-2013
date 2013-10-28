@@ -1,0 +1,27 @@
+<p>
+<table id="servtable" class="nicetable">
+	<tr>
+		<th width="20px">  Id            </th>
+		<th width="220px"> Service name  </th>
+		<th width="240px"> Checker       </th>
+		<th width="20px">  Del           </th>
+	</tr>
+</table>
+</p>
+
+<input type='button' id='show_hide_service' value='>>' onclick='btnShowHideService_Click()' />
+
+<div id="formaddservice" class="invisible">
+	<form action='/services/add' method='POST'>
+		<label for='id'>Id:</label>
+		<input type='text' id='id'><br/>
+
+		<label for='name'>Service name:</label>
+		<input type='text' id='name'><br/>
+
+		<label for='checker'>Checker:</label>
+		<input type='text' id='checker'><br/>
+
+		<input type='button' value='Add' onclick='btnAddService_Click()' />
+	</form>
+</div>

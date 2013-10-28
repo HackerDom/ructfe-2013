@@ -1,0 +1,59 @@
+div#status {
+//	padding: 3px;
+//	background-color:#D6E6FF;
+//	border: solid 1px black;
+}
+
+div#header {
+	background-color:#D6E6FF;
+}
+
+div#header h1 {
+	text-align:center;
+}
+
+div#status {
+	padding: 3px;
+	color: #777777;
+}
+
+table {
+	border-collapse: collapse;
+}
+
+table.service {
+	width: 100%;
+}
+
+table#table_stats {
+	width: 100%;
+	table-layout: fixed;
+}
+
+table, th, td {
+	border: 1px solid black;
+}
+
+tr.header {
+	text-align:center;
+	background-color:#D6E6FF;
+//	font-weight:bold;
+}
+
+td {
+	text-align:center;
+	padding:2px;
+}
+
+.new {
+	background-color:#EBEBEB;
+}
+
+.processing {
+	background-color:#F9FFC2;
+}
+
+.done {
+	background-color:#B6FAC4;
+}
+

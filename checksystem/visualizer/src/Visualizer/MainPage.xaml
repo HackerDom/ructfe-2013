@@ -1,0 +1,19 @@
+﻿<UserControl x:Class="Visualizer.MainPage" x:Name="Page" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" Loaded="UserControl_Loaded">
+	<UserControl.Resources>
+		<local:Localization xmlns:local="clr-namespace:Visualizer" x:Key="Localization" />
+	</UserControl.Resources>
+	<Grid x:Name="LayoutRoot" Width="915" Height="800" CacheMode="BitmapCache">
+		<Button Margin="2,2,827,778" Content="{Binding Source={StaticResource Localization}, Path=LocalizedStrings.FiltersButton}" x:Name="Filters" Click="ShowFiltersHandler" />
+		<TextBlock Margin="550,2,152,778" VerticalAlignment="Center" TextAlignment="Right" Text="{Binding Source={StaticResource Localization}, Path=LocalizedStrings.AllocationLabel}" />
+		<ComboBox Margin="765,2,2,778" x:Name="Allocation" SelectionChanged="ReallocationHandler"></ComboBox>
+        <Grid x:Name="LayoutCanvas" Margin="0,24,0,50" Width="915" Height="726" Background="White" />
+        <Button Margin="0,752,845,24" Content="{Binding Source={StaticResource Localization}, Path=LocalizedStrings.StartButton}" IsEnabled="False" x:Name="playButton" Click="PlayButton_Click" />
+		<Slider Margin="75,752,245,24" x:Name="currentTimeSlider" ValueChanged="PlaySlider_Changed" />
+		<TextBlock Margin="675,752,180,24" Width="60" Height="24" TextAlignment="Center" VerticalAlignment="Center" x:Name="currentTimeCaption" Text="00:00:00" />
+		<Slider Margin="740,752,35,24" Minimum="0" Maximum="59" Value="0" x:Name="speedSlider" ValueChanged="SpeedSlider_Changed" />
+		<TextBlock Margin="885,752,0,24" Width="30" Height="24" TextAlignment="Center" VerticalAlignment="Center" x:Name="speedSliderCaption" Text="1x" />
+		<CheckBox Margin="80,776,600,0" IsChecked="True" x:Name="playFromStart" Content="{Binding Source={StaticResource Localization}, Path=LocalizedStrings.ShowAttacksCheckbox}" />
+		<CheckBox Margin="360,776,350,0" IsChecked="True" x:Name="previewStates" Content="{Binding Source={StaticResource Localization}, Path=LocalizedStrings.ShowPreviewCheckbox}" />
+		<CheckBox Margin="600,776,100,0" IsChecked="False" x:Name="realtime" Content="{Binding Source={StaticResource Localization}, Path=LocalizedStrings.RealtimeCheckbox}" Click="realtime_Click" />
+	</Grid>
+</UserControl>

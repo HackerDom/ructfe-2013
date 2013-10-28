@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<services>
+  <service id="1" name="Service 1" />
+  <service id="2" name="Service 2" />
+  <service id="3" name="Service 3" />
+  <service id="4" name="Service 4" />
+  <service id="5" name="Service 5" />
+  <service id="6" name="Service 6" />
+  <service id="7" name="Service 7" />
+  <service id="8" name="Service 8" />
+</services>

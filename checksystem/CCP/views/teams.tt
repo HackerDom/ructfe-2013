@@ -1,0 +1,10 @@
+<p>
+	<table id="teamtable" class="nicetable">
+		<tr>
+			<th width="20px">  Id        </th>
+			<th width="200px"> Team name </th>
+			<th width="120px"> Network   </th>
+			<th width="120px"> Vuln.box  </th>
+		</tr>
+	</table>
+</p>

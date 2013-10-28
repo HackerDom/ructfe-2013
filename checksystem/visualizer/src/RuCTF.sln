@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Visualizer", "Visualizer\Visualizer.csproj", "{9B37E5F1-4FB8-4F4A-94CD-E03FEE75BD3D}"
+EndProject
+Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Visualizer.Web", "Visualizer.Web", "{3385EAAD-1274-4212-941A-6C6D51265EFF}"
+	ProjectSection(WebsiteProperties) = preProject
+		SccProjectName = "SAK"
+		SccAuxPath = "SAK"
+		SccLocalPath = "SAK"
+		SccProvider = "SAK"
+		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.0"
+		Debug.AspNetCompiler.VirtualPath = "/Visualizer.Web"
+		Debug.AspNetCompiler.PhysicalPath = "Visualizer.Web\"
+		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\Visualizer.Web\"
+		Debug.AspNetCompiler.Updateable = "true"
+		Debug.AspNetCompiler.ForceOverwrite = "true"
+		Debug.AspNetCompiler.FixedNames = "false"
+		Debug.AspNetCompiler.Debug = "True"
+		Release.AspNetCompiler.VirtualPath = "/Visualizer.Web"
+		Release.AspNetCompiler.PhysicalPath = "Visualizer.Web\"
+		Release.AspNetCompiler.TargetPath = "PrecompiledWeb\Visualizer.Web\"
+		Release.AspNetCompiler.Updateable = "true"
+		Release.AspNetCompiler.ForceOverwrite = "true"
+		Release.AspNetCompiler.FixedNames = "false"
+		Release.AspNetCompiler.Debug = "False"
+		VWDPort = "10999"
+		DefaultWebSiteLanguage = "Visual C#"
+		ProjOutputReferences = "{9B37E5F1-4FB8-4F4A-94CD-E03FEE75BD3D}|ClientBin|false;"
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 3
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = http://виктор-пк:8080/tfs/ructfe
+		SccLocalPath0 = .
+		SccWebProject1 = true
+		SccProjectUniqueName1 = Visualizer.Web
+		SccProjectName1 = Visualizer.Web
+		SccLocalPath1 = Visualizer.Web
+		SccProjectEnlistmentChoice1 = 2
+		SccProjectUniqueName2 = Visualizer\\Visualizer.csproj
+		SccProjectName2 = Visualizer
+		SccLocalPath2 = Visualizer
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9B37E5F1-4FB8-4F4A-94CD-E03FEE75BD3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9B37E5F1-4FB8-4F4A-94CD-E03FEE75BD3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9B37E5F1-4FB8-4F4A-94CD-E03FEE75BD3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9B37E5F1-4FB8-4F4A-94CD-E03FEE75BD3D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3385EAAD-1274-4212-941A-6C6D51265EFF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3385EAAD-1274-4212-941A-6C6D51265EFF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3385EAAD-1274-4212-941A-6C6D51265EFF}.Release|Any CPU.ActiveCfg = Debug|Any CPU
+		{3385EAAD-1274-4212-941A-6C6D51265EFF}.Release|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

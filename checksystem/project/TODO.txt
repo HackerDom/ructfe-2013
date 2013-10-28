@@ -1,0 +1,7 @@
+Вынести таймауты WorkerManager-а в настройки демона
+
+логирование
+
+проверить, что будет если у HttpURLConnection звать disconnect после close Reader-а ErrorStream-а
+
+Добавить и наполнять таблички для Task-ов

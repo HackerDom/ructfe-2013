@@ -1,0 +1,79 @@
+﻿<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+  <!--[if IE]><script language="javascript" type="text/javascript" src="flot/excanvas.min.js"></script><![endif]-->
+  <script language="javascript" type="text/javascript" src="flot/jquery.js"></script>
+  <script language="javascript" type="text/javascript" src="flot/jquery.flot.js"></script>
+  <script language="javascript" type="text/javascript" src="flot/jquery.flot.selection.js"></script>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <style>
+    @import "scoreboard.css";
+  </style>
+  <script type="text/javascript" src="scripts.js"></script>
+  <script type="text/javascript" src="charts_static.js"></script>
+  <title>RuCTFE 2011 - Charts</title>  
+</head>
+<body onload="parse_emails()">
+  <div id="mainWrapper">
+    <div id="centeredImage">
+    </div>
+    <div id="in">
+      <table id="inTable">
+        <tr valign="top">
+          <td id="inSpacer1">
+            &#160;
+          </td>
+          <td id="inContent">            
+            <h1 id="title">
+              RuCTFE 2011 Charts
+            </h1>
+            <table border="0" cellspacing="0" cellpadding="0" width="100%">              
+            	<tr>
+            		<td valign=top>
+            		  <table border="0" cellspacing="0" cellpadding="0" width="100%">
+            	      <tr>
+            		      <td><div id="placeholder" style="width: 680px; height: 500px"/></td>
+            	      </tr>            	      
+            	      <tr>
+            	        <td><div id="overview" style="width: 680px; height: 150px"/></td>
+            	      </tr>
+                  </table>
+            		</td>
+            		<td>
+            		  <p>Score type:
+            		    <select id="score_type_select" onchange="plot()">            		    
+            		      <option id="defense">Defense</option>
+            		      <option id="attack">Attack</option>
+            		      <option id="advisories">Advisories</option>
+            		      <option id="tasks">Tasks</option>
+            		    </select>
+            		  </p>            		  
+            		  
+            		  <p id="teams_list">Teams:</p>
+            		</td>
+            	</tr>
+            </table>            
+          </td>
+          <td id="inSpacer3">
+            &#160;
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div id="footWrap">
+    </div>
+  </div>
+  <div id="footer">
+    <div id="footer2">
+      <div id="contacts">
+        Feel free to contact us by email <a href="mailto:info[at]ructf.org">
+          <span class="email">info[at]ructf.org</span>
+        </a>
+        <br/>
+        Official mailing list: <a href="http://groups.google.com/group/ructfe/">http://groups.google.com/group/ructfe/</a><br/>
+        IRC: <a href="irc://irc.freenode.net/ructfe">#ructfe@irc.freenode.net</a>
+      </div>
+      <div id="copyright">&#xA9; 2011 <a href="http://hackerdom.ru/">HackerDom</a></div>
+    </div>
+  </div>
+</body>
+</html>

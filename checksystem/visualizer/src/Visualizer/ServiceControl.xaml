@@ -1,0 +1,38 @@
+﻿<UserControl x:Class="Visualizer.ServiceControl" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d">
+    <UserControl.Resources>
+        <ControlTemplate x:Key="TooltipTemplate">
+            <Border BorderBrush="#353DC6" BorderThickness="1" CornerRadius="4" Background="#90D5E7" MaxWidth="150">
+                <Grid>                    
+                    <ContentPresenter Content="{TemplateBinding Content}" HorizontalAlignment="Center" />
+                </Grid>
+            </Border>
+        </ControlTemplate>
+    </UserControl.Resources>
+	<Grid x:Name="LayoutRoot" Background="Transparent" Width="14" Height="14" CacheMode="BitmapCache">
+		<Ellipse Height="6" Width="6" HorizontalAlignment="Center" VerticalAlignment="Center" Name="ServiceEllipse" Stroke="#000000" StrokeThickness="2">
+			<Ellipse.Fill>
+				<RadialGradientBrush>
+					<GradientStopCollection>
+						<GradientStop Color="#C4C4C4" Offset="0" x:Name="GradientStart" />
+						<GradientStop Color="#202020" Offset="1" x:Name="GradientEnd" />
+					</GradientStopCollection>
+				</RadialGradientBrush>
+			</Ellipse.Fill>
+			<Ellipse.Resources>
+				<Storyboard x:Name="StateTransform">
+					<ColorAnimation Duration="0:0:1" To="{x:Null}" x:Name="StateTransformStartColor" Storyboard.TargetName="GradientStart" Storyboard.TargetProperty="Color" />
+					<ColorAnimation Duration="0:0:1" To="{x:Null}" x:Name="StateTransformStopColor" Storyboard.TargetName="GradientEnd" Storyboard.TargetProperty="Color" />
+					<DoubleAnimation Duration="0:0:1" To="{x:Null}" x:Name="StateTransformWidth" Storyboard.TargetName="ServiceEllipse" Storyboard.TargetProperty="Width" />
+					<DoubleAnimation Duration="0:0:1" To="{x:Null}" x:Name="StateTransformHeight" Storyboard.TargetName="ServiceEllipse" Storyboard.TargetProperty="Height" />
+				</Storyboard>
+				<Storyboard x:Name="ShieldResetTransform">
+					<DoubleAnimation Duration="0:0:1" To="0.0" Storyboard.TargetName="ServiceEllipse" Storyboard.TargetProperty="StrokeThickness" />
+				</Storyboard>
+				<Storyboard x:Name="ShieldRestoreTransform">
+					<DoubleAnimation Duration="0:0:1" To="2.0" Storyboard.TargetName="ServiceEllipse" Storyboard.TargetProperty="StrokeThickness" />
+				</Storyboard>
+			</Ellipse.Resources>
+		</Ellipse>
+	</Grid>
+</UserControl>
+    

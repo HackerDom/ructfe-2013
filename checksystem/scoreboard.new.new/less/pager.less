@@ -1,0 +1,49 @@
+// PAGER
+// -----
+
+.pager {
+  margin-left: 0;
+  margin-bottom: @baseLineHeight;
+  list-style: none;
+  text-align: center;
+  .clearfix();
+}
+.pager li {
+  display: inline;
+}
+.pager a {
+  display: inline-block;
+  padding: 5px 14px;
+  background-color: #E8E8E8; /* Old browsers */
+//  background-repeat: repeat-x; /* Repeat the gradient */
+//  background-image: -moz-linear-gradient(top, @slonikUp 0%, @slonikDown 100%); /* FF3.6+ */
+//  background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,@slonikUp), color-stop(100%,@slonikDown)); /* Chrome,Safari4+ */
+//  background-image: -webkit-linear-gradient(top, @slonikUp 0%,@slonikDown 100%); /* Chrome 10+,Safari 5.1+ */
+//  background-image: -ms-linear-gradient(top, @slonikUp 0%,@slonikDown 100%); /* IE10+ */
+//  background-image: -o-linear-gradient(top, @slonikUp 0%,@slonikDown 100%); /* Opera 11.10+ */
+//  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='@slonikUp', endColorstr='@slonikDown',GradientType=0 ); /* IE6-9 */
+//  background-image: linear-gradient(top, @slonikUp 0%,@slonikDown 100%); /* W3C */
+//  border: 1px solid #ddd;
+  .border-radius(3px);
+  font-family: @headingsFontFamily;
+  font-size: 24px;
+  text-transform: uppercase;
+  color: @headingsColor;
+}
+.pager a:hover {
+  text-decoration: none;
+  color: @headingsColor;
+  background-color: #eee;
+}
+.pager .next a {
+  float: right;
+}
+.pager .previous a {
+  float: left;
+}
+.pager .disabled a,
+.pager .disabled a:hover {
+  color: @grayLight;
+  background-color: #fff;
+  cursor: default;
+}

@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<services>
+  <service id="1" name="up" />
+  <service id="2" name="corrupt" />
+  <service id="3" name="mumble" />
+  <service id="4" name="down" />
+  <service id="5" name="random" />
+</services>

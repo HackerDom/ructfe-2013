@@ -1,0 +1,24 @@
+<table class="nicetable">
+	<tr>
+		<th width="200px"> Name  </th>
+		<th width="200px"> Value </th>
+	</tr>
+	<tr> <td>hostname</td>  <td><% hostname %>   </td></tr>
+	<tr> <td>localtime</td> <td><% localtime %>  </td></tr>
+</table>
+
+<table class="nicetable">
+	<tr>
+		<th width="300px"> Process </th>
+		<th width="100px">  Pid     </th>
+	</tr>
+	<tr> <td>ructf.main.Checksystem</td> <td><% pid_Checksystem %></td></tr>
+	<tr> <td>ructf.roundsCache.Main</td> <td><% pid_RoundsCache %></td></tr>
+	<tr> <td>ructf.secureflags.Main</td> <td><% pid_SecureFlags %></td></tr>
+	<tr> <td>ructf.getflags.Main   </td> <td><% pid_GetFlags %>   </td></tr>
+</table>
+
+<hr/>
+
+<p> <input type='button' id='btnGitPull' value='Pull checkers from Git' onclick='btnGitPull_Click()' /> </p>
+<pre id='gutPullInfo'></pre>

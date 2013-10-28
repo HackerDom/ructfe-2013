@@ -1,0 +1,115 @@
+html,body{margin:0;padding:0}
+body{font: 76% arial,sans-serif}
+
+p {
+	margin:0 10px 10px
+}
+
+a {
+	display:block;
+	color:#BF4D28;
+	padding:6px
+}
+
+a:link    {color: #BF4D28; text-decoration: underline; }
+a:active  {color: #BF4D28; text-decoration: underline; }
+a:visited {color: #BF4D28; text-decoration: underline; }
+a:hover   {color: #BF4D28; text-decoration: none; }
+
+div#header h1{
+	height:60px;
+	line-height:60px;
+	margin:0;
+	padding-left:10px;
+	background:#80BCA3;
+}
+
+div#navigation{
+	background:#F6F7BD;
+}
+
+div#extra{
+	background:#FF8539
+}
+
+div#formaddservice {
+	background:#BF4D28;
+	width:400px;
+	padding:7px;
+}
+
+div#footer{
+	background: #696758;
+	color: #45484B;
+}
+
+div#footer p{
+	margin:0;
+	padding:5px 10px
+}
+
+div#wrapper{
+	float:left;
+	width:100%
+}
+
+div#content{
+	margin: 0 0 0 100px;
+	padding: 5px;
+}
+
+div#navigation{
+	float:left;
+	width:100px;
+	margin-left:-100%
+}
+
+div#extra{
+	float:left;
+	width:200px;
+	margin-left:-200px
+}
+
+div#footer{
+	clear:left;width:100%
+}
+
+select { 
+	width:150px;
+}
+
+table#logtable {
+	width:100%;
+}
+
+.nicetable th {
+	color: #36393B;
+	background-color: #E6AC27;
+	font-family: 'Lucida Console';
+	text-align: left;
+	padding: 0 4px;
+}
+
+.nicetable td {
+	font-family: 'Lucida Console';
+	border-bottom: 1px solid #fff;
+}
+
+#gutPullInfo {
+	font-family: 'Lucida Console';
+}
+
+.nicetable tr:hover {
+	color: #BF4D28;
+	background-color: #F6F7BD;
+}
+
+.invisible {
+    display: none;
+    visibility: hidden;
+}
+
+label {
+	display:inline-block;	
+	width: 120px;
+}

@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<settings>
+  <monitor url="http://ructf2.yandex.ru:8080" interval="10" />
+  <realtime />
+</settings>

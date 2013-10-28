@@ -1,0 +1,45 @@
+//
+// Layouts
+// Fixed-width and fluid (with sidebar) layouts
+// --------------------------------------------
+
+
+// Container (centered, fixed-width layouts)
+.container {
+  .container-fixed();
+  .box-shadow(0 0 92px 46px rgba(0,0,0,.15));
+  /* IE10 Consumer Preview */ 
+background-color: #DFDFDF;
+background-image: -ms-linear-gradient(top, #888888 0%, #DFDFDF 100%);
+
+/* Mozilla Firefox */ 
+background-image: -moz-linear-gradient(top, #888888 0%, #DFDFDF 100%);
+
+/* Opera */ 
+background-image: -o-linear-gradient(top, #888888 0%, #DFDFDF 100%);
+
+/* Webkit (Safari/Chrome 10) */ 
+background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0, #888888), color-stop(1 #DFDFDF));
+
+/* Webkit (Chrome 11+) */ 
+background-image: -webkit-linear-gradient(top, #888888 0%, #DFDFDF 100%);
+
+/* W3C Markup, IE10 Release Preview */ 
+background-image: linear-gradient(to bottom, #888888 0%, #DFDFDF 100%);
+background-size: auto 90px;
+background-repeat: repeat-x;
+}
+
+.inner_container {
+  .container-fixed();
+	background-color: #FFFFFF;
+	margin: 40px;
+	padding: 30px;
+}
+
+// Fluid layouts (left aligned, with sidebar, min- & max-width content)
+.container-fluid {
+  padding-right: @gridGutterWidth;
+  padding-left: @gridGutterWidth;
+  .clearfix();
+}

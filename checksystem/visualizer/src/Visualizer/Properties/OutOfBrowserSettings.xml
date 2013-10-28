@@ -1,0 +1,9 @@
+<OutOfBrowserSettings ShortName="Visualizer Application" EnableGPUAcceleration="True" ShowInstallMenuItem="True">
+  <OutOfBrowserSettings.Blurb>
+    Визуализатор теперь и вне браузера!
+  </OutOfBrowserSettings.Blurb>
+  <OutOfBrowserSettings.WindowSettings>
+    <WindowSettings Title="RuCTF 2010 :: Visualizer" Height="600" Width="800" />
+  </OutOfBrowserSettings.WindowSettings>
+  <OutOfBrowserSettings.Icons />
+</OutOfBrowserSettings>

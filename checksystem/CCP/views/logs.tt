@@ -1,0 +1,45 @@
+<p>
+
+<form action="/logs/view" method="POST">
+<select id="team">
+	<option value="">Loading ...
+</select>
+<select id="service">
+	<option value="">Loading ...
+</select>
+<select id="logcount">
+	<option value="10">Last 10</option>
+	<option value="50">Last 50</option>
+	<option value="100">Last 100</option>
+	<option value="500">Last 500</option>
+	<option value="1000">Last 1000</option>
+	<option value="-1">All items</option>
+</select>
+<select id="result">
+	<option value="">[All results]</option>
+	<option value="101">101 - UP</option>
+	<option value="102">102 - NOFLAG</option>
+	<option value="103">103 - MUMBLE</option>
+	<option value="104">104 - DOWN</option>
+	<option value="other">Checker errors</option>
+	<option value="not101">Not UP</option>
+</select>
+
+<input type="button" value="Update" id="btnViewLog"/>
+<input type="checkbox" id="autoupdate"/> auto-update
+</p>
+
+<table id="logtable" class="nicetable">
+	<tr>
+		<th width="20px">  Round  </th>
+		<th width="130px">  Time   </th>
+		<th width="20px">  Dur.   </th>
+		<th width="20px">  T.     </th>
+		<th width="20px">  S.     </th>
+		<th width="500px"> Args   </th>
+		<th width="30px">  Retval  </th>
+		<th width="200px">   Stdout  </th>
+		<th width="200px">   Stderr  </th>
+	</tr>
+</table>
+

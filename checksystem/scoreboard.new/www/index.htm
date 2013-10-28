@@ -1,0 +1,53 @@
+<html>
+
+<head>
+	<title>New scoreboard</title>
+	<link rel="stylesheet" type="text/css" href="css/new.css" />
+	<script type="text/javascript" src="js/jquery.js"></script>
+	<script type="text/javascript" src="js/scoreboard.js"></script>
+</head>
+
+<body>
+
+<div id="mainWrapper">
+	<div id="teamGroups"></div>
+	<div id="selectedGroup"></div>
+	<div id="info"></div>
+	
+	<input type="button" value="Update" id="btn_Update" onclick="Update_Click()"/>
+	<text id="statusText">...</text>
+	<table class="scoreboard" border="1" cellSpacing="0" cellPadding="10">
+	<colgroup>
+		<col width=30/>
+		<col width=60/>
+		<col width=200/>
+		<col width=80/>
+		<col width=80/>
+		<col width=80/>
+		<col width=80/>
+		<col width=50/>
+		<col width=50/>
+		<col width=50/>
+		<col width=50/>
+		<col width=50/>
+		<col width=50/>
+		<col width=50/>
+		<col width=50/>
+		<col width=50/>
+		<col width=50/>
+	</colgroup>
+	<tr>
+		<th>#</th>
+		<th>Logo </th>
+		<th>Team</th>
+		<th>Rating</th>
+		<th>Defense</th>
+		<th>Attack</th>
+		<th>Advisory</th>
+		<th>Ping (r/v/t)</th>
+	</tr>
+	</table>
+</div>
+</body>
+
+</html>

@@ -1,0 +1,8 @@
+{
+	"groups" : {
+		"Group1" : "data/1/",
+		"Group2" : "data/2/",
+		"Group3" : "data/3/"
+  },
+	"updateDataInterval" : "15"
+}

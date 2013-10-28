@@ -1,0 +1,104 @@
+﻿<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <style>@import "scoreboard.css";</style>
+    <link type="text/css" rel="stylesheet" href="visualizer.css" />
+    <script type="text/javascript" src="scripts.js"></script>
+    <script type="text/javascript" src="Silverlight.js"></script>
+    <script type="text/javascript">
+        function onSilverlightError(sender, args) {
+            var appSource = "";
+            if (sender != null && sender != 0) {
+              appSource = sender.getHost().Source;
+            }
+            
+            var errorType = args.ErrorType;
+            var iErrorCode = args.ErrorCode;
+
+            if (errorType == "ImageError" || errorType == "MediaError") {
+              return;
+            }
+
+            var errMsg = "Unhandled Error in Silverlight Application " +  appSource + "\n" ;
+
+            errMsg += "Code: "+ iErrorCode + "    \n";
+            errMsg += "Category: " + errorType + "       \n";
+            errMsg += "Message: " + args.ErrorMessage + "     \n";
+
+            if (errorType == "ParserError") {
+                errMsg += "File: " + args.xamlFile + "     \n";
+                errMsg += "Line: " + args.lineNumber + "     \n";
+                errMsg += "Position: " + args.charPosition + "     \n";
+            }
+            else if (errorType == "RuntimeError") {           
+                if (args.lineNumber != 0) {
+                    errMsg += "Line: " + args.lineNumber + "     \n";
+                    errMsg += "Position: " +  args.charPosition + "     \n";
+                }
+                errMsg += "MethodName: " + args.methodName + "     \n";
+            }
+
+            throw new Error(errMsg);
+        }
+    </script>
+    <title>RuCTFE 2011 - Visualization</title>
+  </head>
+  <body onload="parse_emails()">
+    <div id="mainWrapper">
+      <div id="centeredImage">
+      </div>
+      <div id="in">
+        <table id="inTable">
+          <tr valign="top">
+            <td id="inSpacer1">&#160;</td>
+            <td id="inContent">
+              <div>
+                <a class="menulink" href="news.html">News</a>
+                <a class="menulink" href="scoreboard.xml">Scoreboard</a>
+                <a class="menulink" href="flags.xml">Flags</a>
+                <a class="menulink" href="http://advisories.e.ructf.org">Advisories</a>
+                <a class="selected" href="#">Visualization</a>
+              </div>
+
+              <form id="form1" runat="server" style="height:100%">
+                <div id="silverlightControlHost">
+                  <object data="data:application/x-silverlight-2," type="application/x-silverlight-2" width="100%" height="100%">
+                    <param name="source" value="ClientBin/Visualizer.xap"/>
+                    <param name="onError" value="onSilverlightError" />
+                    <param name="background" value="white" />
+                    <param name="minRuntimeVersion" value="3.0.40818.0" />
+                    <param name="autoUpgrade" value="true" />
+                    <a href="http://go.microsoft.com/fwlink/?LinkID=149156&v=3.0.40818.0" style="text-decoration:none">
+                      <img src="http://go.microsoft.com/fwlink/?LinkId=108181" alt="Get Microsoft Silverlight" style="border-style:none"/>
+                    </a>
+                  </object>
+                  <iframe id="_sl_historyFrame" style="visibility:hidden;height:0px;width:0px;border:0px">
+                  </iframe>
+                </div>
+              </form>
+
+            </td>
+            <td id="inSpacer3">&#160;</td>
+          </tr>
+        </table>
+      </div>
+      <div id="footWrap"></div>
+    </div>
+
+    <div id="footer">
+      <div id="footer2">
+        <div id="contacts">
+          Feel free to contact us by email <a href="mailto:info[at]ructf.org">
+            <span class="email">info[at]ructf.org</span>
+          </a>
+          <xsl:element name="br"/>
+          Official mailing list: <a href="http://groups.google.com/group/ructfe/">http://groups.google.com/group/ructfe/</a><xsl:element name="br"/>
+          IRC: <a href="irc://irc.freenode.net/ructfe">#ructfe@irc.freenode.net</a>
+        </div>
+        <div id="copyright">
+          &#xA9; 2011 <a href="http://hackerdom.ru/">HackerDom</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
