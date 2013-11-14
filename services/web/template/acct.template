@@ -1,0 +1,18 @@
+<table class="accts">
+<thead>
+<tr>
+<th>#</th>
+<th>ACCT</th>
+<th>Type</th>
+<th>Balance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>_id_</td>
+<td>_acct_</td>
+<td>_type_</td>
+<td>_balance_</td>
+</tr>
+</tbody>
+</table>

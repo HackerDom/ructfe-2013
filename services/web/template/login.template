@@ -1,0 +1,8 @@
+<form class="navbar-form pull-right" name="auth" method="POST" action="_login_link_">
+<input class="span2" id="login"  name="login" type="text" placeholder="login">
+<input class="span2" name="passwd" type="password" placeholder="Password">
+    <input type="checkbox" name="remember" value="remember"> Запомнить
+
+<button type="submit" class="btn">Sign in</button>
+<a href="_reg_link_">reg</a>
+		</form>

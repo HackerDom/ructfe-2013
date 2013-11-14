@@ -1,0 +1,16 @@
+<table class="accts">
+<thead>
+<tr>
+<th>acct out</th>
+<th>acct in</th>
+<th>sum</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>_acct_out_</td>
+<td>_acct_in_</td>
+<td>_sum_</td>
+</tr>
+</tbody>
+</table>
