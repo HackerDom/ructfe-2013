@@ -81,7 +81,17 @@ class PFS < FuseFS::FuseDir
   def directory?(path)
     @log.debug("directory? (#{path})")
 
-    return !file?(path)
+    row = @pg.exec(
+      "SELECT type " +
+      "FROM files " +
+      "WHERE path = '#{path}'"
+    )
+
+    if (row.ntuples > 0)
+      return row.getvalue(0, 0) == 'd'
+    else
+      return false
+    end
   end
 
   def mkdir(path)
