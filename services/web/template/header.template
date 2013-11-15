@@ -1,23 +1,23 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="utf-8">
-    <title>_title_</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="">
-    <meta name="author" content="">
+  <meta charset="utf-8">
+  <title>_title_</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
 
-<link rel="stylesheet" type="text/css" href="http://mybootstrap.ru/wp-content/themes/clear-theme/styles/site.css" media="screen" />
+  <link rel="stylesheet" type="text/css" href="http://mybootstrap.ru/wp-content/themes/clear-theme/styles/site.css" media="screen" />
   <link rel="stylesheet" type="text/css" href="http://mybootstrap.ru/wp-content/themes/clear-theme/styles/bootstrap.css" media="screen" />
   <link rel="stylesheet" type="text/css" href="http://mybootstrap.ru/wp-content/themes/clear-theme/styles/bootstrap-responsive.css" media="screen" />
   <link rel="stylesheet" type="text/css" href="http://mybootstrap.ru/wp-content/themes/clear-theme/styles/docs.css" media="screen" />
   <link rel="stylesheet" type="text/css" href="http://mybootstrap.ru/wp-content/themes/clear-theme/styles/prettify.css" media="screen" />
-    <!-- Fav and touch icons -->
-    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/img/apple-touch-icon-144-precomposed.png">
-    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/img/apple-touch-icon-114-precomposed.png">
-      <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/img/apple-touch-icon-72-precomposed.png">
-                    <link rel="apple-touch-icon-precomposed" href="/img/apple-touch-icon-57-precomposed.png">
-                                   <link rel="shortcut icon" href="/img/favicon.png">
+  <!-- Fav and touch icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/img/apple-touch-icon-144-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/img/apple-touch-icon-114-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/img/apple-touch-icon-72-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" href="/img/apple-touch-icon-57-precomposed.png">
+  <link rel="shortcut icon" href="/img/favicon.png">
   </head>
 
   <body>
@@ -35,19 +35,6 @@
             <ul class="nav">
               <li class="active"><a href="#">Home</a></li>
               <li><a href="#about">About</a></li>
-              <li><a href="#contact">Contact</a></li>
-              <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>
-                <ul class="dropdown-menu">
-                  <li><a href="#">Action</a></li>
-                  <li><a href="#">Another action</a></li>
-                  <li><a href="#">Something else here</a></li>
-                  <li class="divider"></li>
-                  <li class="nav-header">Nav header</li>
-                  <li><a href="#">Separated link</a></li>
-                  <li><a href="#">One more separated link</a></li>
-                </ul>
-              </li>
             </ul>
             _login_
           </div><!--/.nav-collapse -->

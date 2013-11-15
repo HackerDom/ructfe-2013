@@ -1,0 +1,17 @@
+<form class="form-horizontal" name="auth" method="POST" action="_link_">
+  <div class="control-group">
+    <label class="control-label" for="summ">max_sum</label>
+    <div class="controls">
+     <input class="span2" id="summ"  name="summ" type="text" placeholder="summ">
+    </div>
+  </div>
+  <div class="control-group">
+    <label class="control-label" for="type">type</label>
+    <div class="controls">
+      <input class="span2" id="type"  name="type" type="text" placeholder="type">
+    </div>
+  </div>
+  <button type="submit" class="btn">Add</button>
+    </div>
+  </div>
+</form>

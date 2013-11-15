@@ -17,16 +17,23 @@ class bank
         $this->content.=preg_replace($search, $replace, file_get_contents('template/header.template'));
         if(!isset($_GET['action']) && !isset($_GET['hash']))
             $this->news();
+        else if(isset($_GET['hash']))
+            $this->hash();
+        
+        else if($_GET['action']=="accept")
+             $this->accept();
         else if($_GET['action']=="registration")
              $this->registration();
         else if($_GET['action']=="acct")
             $this->acct();
         else if($_GET['action']=="login")
             $this->login();
+        else if($_GET['action']=="logout")
+            $this->logout();
         else if($_GET['action']=="transfer")
             $this->transfer();
-         else if(isset($_GET['hash']))
-            $this->bla();
+        else if($_GET['action']=="addacct")
+            $this->AddAcct();
         else
             $this->news();
      
@@ -74,6 +81,7 @@ private function registration()
                     $this->content.=$this->redirectMsg("Удача!", 1, "index.php");
                 else
                     $this->content.=$this->redirectMsg("Произошла ошибка!", 2, "index.php?action=registration");
+
             }
             else
                 $this->content.=$this->redirectMsg("В наших рядах уже есть \"$name\"!", 3, "index.php?action=registration");
@@ -108,16 +116,20 @@ private function registration()
         $result=mysql_query($sql);
         $rows=mysql_fetch_array($result);
         $tbl_name="accts";
-
+        $data="";
+        $i=0;
         $sql="SELECT id, acct, type,balance FROM $tbl_name  WHERE user_id= '".$rows['id']."' ORDER BY id ";
         $result=mysql_query($sql);
         $this->mysqlClose();
                   while ($rows = mysql_fetch_array($result))
-                   {
-                        $search = array("/_title_/", "/_id_/", "/_acct_/","/_type_/","/_balance_/");
-                        $replace = array("News Bank_CTF", $rows['id'],$rows['acct'], $rows['type'], $rows['balance'] );
-                        $this->content.= preg_replace($search, $replace, file_get_contents('template/acct.template'));
+                    {
+                        $data.="<tr><td>".$rows['id']."</td><td>".$rows['acct']."</td><td>".$rows['type']."</td><td>".$rows['balance']."</td></tr>";
+                        $i++;
                     }
+                    $search = array("/_tbody_/");
+                    $replace = array($data );
+                    $this->content.= preg_replace($search, $replace, file_get_contents('template/acct.template'));
+                     $this->content.= ($i>1) ? "<a href=\"index.php?action=transfer\" class=\"btn btn-large btn-primary\">Перевести с карты на карту</a>" :"";
          }
     }
     
@@ -125,7 +137,14 @@ private function registration()
     {  
         if(isset($_SESSION['name']))
         {
-        $this->mysqlInit();
+       
+        if(isset($_POST['acct_out']) && isset($_POST['acct_in']) && isset($_POST['sum']))
+        {
+            $hash=base64_encode($_POST['acct_out'].' '.$_POST['acct_in'].' '.$_POST['sum']);
+            $this->content.=$this->redirectMsg("Идет обработка запроса!", 10, "index.php?hash=$hash");
+        }else{
+
+             $this->mysqlInit();
         $tbl_name='user';
         $sql="SELECT * FROM $tbl_name WHERE name='".$_SESSION['name']."'";
         $result=mysql_query($sql);
@@ -135,14 +154,11 @@ private function registration()
         $result=mysql_query($sql);
         $this->mysqlClose();
         $this->content.= file_get_contents('template/transfer.template');
-        if(isset($_POST['acct_out']) && isset($_POST['acct_in']) && isset($_POST['sum']))
-        {
-            $hash=base64_encode($_POST['acct_out'].' '.$_POST['acct_in'].' '.$_POST['sum']);
-            header("Location: /index.php?hash=$hash");
         }
          
     }
-}
+        }
+
 
     private function logout()
     {
@@ -169,9 +185,9 @@ private function registration()
             if(($row=mysql_fetch_array($result)) != NULL)
             {
                 if($row['pass']==$_SESSION['UID'])
-                    $result = "HI, <a href=\"index.php?action=info\">".htmlspecialchars($row['name'])."</a>"
-                            ."&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"index.php?action=logout\" class=\"exit\">Выйти</a>";
-            }
+                  $result = "<ul class='nav'><li><a href=\"index.php?action=info\">".htmlspecialchars($row['name'])."</a></li>"
+                            ."<li><a href=\"index.php?action=acct\">ACCT</a></li><li><a href=\"index.php?action=logout\" class=\"exit\">Выйти</a></li></ul>";
+                  }
             else
                 $result = "SESSION ERROR!";
             $this->mysqlClose();
@@ -186,8 +202,8 @@ private function registration()
             {
                 if($row['pass']==$_COOKIE['UID'])
                 {
-                    $result = "HI, <a href=\"index.php?action=info\">".htmlspecialchars($row['name'])."</a>"
-                            ."&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"index.php?action=logout\" class=\"exit\">Выйти</a>";
+                    $result = "HI, <li><a href=\"index.php?action=info\">".htmlspecialchars($row['name'])."</a></li>"
+                            ."&nbsp;&nbsp;&nbsp;<li><a href=\"#index.php?action=acct\">ACCT</a></li>&nbsp;&nbsp;&nbsp;<li><a href=\"index.php?action=logout\" class=\"exit\">Выйти</a></li>";
                     $_SESSION['name'] = $_COOKIE['name'];
                     $_SESSION['UID'] = $_COOKIE['UID'];
                     $result.=$this->redirectMsg("", 0, "index.php");
@@ -234,31 +250,87 @@ private function registration()
         return $result;
     }
 
-    
+    private function acctRand()
+    {
+       $acct="";
+       for ($i=0; $i <4 ; $i++) { 
+                $acct.= mt_rand(1000, 9999);
+            }
+            return $acct;
+    }
+    private function AddAcct()
+    {
+        if(isset($_SESSION['name']))
+            {
+                if( isset  ($_POST['summ']) &&  isset ($_POST['type']))
+                    {
+                        $summ = mysql_real_escape_string($_POST['summ']);
+                        $type=mysql_real_escape_string($_POST['type']);
+                        $acct= $this->acctRand();
+                        $this->mysqlInit();
+                        $tbl_name='user';
+                        $sql="SELECT id FROM $tbl_name WHERE name='".$_SESSION['name']."'";
+                        $result=mysql_query($sql);
+                        $rows=mysql_fetch_array($result);
+                        $user_id= $rows['id'];
+                        $tbl_name="accts";
+                       
+                        $sql="SELECT * FROM $tbl_name WHERE acct='$acct'";
+                        $result=mysql_query($sql);
+                        if(mysql_fetch_array($result) == NULL)
+                            {
+                                $sql="INSERT INTO $tbl_name (user_id,acct, type,balance,max_sum) VALUES ('$user_id','$acct', '$type','100', '$summ')";
+                                $result = mysql_query($sql);
+                                if($result)
+                                    $this->content.=$this->redirectMsg("Удача!", 1, "index.php");
+                                else
+                                    $this->content.=$this->redirectMsg("Произошла ошибка!", 2, "index.php?action=addacct");
+                            }
+                            else
+                                {
+                                    $acct= $this->acctRand();
+                                }
+                    }
+                    else
+                        {
+                              $this->content.= preg_replace("/_link_/", "index.php?action=addacct", file_get_contents('template/addacct.template')); 
+                        }
+            }
+            else
+                {
+                    $this->content.=$this->redirectMsg("Войдите в систему!", 2, "index.php?action=index");
+                }
+    }
 
-    private function bla()
+
+    private function hash()
     {
          
             preg_match_all('/([a-zA-Z0-9]+)/',base64_decode($_GET['hash']),$ok);
-            for ($i=0; $i<3; $i++) 
+  /*          for ($i=0; $i<3; $i++) 
                 {
                     $search = array("/_acct_out_/", "/_acct_in_/", "/_sum_/");
                      $replace = array(  $ok[1][$i++],  $ok[1][$i++],$ok[1][$i++]);
                     $this->content.= preg_replace($search, $replace, file_get_contents('template/review.template'));  
                 }
-          /*  $this->mysqlInit();
-            $tbl_name="acct";
-              $sql="SELECT balance, max_sum FROM $tbl_name  WHERE acct='".$acct_out."'";
+*/
+      
+            $this->mysqlInit();
+            $tbl_name="accts";
+              $sql="SELECT balance, max_sum FROM $tbl_name  WHERE acct='". $ok[1][0]."'";
             $result=mysql_query($sql);
             $this->mysqlClose();
             $rows = mysql_fetch_array($result);
-            if ($rows['max_sum']<=$sum) 
+            if ($rows['max_sum']<=$ok[1][2]) 
             {
-            $this->content.="Максимальная сумма перевода не должна привышать: ".$rows['max_sum'];
+            $this->content.="<p>Максимальная сумма перевода не должна привышать: ".$rows['max_sum']."</p>";
+            $this->content.=$this->redirectMsg("Повторите платеж!", 5, "index.php?action=index");
             } else
-            {
-                 $this->content.="бла бла бла бла";
-            }*/
-    }
+     
+                 $this->content.="Перевод осуществлен";
+            }
+     
+    
 }
+
 ?>

@@ -14,3 +14,4 @@
 </tr>
 </tbody>
 </table>
+<a href="index.php?action=accept" class="btn btn-large btn-primary">Accept</a>

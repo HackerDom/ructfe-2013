@@ -8,11 +8,7 @@
 </tr>
 </thead>
 <tbody>
-<tr>
-<td>_id_</td>
-<td>_acct_</td>
-<td>_type_</td>
-<td>_balance_</td>
-</tr>
+_tbody_
 </tbody>
 </table>
+<a href="index.php?action=addacct" class="btn btn-large btn-primary">Добывить карту</a>
