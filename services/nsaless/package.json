@@ -1,0 +1,13 @@
+{ "name" : "nsaless"
+, "version" : "0.0.1"
+, "description" : "NSAless service on ructfe-2013"
+, "main" : "app.js"
+, "dependencies" : {
+    "express" : "*"
+    , "ejs" : "*"
+  }
+, "repository" : {
+    "type" : "git"
+    , "url" : "https://github.com/HackerDom/ructfe-2013.git"
+  }
+}
