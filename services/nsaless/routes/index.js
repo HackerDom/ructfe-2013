@@ -1,15 +1,12 @@
-var messages = [{id:0, message:'Huj'}]
-
-exports.index = function(req, res) {
-  res.render('index', {messages: messages});
-}
-
-exports.destroy = function(req, res) {
-  delete messages[req.params.id];
-  res.redirect('/');
-}
+var messages = {}
 
 exports.create = function(req, res) {
-  messages.push({id:messages.length + 1, message: req.body.message})
-  res.redirect('/');
+  messages[req.body.id] = req.body.message;
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.end(req.body.id);
+}
+
+exports.get = function(req, res) {
+  res.writeHead(200, {'Content-Type': 'text/plain'});
+  res.end(messages[req.params.id]);
 }
