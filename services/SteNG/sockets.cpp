@@ -23,6 +23,38 @@ socket_t::~socket_t()
 	}
 }
 */
+server::server()
+{
+	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
+        {
+        	std::cout << "Error on socket() func call, error: " << errno << std::endl;
+                errors = -11;
+        }
+        else
+                errors = 0;
+
+        memset(&addr, 0, sizeof(sockaddr_in));
+        addr.sin_family = family;
+        addr.sin_addr.s_addr = address;
+        addr.sin_port = port;
+
+        if (bind(sock, (sockaddr *) &addr, sizeof(sockaddr_in)) == -1)
+        {
+        	std::cout << "Error on bind() func call, error: " << errno << std::endl;
+                if (close(sock) == -1)
+                	std::cout << "Error on close() func call, error: " << errno << std::endl;
+        	errors = -12;
+        }
+
+        if (listen(sock, numberOfClients) == -1)
+        {
+        	std::cout << "Error on listen() func call, error: " << errno << std::endl;
+                if (close(sock) == -1)
+                	std::cout << "Error on close() func call, error: " << errno << std::endl;
+		errors = -13;
+        }
+}
+
 client server::acceptConnection()
 {
 	sockaddr clientAddr;
@@ -53,25 +85,22 @@ client::client(int sockNumber, sockaddr clientSock)
 		errors = 0;
 }
 
-void client::receiveString(std::string& data)
+std::string client::receiveString()
 {
-	char* buffer;
-	buffer = new char [512];
-	memset(buffer, 0, 512);
-	const int len = 512;
+	char letter;
+	int received;
+	std::string data;	
 
-	if (recv(sock, buffer, len, 0) == -1)
+	while ((received = recv(sock, &letter, 1, 0)) != -1)
 	{
-		std::cout << "Error on recv() func call, error: " << errno << std::endl;
-		if (close(sock) == -1)
-			std::cout << "Error on close() func call, error: " << errno << std::endl;
-		errors = -22;
-		return;
+		if ((letter == '\n') || (received == 0))
+			return data;
+
+		data += letter;
 	}
 
-	data = std::string(buffer);
-
-	return;
+	std::cout << "Error on recv() func call, error: " << errno << std::endl;
+	return data;
 }
 
 void client::sendString(std::string data)

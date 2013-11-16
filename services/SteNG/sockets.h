@@ -32,7 +32,7 @@ class client : public socket_t
 public:
 	client(int sockNumber, sockaddr clientSock);
 	
-	void receiveString(std::string& data);
+	std::string receiveString();
 	void sendString(std::string data);
 	
 private:
@@ -42,41 +42,10 @@ private:
 class server : public socket_t
 {
 public:
-	server()
-	{
-		if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
-		{
-        		std::cout << "Error on socket() func call, error: " << errno << std::endl;
-	        	errors = -11;
-		}
-		else
-			errors = 0;
-
-		memset(&addr, 0, sizeof(sockaddr_in));
-		addr.sin_family = family;
-		addr.sin_addr.s_addr = address;
-		addr.sin_port = port;
-
-		if (bind(sock, (sockaddr *) &addr, sizeof(sockaddr_in)) == -1)
-		{
-			std::cout << "Error on bind() func call, error: " << errno << std::endl;
-			if (close(sock) == -1)
-                std::cout << "Error on close() func call, error: " << errno << std::endl;
-			errors = -12;
-		}
-
-		if (listen(sock, numberOfClients) == -1)
-		{
-			std::cout << "Error on listen() func call, error: " << errno << std::endl;
-			if (close(sock) == -1)
-                std::cout << "Error on close() func call, error: " << errno << std::endl;
-			errors = -13;
-		}
-	}
+	server();
 
 	client acceptConnection();
 
 private:
 	sockaddr_in addr;
 };
-

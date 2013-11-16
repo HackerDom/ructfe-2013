@@ -2,8 +2,7 @@
 
 void connectionHandler(client connection)
 {
-        std::string text;
-        connection.receiveString(text);
+        std::string text = connection.receiveString();
         std::cout << text << std::endl;
         connection.sendString(text);
 	//for test
