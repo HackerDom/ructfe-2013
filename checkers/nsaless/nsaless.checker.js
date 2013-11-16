@@ -64,6 +64,12 @@ var put = function(ip, id, flag) {
         }
         done(return_value);
       });
+
+  });
+
+  post_req.on('error', function(err) {
+    console.log(err);
+    done(codes['SERVICE_FAIL']);
   });
 
   post_req.write(post_data);
@@ -101,6 +107,13 @@ var get = function(ip, id, flag) {
         }
         done(return_value);
       });
+      
+      res.on('error', function() {
+        console.log("qwer");
+      });
+  }).on('error', function(err) {
+    console.log(err);
+    done(codes['SERVICE_FAIL']);
   });
 
   req.end();
