@@ -4,6 +4,15 @@ bool socket_t::allOk()
 {
 	return (errors == 0);
 }
+
+void socket_t::closeSocket()
+{
+	if (close(sock) == -1)
+        {
+                std::cout << "Error on close() func call, error: " << errno << std::endl;
+                errors = -1;
+        }
+}
 /*
 socket_t::~socket_t()
 {
@@ -44,7 +53,7 @@ client::client(int sockNumber, sockaddr clientSock)
 		errors = 0;
 }
 
-void client::receive(std::string& data)
+void client::receiveString(std::string& data)
 {
 	char* buffer;
 	buffer = new char [512];
@@ -65,7 +74,7 @@ void client::receive(std::string& data)
 	return;
 }
 
-void client::sendOut(std::string data)
+void client::sendString(std::string data)
 {
 	if (send(sock, data.c_str(), data.size(), 0) == -1)
 	{

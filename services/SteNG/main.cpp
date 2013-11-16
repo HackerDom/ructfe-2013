@@ -3,9 +3,11 @@
 void connectionHandler(client connection)
 {
         std::string text;
-        connection.receive(text);
+        connection.receiveString(text);
         std::cout << text << std::endl;
-        connection.sendOut(text);
+        connection.sendString(text);
+	//for test
+	connection.closeSocket();
 }
 
 int main()

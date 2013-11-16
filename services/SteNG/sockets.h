@@ -15,6 +15,9 @@ public:
 
 	bool allOk();
 
+	//for test
+	void closeSocket();
+
 protected:
 	int sock;
 	int errors;
@@ -29,8 +32,8 @@ class client : public socket_t
 public:
 	client(int sockNumber, sockaddr clientSock);
 	
-	void receive(std::string& data);
-	void sendOut(std::string data);
+	void receiveString(std::string& data);
+	void sendString(std::string data);
 	
 private:
 	sockaddr sclient;
