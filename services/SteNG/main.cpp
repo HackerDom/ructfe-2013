@@ -1,6 +1,6 @@
 #include "sockets.h"
 
-connectionHandler(client connection)
+void connectionHandler(client connection)
 {
         std::string text;
         connection.receive(text);
