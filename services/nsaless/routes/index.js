@@ -1,41 +1,50 @@
-var bignum = require("bignum");
 var crypto = require("./crypto");
-var storage = require("./storage")
+
+var tweets = require("./tweets")
 var users = require("./users")
 
+exports.getUser = function(req, res, next) {
+    users.getUserFromCookie(req, res, function(user) {
+        res.user = user;
+        next();
+    });
+}
 
 exports.index = function(req, res) {
-    users.get_id_or_signup(req, res, function(id) {
-        res.redirect('/' + id);
-    });
+    if (res.user.authorized) {
+        res.redirect('/' + res.user.id);
+    } else {
+        res.redirect('/signin');
+    }
 }
 
 exports.home = function(req, res) {
-    var url_id = req.params.id;
-    var cookie_id = users.get_id(req, res);
-    storage.get_tweets(url_id, function(tweets) {
-        res.render('home', { 'id': url_id, 'tweets': tweets, 'is_home': url_id == cookie_id });
+    var id = req.params.id;
+    users.getUserFromId(req, res, id, function(user) {
+        res.render('home', {
+            'cookie_user': res.user,
+            'url_user': user
+        });
     });
 }
 
-exports.registration = function(req, res) {
-    var id = users.register_user(req, res);
-    res.render('registration', {'id': id});
+exports.signin = function(req, res) {
+    res.render('signin');
+}
+
+exports.signup = function(req, res) {
+    res.render('signup')
+}
+
+exports.checkpub = function(req, res) {
+    res.end()
 }
 
 exports.tweet = function(req, res) {
-    users.get_id_or_signup(req, res, function(id) {
-        var message = req.body.message;
-        storage.store_tweet(id, message);
-        res.redirect('/');
-    });
+    res.end()
 }
 
 exports.retweet = function(req, res) {
-    users.get_id_or_signup(req, res, function(id) {
-        var tweet_id = req.params.id;
-        storage.retweet(id, tweet_id);
-        res.redirect('/');
-    });
+    res.end()
 }
 

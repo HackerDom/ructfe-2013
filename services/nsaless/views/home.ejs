@@ -1,29 +1,10 @@
 <html>
     <head>
         <title>
-            NSA less twitter
+            Twitter
         </title>
     </head>
     <body>
         <a href="/">Home</a>
-        <br/>
-        <%= id %>
-        <% if (is_home) { %>
-           <form action='/tweet' method='post'>
-                <textarea name="message"></textarea>
-                <br/>
-                <input type="submit" value="Tweet!">
-            </form>
-        <% } %>
-        <br/>
-        <% for (var i = 0; i < tweets.length; ++i) { %>
-            <div>
-                <%= tweets[i].message %>
-                <% if (!is_home) { %>
-                    <br/>
-                    <a href="/retweet/<%= tweets[i].id %>">Retweet!</a>
-                <% } %>
-            </div>
-        <% } %>
     </body>
 </html>

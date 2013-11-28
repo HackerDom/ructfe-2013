@@ -2,6 +2,38 @@ var redis = require("redis"),
     client = redis.createClient();
 var bignum = require("bignum");
 
+exports.getUserFromId = function(req, res, id, callback) {
+    var user = {}
+    client.get(id, function(err, reply) {
+        if (reply != null) {
+            user = JSON.parse(reply);
+        }
+        callback(user);
+    });
+}
+
+exports.getUserFromCookie = function(req, res, callback) {
+    var user = {}
+    var id = req.cookies.id;
+    if (id) {
+        exports.getUserFromId(req, res, id, callback);
+    } else {
+        callback(user);
+    }
+}
+
+exports.createUser = function(req, res) {
+    return {
+        'id': bignum.rand(bignum(2).pow(64)),
+        'tweets': []
+    };
+}
+
+exports.saveUser = function(req, res, user) {
+    client.set(user.id, JSON.stringify(user));
+}
+
+/*
 exports.get_id = function(req, res) {
     if (req.cookies.id) {
         return req.cookies.id;
@@ -32,3 +64,5 @@ exports.register_user = function(req, res) {
     res.cookie('id', id);
     return id;
 }
+
+*/
