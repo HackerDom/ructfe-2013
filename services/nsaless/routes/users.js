@@ -2,7 +2,15 @@ var redis = require("redis"),
     client = redis.createClient();
 var bignum = require("bignum");
 
-exports.get_id_or_redirect = function(req, res, callback) {
+exports.get_id = function(req, res) {
+    if (req.cookies.id) {
+        return req.cookies.id;
+    } else {
+        return null;
+    }
+}
+
+exports.get_id_or_signup = function(req, res, callback) {
     var id = req.cookies.id;
     if (id) {
         client.get(id, function(err, reply) {
