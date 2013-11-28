@@ -1,0 +1,10 @@
+@(users: Seq[User])(implicit request: Request[_], user: components.AuthorisedUser)
+
+<h1>List of registered users</h1>
+
+@users.map { user =>
+    <div id="@user.id" class="user">
+        <span class="user-name">@user.name</span>
+        <span class="user-login">@user.login</span>
+    </div>
+}
