@@ -1,0 +1,14 @@
+@(messages: Seq[(Message, User)])(implicit request: Request[_], user: components.AuthorisedUser)
+@import org.apache.commons.codec.binary.Hex
+
+@main("Warp beam") {
+
+    @messages.map { case (message, author) =>
+        <div class="">
+            <div class="msg-public">@message.message</div>
+            <div class="msg-mark">@{Hex.encodeHexString(message.mark)}</div>
+            <div class="msg-date">@message.created</div>
+            <div class="msg-author">@author.name</div>
+        </div>
+    }
+}
