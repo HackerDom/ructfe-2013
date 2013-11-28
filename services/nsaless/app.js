@@ -8,12 +8,13 @@ var app = express();
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
-app.use(express.logger('dev'));
 app.use(express.bodyParser());
+app.use(express.cookieParser());
 
-app.post('/create', routes.create);
-app.get('/get/:id', routes.get);
+app.get('/', routes.index);
+app.get('/registration', routes.registration);
+app.post('/tweet', routes.tweet);
 
 app.listen(3000, function(){
   console.log('listening');
-})
+});

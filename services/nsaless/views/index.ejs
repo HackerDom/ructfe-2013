@@ -1,17 +1,16 @@
 <html>
-<body>
-<form method='post' action='/create'>
-<input name='message'>
-<submit>
-</form>
-<table>
-<% messages.forEach(function(message) { %>
-<tr>
-  <td><%= message.id %></td>
-  <td><%= message.message %></td>
-  <td><a href="/delete/<%= message.id %>">delete</a></td>
-</tr>
-<% }) %>
-</table>
-</body>
+    <head>
+        <title>
+            NSA less twitter
+        </title>
+    </head>
+    <body>
+        <%= id %>
+        <form action='/tweet' method='post'>
+            <textarea name="message"></textarea>
+            <br/>
+            <input type="submit" value="Tweet!">
+        </form>
+        <%= tweets %>
+    </body>
 </html>
