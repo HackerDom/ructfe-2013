@@ -30,3 +30,12 @@ exports.tweet = function(req, res) {
         res.redirect('/');
     });
 }
+
+exports.retweet = function(req, res) {
+    users.get_id_or_signup(req, res, function(id) {
+        var tweet_id = req.params.id;
+        storage.retweet(id, tweet_id);
+        res.redirect('/');
+    });
+}
+

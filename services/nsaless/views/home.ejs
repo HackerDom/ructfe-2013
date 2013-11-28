@@ -5,6 +5,8 @@
         </title>
     </head>
     <body>
+        <a href="/">Home</a>
+        <br/>
         <%= id %>
         <% if (is_home) { %>
            <form action='/tweet' method='post'>
@@ -15,8 +17,13 @@
         <% } %>
         <br/>
         <% for (var i = 0; i < tweets.length; ++i) { %>
-            <%= tweets[i] %>
-            <br/>
+            <div>
+                <%= tweets[i].message %>
+                <% if (!is_home) { %>
+                    <br/>
+                    <a href="/retweet/<%= tweets[i].id %>">Retweet!</a>
+                <% } %>
+            </div>
         <% } %>
     </body>
 </html>

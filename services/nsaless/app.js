@@ -13,6 +13,7 @@ app.use(express.cookieParser());
 
 app.get('/registration', routes.registration);
 app.post('/tweet', routes.tweet);
+app.get('/retweet/:id', routes.retweet);
 app.get('/', routes.index);
 app.get('/:id', routes.home)
 
