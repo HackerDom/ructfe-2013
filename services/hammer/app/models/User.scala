@@ -1,17 +1,16 @@
 package models
 
+
+
 import scala.slick.lifted._
 import play.api.db.slick.Config.driver.simple._
 import org.apache.commons.codec.digest.DigestUtils
 import scala.util.Random
 import components.AuthorisedUser
 
-/**
- * Created by Last G on 21.11.13.
- */
 
 object User {
-  def newUser(login: String, password: String, name: String): User = {
+  def create(login: String, password: String, name: String): User = {
     val salt = Random.nextString(16)
     val hashedPassword = hashPassword(salt, password)
     User(None, login, hashedPassword, salt, name)
