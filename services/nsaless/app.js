@@ -11,9 +11,10 @@ app.set('view engine', 'ejs');
 app.use(express.bodyParser());
 app.use(express.cookieParser());
 
-app.get('/', routes.index);
 app.get('/registration', routes.registration);
 app.post('/tweet', routes.tweet);
+app.get('/', routes.index);
+app.get('/:id', routes.index)
 
 app.listen(3000, function(){
   console.log('listening');

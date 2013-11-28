@@ -11,6 +11,9 @@
             <br/>
             <input type="submit" value="Tweet!">
         </form>
-        <%= tweets %>
+        <% for (var i = 0; i < tweets.length; ++i) { %>
+            <%= tweets[i] %>
+            <br/>
+        <% } %>
     </body>
 </html>
