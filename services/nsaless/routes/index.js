@@ -45,7 +45,13 @@ exports.signup = function(req, res) {
 }
 
 exports.checkpub = function(req, res) {
-    res.end()
+    var id = req.body.id;
+    if (id) {
+        users.getUserFromId(req, res, id, function(user) {
+        });
+    } else {
+        res.redirect('/signin');
+    }
 }
 
 exports.tweet = function(req, res) {

@@ -33,6 +33,11 @@ exports.buildKeys = function() {
     }
 }
 
+exports.encryptWithUser = function(user, num) {
+    var pub = JSON.parse(user.pub);
+    return bignum(num).powm(pub.e, pub.n).toString();
+}
+
 /*
 exports.prime = function(bits) {
     return bignum.prime(bits);
