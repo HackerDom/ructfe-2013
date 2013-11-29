@@ -33,7 +33,13 @@ exports.signin = function(req, res) {
 }
 
 exports.signup = function(req, res) {
-    res.render('signup')
+    var user = users.createUser();
+    var keys = crypto.buildKeys();
+    user.pub = keys.pub;
+    res.render('signup', {
+        'user': user,
+        'keys': keys
+    });
 }
 
 exports.checkpub = function(req, res) {
