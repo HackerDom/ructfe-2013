@@ -11,7 +11,7 @@ exports.getUser = function(req, res, next) {
 }
 
 exports.index = function(req, res) {
-    if (res.user.authorized) {
+    if (res.user) {
         res.redirect('/' + res.user.id);
     } else {
         res.redirect('/signin');
@@ -36,6 +36,8 @@ exports.signup = function(req, res) {
     var user = users.createUser();
     var keys = crypto.buildKeys();
     user.pub = keys.pub;
+    users.createSession(req, res, user);
+    users.saveUser(user);
     res.render('signup', {
         'user': user,
         'keys': keys
