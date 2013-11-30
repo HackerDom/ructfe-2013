@@ -85,7 +85,7 @@ sub put {
 sub get {
 	my ($id, $flag) = @_;
 
-	my @t = split /\s+/, $id;
+	my @t = split /\s+/, $id, 2;
 	if ($t[0] == 1) {
 		my @x = split /;/, $t[1];
 		send S, "getpic $x[0]\n", 0;
