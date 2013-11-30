@@ -1,4 +1,6 @@
 var bignum = require('bignum')
+var redis = require("redis"),
+    client = redis.createClient();
 
 var getPrime = function(bits) {
     return bignum.prime(bits);
@@ -11,8 +13,9 @@ var pubKey = function(e, n) {
     })
 }
 
-var privKey = function(p, q) {
+var privKey = function(e, p, q) {
     return JSON.stringify({
+        'e': e.toString(),
         'p': p.toString(),
         'q': q.toString()
     })
@@ -29,13 +32,45 @@ exports.buildKeys = function() {
 
     return {
         'pub': pubKey(e, n),
-        'priv': privKey(p, q)
+        'priv': privKey(e, p, q)
     }
+}
+
+exports.random = function(bits) {
+    return bignum.rand(bignum(2).pow(bits)).toString();
 }
 
 exports.encryptWithUser = function(user, num) {
     var pub = JSON.parse(user.pub);
     return bignum(num).powm(pub.e, pub.n).toString();
+}
+
+exports.toBase64 = function(string) {
+    return new Buffer(string).toString('base64')
+}
+
+exports.fromBase64 = function(string) {
+    return new Buffer(string, 'base64').toString('utf-8')
+}
+
+exports.saveRandom = function(user, random) {
+    var id = exports.random(64);
+    var userRandom = { 'random': random, 'id': user.id };
+    client.hset('randoms', id, JSON.stringify(userRandom));
+    return id;
+}
+
+exports.getIdByRandom = function(id, random, callback) {
+    client.hget('randoms', id, function(err, reply) {
+        if (reply) {
+            var userRandom = JSON.parse(reply);
+            if (userRandom.random == random) {
+                callback(userRandom.id);
+            } else {
+                callback(null);
+            }
+        }
+    });
 }
 
 /*

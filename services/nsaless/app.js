@@ -20,6 +20,7 @@ app.post('/checkpub', routes.checkpub);
 
 app.get('/retweet/:id', routes.retweet);
 app.get('/:id', routes.home)
+app.post('/checkrandom/:id', routes.checkrandom)
 
 app.listen(3000, function(){
   console.log('listening 0.0.0.0:3000');

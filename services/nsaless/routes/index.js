@@ -40,14 +40,44 @@ exports.signup = function(req, res) {
     users.saveUser(user);
     res.render('signup', {
         'user': user,
-        'keys': keys
+        'pub': crypto.toBase64(keys.pub),
+        'priv': crypto.toBase64(keys.priv)
     });
+}
+
+exports.checkrandom = function(req, res) {
+    var id = req.params.id;
+    var random = req.body.id;
+    if (id && random) {
+        crypto.getIdByRandom(id, random, function(id) {
+            if (id) {
+                users.getUserFromId(req, res, id, function(user) {
+                    users.createSession(req, res, user);
+                    res.redirect('/');
+                });
+            } else {
+                res.redirect('/signin');
+            }
+        });
+    } else {
+        res.redirect('/signin');
+    }
 }
 
 exports.checkpub = function(req, res) {
     var id = req.body.id;
     if (id) {
-        users.getUserFromId(req, res, id, function(user) {
+        users.getUserFromId(req, res, id.replace(" ",""), function(user) {
+            if (user) {
+                var random = crypto.random(64);
+                var randomId = crypto.saveRandom(user, random);
+                res.render('checkpub', {
+                    'cryptedrandom': crypto.encryptWithUser(user, random).toString(),
+                    'randomid': randomId
+                });
+            } else {
+                res.redirect('/signin');
+            }
         });
     } else {
         res.redirect('/signin');
