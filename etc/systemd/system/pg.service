@@ -1,0 +1,12 @@
+[Unit]
+Description=Simple PUT/GET HTTP service
+Requires=pfs.service
+After=pfs.service
+
+[Service]
+Type=simple
+User=pfs
+Group=pfs
+
+Environment=MOJO_MODE=production
+ExecStart= /home/PFS daemon
