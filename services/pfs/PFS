@@ -1,0 +1,31 @@
+#!/usr/bin/env perl
+
+use Mojolicious::Lite;
+
+use File::Basename;
+use File::Path 'make_path';
+use File::Spec;
+use Mojo::Util 'spurt';
+
+my $root = '/home/pfs/t/';
+
+app->static->paths([$root]);
+
+get '*path' => sub {
+  my $self = shift;
+  $self->render_static($self->stash('path'));
+};
+
+put '*path' => sub {
+  my $self = shift;
+
+  my $path = $self->stash('path');
+  my $dir = dirname $path;
+
+  make_path(File::Spec->catfile($root, $dir));
+  spurt $self->req->body, File::Spec->catfile($root, $path);
+
+  $self->render(text => 'OK');
+};
+
+app->start;
