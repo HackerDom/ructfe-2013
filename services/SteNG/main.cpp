@@ -1,3 +1,4 @@
+/*
 #include "sockets.h"
 
 void connectionHandler(client connection)
@@ -26,4 +27,5 @@ int main()
 
         return 0;
 }
+*/
 
