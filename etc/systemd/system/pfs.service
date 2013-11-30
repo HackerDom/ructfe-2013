@@ -1,6 +1,6 @@
 [Unit]
 Description=PostgreSQL File System
-After=network.target
+After=postgresql.service
 
 [Service]
 Type=simple
