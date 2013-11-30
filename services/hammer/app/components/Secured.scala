@@ -16,9 +16,6 @@ import models._
 import play.api.db.slick._
 import play.api.libs.iteratee.Input
 
-/**
- * Created by Last G on 23.11.13.
- */
 trait Secured {
   def getLogin(request: RequestHeader) = request.session.get("login")
   def userFromLogin(login: String)(implicit session:Session): Option[User] = Query(Users).filter(_.login === login).firstOption
@@ -26,12 +23,13 @@ trait Secured {
 
   def onUnauthorized(request: RequestHeader):SimpleResult = Results.Forbidden
 
-  def withUser(action: User => EssentialAction) = DB.withSession {
-    implicit session:Session => Security.Authenticated(getUser(_), onUnauthorized )(action)
-  }
 
   def withLogin(action: String => EssentialAction) = {
     Security.Authenticated(getLogin, onUnauthorized )(action)
+  }
+
+  def withUser(action: User => EssentialAction) = DB.withSession {
+    implicit session:Session => Security.Authenticated(getUser(_), onUnauthorized )(action)
   }
 
   def withAuthorisedUser(action: AuthorisedUser => EssentialAction) = DB.withSession {

@@ -31,7 +31,7 @@ object Auth extends Controller with Secured {
       "name"  -> nonEmptyText(minLength = 3)
     )
     {
-      (login, passwords, name) => User.newUser(login, passwords._1, name)
+      (login, passwords, name) => User.create(login, passwords._1, name)
     }
     {
       user => Some(user.login, ("", ""), user.name)
