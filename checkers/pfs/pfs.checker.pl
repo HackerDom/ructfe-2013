@@ -1,11 +1,10 @@
 #!/usr/bin/perl -wl
 
 use feature ':5.10';
-use Net::TFTP;
+use HTTP::Tiny;
 
 my ($SERVICE_OK, $FLAG_GET_ERROR, $SERVICE_CORRUPT, $SERVICE_FAIL, $INTERNAL_ERROR) = (101, 102, 103, 104, 110);
 my %MODES = (check => \&check, get => \&get, put => \&put);
-my %OPTS  = (Timeout => 3, Retries => 1);
 
 my ($mode, $ip) = splice @ARGV, 0, 2;
 
@@ -28,22 +27,17 @@ sub check {
 sub get {
   my ($id, $flag) = @_;
 
-  my $tftp = Net::TFTP->new($ip, %OPTS);
-  my $fh = $tftp->get($id);
-  sysread $fh, my $data, length $flag;
-  return $FLAG_GET_ERROR unless defined $data;
-
-  return $data eq $flag ? $SERVICE_OK : $FLAG_GET_ERROR;
+  my $ua = HTTP::Tiny->new(timeout => 10);
+  my $response = $ua->get("http://$ip:3000/$id");
+  return $FLAG_GET_ERROR unless $response->{status} == 200;
+  return $response->{content} eq $flag ? $SERVICE_OK : $FLAG_GET_ERROR;
 }
 
 sub put {
   my ($id, $flag) = @_;
 
-  my $tftp = Net::TFTP->new($ip, %OPTS);
-  my $fh = $tftp->put($id);
-  my $len = syswrite $fh, $flag, length $flag;
-  close $fh;
-  return $SERVICE_FAIL unless $len == length $flag;
-
+  my $ua = HTTP::Tiny->new(timeout => 10);
+  my $response = $ua->put("http://$ip:3000/$id", {content => $flag});
+  return $SERVICE_FAIL unless $response->{status} == 200;
   return $SERVICE_OK;
 }
