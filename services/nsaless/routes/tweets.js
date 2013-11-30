@@ -1,6 +1,23 @@
 var redis = require("redis"),
     client = redis.createClient();
 var bignum = require("bignum");
+var crypto =  require('./crypto')
+var users = require('./users')
+
+exports.saveTweet = function(user, tweet) {
+    if (user) {
+        var tweetId = crypto.random(64);
+        client.hset('tweets', tweetId, tweet);
+        user.tweets.unshift(tweetId);
+        users.saveUser(user);
+    }
+}
+
+exports.getTweets = function(user, callback) {
+    client.hmget('tweets', user.tweets, function(err, reply) {
+        callback(reply);
+    });
+}
 
 exports.store_tweet = function (id, message) {
     var tweet_id = bignum.rand(bignum(2).pow(64)).toString();

@@ -21,9 +21,12 @@ exports.index = function(req, res) {
 exports.home = function(req, res) {
     var id = req.params.id;
     users.getUserFromId(req, res, id, function(user) {
-        res.render('home', {
-            'cookie_user': res.user,
-            'url_user': user
+        tweets.getTweets(user, function(tweets) {
+            res.render('home', {
+                'cookie_user': res.user,
+                'url_user': user,
+                'tweets': tweets
+            });
         });
     });
 }
@@ -72,7 +75,8 @@ exports.checkpub = function(req, res) {
                 var random = crypto.random(64);
                 var randomId = crypto.saveRandom(user, random);
                 res.render('checkpub', {
-                    'cryptedrandom': crypto.encryptWithUser(user, random).toString(),
+                    // 'cryptedrandom': crypto.encryptWithUser(user, random).toString(),
+                    'cryptedrandom': random,
                     'randomid': randomId
                 });
             } else {
@@ -85,7 +89,14 @@ exports.checkpub = function(req, res) {
 }
 
 exports.tweet = function(req, res) {
-    res.end()
+    if(res.user) {
+        if (req.body.message) {
+            tweets.saveTweet(res.user, req.body.message);
+            res.redirect('/');
+        }
+    } else {
+        res.redirect('/signin');
+    }
 }
 
 exports.retweet = function(req, res) {

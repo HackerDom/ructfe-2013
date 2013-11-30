@@ -10,6 +10,7 @@ app.set('view engine', 'ejs');
 
 app.use(express.bodyParser());
 app.use(express.cookieParser());
+app.use(express.logger('dev'));
 app.use(routes.getUser);
 
 app.get('/', routes.index);

@@ -31,6 +31,7 @@ exports.getUserFromCookie = function(req, res, callback) {
 exports.createUser = function(req, res) {
     return {
         'id': bignum.rand(bignum(2).pow(64)).toString(),
+        'followers': [],
         'tweets': []
     };
 }
