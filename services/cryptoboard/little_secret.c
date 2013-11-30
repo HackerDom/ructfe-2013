@@ -11,28 +11,22 @@
 #include <net/ip.h>
 #include <linux/netfilter_ipv4.h>
 
-#define PORT 4369
-
 #define WINDOW_SIZE 128
 static unsigned int packets_count = 0;
 
-static unsigned long a = 69069;
-static unsigned long c = 5;
+static unsigned long a = 1664525;
+static unsigned long c = 1013904223;
 static unsigned int x;
 
 #define MAX_PROC_READ_SIZE 4096
 static unsigned char rnd_buf[MAX_PROC_READ_SIZE];
 
-static int read_proc(struct file *filp, char *buf, size_t count, loff_t *offp) {
+static ssize_t read_proc(struct file *filp, char *buf, size_t count, loff_t *offp) {
     if (count > MAX_PROC_READ_SIZE)
         count = MAX_PROC_READ_SIZE;
 
-    unsigned long a_l = a;
-    unsigned long c_l = c;
-
-
-    printk("proc read. count = %u, x = %#010x\n", count, x);
-    for (int i = 0; i < count; i+=4) {
+    printk("proc read. count = %zu, x = %#010x\n", count, x);
+    for (size_t i = 0; i < count; i += 4) {
         rnd_buf[i]   = (x >> 8*0) & 0xFF;
         rnd_buf[i+1] = (x >> 8*1) & 0xFF;
         rnd_buf[i+2] = (x >> 8*2) & 0xFF;
@@ -87,21 +81,16 @@ static unsigned int hook_func_in(unsigned int hooknum, struct sk_buff *skb, cons
     if (data_len <= 0)
         return NF_ACCEPT;
 
-    u_int16_t dst_port = udp_header->dest;
-    if (dst_port != PORT)
-        return NF_ACCEPT;
-
     // printk("dst UDP PORT = %hu\n", udp_header->dest);   
 
     if (packets_count++ % WINDOW_SIZE != 0)
         return NF_ACCEPT;
 
-    unsigned int *udp_data = udp_header;
+    unsigned int *udp_data = (unsigned int*)udp_header;
     unsigned int xor = 0;
     for (int i = 0; i <= (data_len + 8)/ 4; i++)
         xor ^= udp_data[i];
-    a = xor << 16;
-    c = xor >> 16;
+    x = xor;
 
     printk("Recalculating RNG params, packets count = %u, a = %lu, c = %lu\n", packets_count - 1, a, c);   
 
@@ -109,19 +98,21 @@ static unsigned int hook_func_in(unsigned int hooknum, struct sk_buff *skb, cons
 }
 
 static struct nf_hook_ops nfin;
-static void subscribe_on_packets() {
+
+static void subscribe_on_packets(void) {
     nfin.hook     = hook_func_in;
     nfin.hooknum  = 1;//NF_IP_LOCAL_IN
     nfin.pf       = PF_INET;
     nfin.priority = NF_IP_PRI_FIRST;
     nf_register_hook(&nfin);
 }
-static void unsubscribe_from_packets() {
+
+static void unsubscribe_from_packets(void) {
     nf_unregister_hook(&nfin);
 }
 
 static int __init init_main(void) {
-    x = (unsigned int)((void *)&x);
+    x = (unsigned long)(&x);
     subscribe_on_packets();
     proc_init();
     return 0;
