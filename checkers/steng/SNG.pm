@@ -1,6 +1,7 @@
 package SNG;
 
 require Exporter;
+use IPC::Open2;
 
 our @ISA = qw/Exporter/;
 our @EXPORT = qw/generate_simple_sng/;
@@ -21,8 +22,14 @@ sub generate_simple_sng {
 
 sub unparse_flag {
 	my ($p, $v) = @_;
+
+	my $pid = open2 (*FIN, *FOUT, "./extract '$v'");
+	print FOUT $p;
+	close FOUT;
+	my $r = <FIN>;
+	waitpid ($pid, 0);
 	
-	# TODO
+	$r;
 }
 
 1;
