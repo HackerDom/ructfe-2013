@@ -1,0 +1,56 @@
+#! /usr/bin/a+ -q
+
+strip s: {
+  (~sÅ(" ", "\n"))/s
+}
+
+read n: {
+ xûnÒ' ';
+ sys.read{0;x;n};
+ strip x
+}
+
+get: {
+ nameûread 32;
+ sys.chdir "files";
+ sys.readmat name
+}
+
+put: {
+  nameûread 32;
+  valûread 32;
+  sys.chdir("files");
+  write{name;val}
+}
+
+list: {
+  sys.agetdents "files"
+}
+
+hash str: {
+ str
+}
+
+write{file;data}:{
+     if ((`char=©data)^2=ÒÒdata) dataûclean{data};
+     if (0<fdûsys.open{file;
+                       `O_CREAT`O_TRUNC`O_WRONLY;
+                       8Â6 4 4})
+        {
+        sys.write{fd;data;#data};
+        sys.close{fd};
+        };
+     }
+
+clean{n}:Ø(cleanline¡<@1 n),¡<"\n"
+
+cleanline{x}:(-+/^\' '=÷x)Õx
+
+cû1Ùread 1
+
+case (c) {
+  'g';get;
+  'p';put;
+  'l';list;
+}
+sys.exit 0
