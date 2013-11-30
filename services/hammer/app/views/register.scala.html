@@ -1,0 +1,30 @@
+@(registrationForm: Form[User])(implicit request: Request[_], user: components.AuthorisedUser)
+
+@import helper._
+@import helpers.BootstrapHelper._
+
+@main("Register on Hammer") {
+    <h1>Please provide your credentials</h1>
+
+    @helper.form(action = routes.Auth.do_register, 'class -> "form-horizontal") {
+        <fieldset>
+            <legend>Registration form</legend>
+            @inputText(
+                registrationForm("login"),
+                '_error -> registrationForm.globalError
+            )
+            @inputPassword(registrationForm("password.main"))
+            @inputPassword(
+                registrationForm("password.confirm"),
+                '_error -> registrationForm.error("password")
+            )
+            @inputText(registrationForm("name"))
+        </fieldset>
+        <div class="control-group">
+            <div class="controls">
+                <input type="submit" class="btn btn-primary" value="For the Emperor">
+                <a href="@routes.Application.index" class="btn btn-danger">I'm da heretic!</a>
+            </div>
+        </div>
+    }
+}

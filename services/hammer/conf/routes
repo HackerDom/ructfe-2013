@@ -1,0 +1,28 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET         /                           controllers.Application.index
+
+GET         /register                   controllers.Auth.register
+POST        /do_register                controllers.Auth.do_register
+POST        /login                      controllers.Auth.login
+GET         /logout                     controllers.Auth.logout
+
+GET         /users                      controllers.Application.users
+
+GET         /warp/                      controllers.Warp.all
+GET         /warp/create                controllers.Warp.create
+POST        /warp/do_create             controllers.Warp.do_create
+GET         /warp/my                    controllers.Warp.own
+GET         /warp/:id/delete            controllers.Warp.delete(id: Int)
+GET         /warp/:id/send/:user        controllers.Warp.send(id:Int, user:Int)
+GET         /warp/:id                   controllers.Warp.show(id: Int)
+GET         /warp/dummy/:message/       controllers.Warp.dummy(message: String)
+
+# Map static resources from the /public folder to the /assets URL path
+GET         /assets/*file               controllers.Assets.at(path="/public", file)
+
+# Additional static files (client dependesies)
+GET     /webjars/*file                    controllers.WebJarAssets.at(file)

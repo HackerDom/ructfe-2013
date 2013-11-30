@@ -5,6 +5,8 @@
 , "dependencies" : {
     "express" : "*"
     , "ejs" : "*"
+    , "redis" : "*"
+    , "bignum" : "*"
   }
 , "repository" : {
     "type" : "git"

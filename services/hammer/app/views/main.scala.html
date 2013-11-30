@@ -1,0 +1,58 @@
+@(title: String)(content: Html)(implicit request: Request[_], user: components.AuthorisedUser)
+@import akka.routing.FromConfig
+@import play.api.mvc._
+
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <title>@title</title>
+        <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
+        <link rel='stylesheet' href='@routes.WebJarAssets.at(WebJarAssets.locate("css/bootstrap.min.css"))'>
+        <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("jquery.min.js"))'></script>
+        <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.js"))'></script>
+
+        <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
+
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="navbar navbar-fixed-top">
+                <div class="navbar-inner">
+                    <div class="container">
+                        <a class="brand" href="#">Hammer</a>
+                        <ul class="nav">
+                            <li><a href="@routes.Application.index">Home</a></li>
+
+                            <li><a href="@routes.Warp.create">Create warp</a></li>
+                            <li><a href="@routes.Warp.all">Enter the Warp</a></li>
+                            <li><a href="@routes.Warp.own">Mutations</a></li>
+                        </ul>
+                        <ul class="nav pull-right">
+                            @if(user.isAuth) {
+                                        <li><a href="@routes.Auth.logout">Logout </a> </li>
+                            } else {
+                                        <form class="navbar-form pull-left" method="post" action="@routes.Auth.login">
+                                            <input class="input-small" type="text" name="login" placeholder="login"></input>
+                                            <input class="input-small" type="password" name="password" placeholder="password"></input>
+                                            <input class="input-small btn" type="submit" value="Login"></input>
+                                        </form>
+                                        <li><a href="@routes.Auth.register">Registration</a></li>
+                            }
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="flashing">
+                @request.flash.data.map { case (key, value) =>
+                    <div class="alert alert-@key">
+                        <a href="#" class="close" data-dismiss="alert">&times;</a>
+                        @value
+                    </div>
+                }
+            </div>
+            @content
+        </div>
+    </body>
+</html>
