@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include <map>
 
 struct sng_IHDR {
 	long height;
@@ -77,6 +78,10 @@ struct sng_IMAGE {
 	sng_IMAGE ();
 };
 
+struct sng_private {
+	std::map <std::string, std::string> data;
+};
+
 class sng {
 	sng_IHDR m_IHDR;
 	sng_gAMA m_gAMA;
@@ -85,6 +90,7 @@ class sng {
 	sng_tIME m_tIME;
 	sng_tEXt m_tEXt;
 	sng_IMAGE m_IMAGE;
+	sng_private m_private;
 
 public:
 	sng (const std::string & s);

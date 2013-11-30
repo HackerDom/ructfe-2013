@@ -240,6 +240,22 @@ sng_IMAGE parse_IMAGE (const std::string & s, bool has_palette) {
 	return r;
 }
 
+sng_private parse_private (const std::string & s) {
+	sng_private r;
+
+	std::istringstream is (s);
+	std::string line;
+	while (std::getline (is, line)) {
+		std::istringstream iss (_ (line));
+		std::string k, v;
+
+		while (iss >> k >> v)
+			r.data [_ (k)] = _ (v);
+	}
+
+	return r;
+}
+
 sng::sng (const std::string & s) {
 	std::string::size_type it = 0;
 
@@ -287,6 +303,8 @@ sng::sng (const std::string & s) {
 				m_tEXt = parse_tEXt (fields);
 			else if (tag == "IMAGE")
 				m_IMAGE = parse_IMAGE (fields, has_palette);
+			else if (tag == "private")
+				m_private = parse_private (fields);
 		}
 	}	
 }
@@ -384,6 +402,7 @@ std::ostream & operator << (std::ostream & os, const sng & p) {
 		"\ttext: " << p.m_tEXt.text << std::endl <<
 		"}" << std::endl;
 
+	/* IMAGE */
 	os << "IMAGE {" << std::endl << "\tpixels hex" << std::endl;
 	if (p.m_hIST.values.empty ()) {
 		for (std::vector <std::vector <color_t>>::const_iterator it = p.m_IMAGE.pixels.begin (); it != p.m_IMAGE.pixels.end (); ++ it) {
@@ -409,7 +428,16 @@ std::ostream & operator << (std::ostream & os, const sng & p) {
 			os << std::endl;
 		}
 	}
-	os << "}";
+	os << "}" << std::endl;
+
+	/* private */
+	if (! p.m_private.data.empty ()) {
+		os << "private {" << std::endl;
+		for (std::map <std::string, std::string>::const_iterator it = p.m_private.data.begin (); it != p.m_private.data.end (); ++ it)
+			os << "\t" << it->first << ": " << it->second << std::endl;
+
+		os << "}";
+	}
 
 	return os;
 }

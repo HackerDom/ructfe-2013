@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use constant {
-	DEBUG => 0,
+	DEBUG => 1,
 
 	CHECKER_OK => 101,
 	CHECKER_NOFLAG => 102,
@@ -12,10 +12,13 @@ use constant {
 
 use constant {
 	CONNECTION_ERROR => "Could not connect to service",
-	INVALID_STRING => "Invalid string"
+	CANNOT_GET_PICTURE => "Can't get picture",
+	CANNOT_PUT_PICTURE => "Can't put picture",
+	FLAG_NOT_FOUND => "Flag not found"
 };
 
 use Socket;
+use SNG;
 
 my $port = 18360;
 my ($mode, $ip, $id, $flag) = @ARGV;
@@ -27,6 +30,8 @@ my %handlers = (
 
 socket S, PF_INET, SOCK_STREAM, getprotobyname 'tcp';
 $cr = connect S, sockaddr_in $port, inet_aton $ip;
+do_exit (CHECKER_DOWN, CONNECTION_ERROR) unless $cr;
+
 vec ($r = '', fileno (S), 1) = 1;
 $handlers {$mode}->($id, $flag);
 
@@ -37,37 +42,67 @@ sub do_exit {
 
 	print $msg;
 	print STDERR $log;
-	close S;
+	shutdown S, 2;
 	exit $code;
 }
 
 sub check {
-	if ($cr) {
-		do_exit (CHECKER_OK);
-	}
-	else {
-		do_exit (CHECKER_DOWN, CONNECTION_ERROR);
-	}
+	send S, "list\n", 0;
+	my @l = split /\s+/, &geta;
+	my $p = int rand @l;
+
+	send S, "getpic $p\n", 0;
+	my $d = &geta;
+
+	do_exit (CHECKER_MUMBLE, CANNOT_GET_PICTURE) if $d =~ /^ERROR/;
+	do_exit (CHECKER_OK);
 }
 
 sub put {
-	do_exit (CHECKER_DOWN, CONNECTION_ERROR) unless $cr;
+	my $p = &SNG::generate_simple_sng;
 
-	my $flag = $_[1];
-	send S, $flag, 0;
+	if (int rand 2) {
+		send S, "putpic $flag\n$p\n", 0;
+		my $d = &geta;
 
-	my $x = &geta;
+		do_exit (CHECKER_MUMBLE, CANNOT_PUT_PICTURE) if $d =~ /^ERROR/;
 
-	if ($flag eq $x) {
-		do_exit (CHECKER_OK);
+		print "1 $d";
 	}
 	else {
-		do_exit (CHECKER_MUMBLE, INVALID_STRING);
+		my $pasw = join '', map { chr (ord ('a') + int rand 26) } 1 .. 8;
+		send S, "putpic $flad $pasw\n$p\n", 0;
+		my $d = &geta;
+
+		do_exit (CHECKER_MUMBLE, CANNOT_PUT_PICTURE) if $d =~ /^ERROR/;
+
+		print "2 $pasw:$d";
 	}
+
+	do_exit (CHECKER_OK);
 }
 
 sub get {
-	do_exit (CHECKER_DOWN, CONNECTION_ERROR) unless $cr;
+	my ($id, $flag) = @_;
+
+	my @t = split /\s+/, $id;
+	if ($t[0] == 1) {
+		my @x = split /;/, $t[1];
+		send S, "getpic $x[0]\n", 0;
+		my $d = &geta;
+
+		do_exit (CHECKER_MUMBLE, CANNOT_GET_PICTURE) if $d =~ /^ERROR/;
+		do_exit (CHECKER_NOFLAG, FLAG_NOT_FOUND) if SNG::unparse_flag ($d, $x[1]) ne $flag;
+	}
+	else {
+		my @x = split /:/, $t[1];
+		send S, "getpic $x[1] $x[0]\n", 0;
+		my $d = &geta;
+
+		do_exit (CHECKER_MUMBLE, CANNOT_GET_PICTURE) if $d =~ /^ERROR/;
+		do_exit (CHECKER_NOFLAG, FLAG_NOT_FOUND) unless $d =~ qr/$flag/;
+	}
+
 	do_exit (CHECKER_OK);
 }
 
