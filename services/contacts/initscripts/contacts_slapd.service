@@ -1,0 +1,14 @@
+[Unit]
+Description=OpenLDAP Server Daemon for contacts service
+After=network.target
+
+[Service]
+Type=forking
+User=contacts
+Group=contacts
+PIDFile=/home/contacts/ldap/run/slapd.pid
+ExecStartPre=/usr/sbin/slaptest -Q -u -f /home/contacts/ldap/conf/slapd.conf
+ExecStart=/usr/bin/slapd -u contacts -f /home/contacts/ldap/conf/slapd.conf -h 'ldapi://%2Fhome%2Fcontacts%2Fldap%2Fsocket'
+
+[Install]
+WantedBy=multi-user.target
