@@ -8,23 +8,22 @@
 #include <unistd.h>
 #include <memory>
 
+#define PORT 18360
+#define NUMBEROFCLIENTS 5
+
 class socket_t
 {
 public:
 	//~socket_t();
-
-	bool allOk();
-
 	//for test
 	void closeSocket();
 
 protected:
 	int sock;
-	int errors;
 	const int family = AF_INET;
 	const int address = htonl(INADDR_ANY);
-	const int port = htons(18360);
-	const int numberOfClients = 5;
+	const int port = htons(PORT);
+	const int numberOfClients = NUMBEROFCLIENTS;
 };
 
 class client : public socket_t
@@ -32,7 +31,9 @@ class client : public socket_t
 public:
 	client(int sockNumber, sockaddr clientSock);
 	
+	bool needRead();
 	std::string receiveString();
+	std::string receiveAll();
 	void sendString(std::string data);
 	
 private:

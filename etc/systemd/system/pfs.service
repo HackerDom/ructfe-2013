@@ -1,0 +1,10 @@
+[Unit]
+Description=PostgreSQL File System
+After=postgresql.service
+
+[Service]
+Type=simple
+User=pfs
+Group=pfs
+
+ExecStart=/home/pfs.rb /home/pfs/t

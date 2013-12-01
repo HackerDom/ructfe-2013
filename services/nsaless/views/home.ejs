@@ -6,5 +6,19 @@
     </head>
     <body>
         <a href="/">Home</a>
+        <% if (cookie_user && url_user && cookie_user.id == url_user.id) { %>
+            <form action='/tweet' method='post'>
+                <textarea name='message' style='width: 250px; height: 100px;'></textarea>
+                <br/>
+                <input type='submit' value='Tweet!'>
+            </form>
+        <% } %>
+        <% if (tweets) { %>
+           <% for (var i = 0; i < tweets.length; ++i) { %>
+            <hr/>
+            <%= tweets[i] %>
+            <hr/>
+            <% } %>
+        <% } %>
     </body>
 </html>
