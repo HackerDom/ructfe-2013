@@ -1,27 +1,6 @@
-Dependencies:
- - Bash 4
- - ldapsearch util
+Copy contents of this directory to server
 
-======= LDAP =========
-1. pacman -S core/openldap
-2. useradd -m contacts
-3. copy ldap directory to /home/contacts/
-4. /usr/bin/slapd -f /home/contacts/ldap/conf/slapd.conf -d9 -u contacts -h ldap://127.0.0.1:3890
-5. /usr/bin/slapindex -f /home/contacts/ldap/conf/slapd.conf
-6. test cmd: /usr/bin/slapd -f /home/contacts/ldap/conf/slapd.conf -d9 -u contacts -h ldapi://%2Fhome%2Fcontacts%2Fldap%2Fsocket
-7. ldapsearch -H ldap://127.0.0.1:3890 -LLL -x -b "dc=ructfe,dc=org"  -s sub "*"
-8. ldapadd -H ldap://127.0.0.1:3890 -w ctf -D "cn=Manager,dc=ructfe,dc=org"
-dn: dc=ructfe,dc=org
-objectClass: dcObject
-objectClass: organization
-dc: ructfe
-o: ctforg
-description: The ctf org
+Launch deploy.sh to deploy
+Launch undeploy.sh to remove service from the system
 
-======= Apache =========
-9. pacman -S extra/apache
-10. copy apache directory to /home/contacts/
-11. test cmd: /usr/sbin/apache2 -f /home/contacts/apache/conf/httpd.conf -X
-
-12. cp initscripts/contacts_apache.service initscripts/contacts_slapd.service /etc/systemd/system/
-13. systemctl enable contacts_apache.service contacts_slapd.service
+DO NOT LAUNCH ANY SHELL SCRIPTS ON YOUR LOCAL MACHINE!!!

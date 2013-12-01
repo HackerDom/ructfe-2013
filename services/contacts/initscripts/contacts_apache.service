@@ -3,6 +3,8 @@ Description=The Apache HTTP Server for contacts service
 After=network.target contacts.service
 
 [Service]
+User=contacts
+Group=contacts
 ExecStart=/usr/bin/httpd -f /home/contacts/apache/conf/httpd.conf -DFOREGROUND
 ExecReload=/usr/bin/httpd -f /home/contacts/apache/conf/httpd.conf -k graceful
 ExecStop=/usr/bin/httpd -f /home/contacts/apache/conf/httpd.conf -k graceful-stop
