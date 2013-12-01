@@ -12,9 +12,6 @@ DBNAME = 'taxi'
 COLNAME = 'orders'
 
 def connect_db(dbname):
-    #from pymongo import MongoClient
-    #client = MongoClient('localhost', 27017)
-    #return client.test
     from pymongo import Connection
     c = Connection()
     return c[dbname]
@@ -68,6 +65,15 @@ def view_all(col, admin_name):
         results.append(doc)
     return results
 
+def rreplace(s, old, new, occurrence):
+    li = s.rsplit(old, occurrence)
+    return new.join(li)
+
+def dict_to_str(d):
+    res = "{%s}" % ''.join('\'{}\':\'{}\','.format(key, val) for key, val in d.items())
+    r = rreplace(res, ',', '', 1)
+    return r
+
 class MonHTTPRequestHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         import os.path
@@ -81,10 +87,26 @@ class MonHTTPRequestHandler(BaseHTTPRequestHandler):
             db = connect_db(DBNAME)
             col = collection.Collection(db, COLNAME)
 
-            if action == 'routes':
+            if action == 'route':
+                if p.has_key('id'):
+                    r_id = p['id'][0]
+                    res = get_by_id(r_id, col)
+                    result_doc = dict_to_str(res)
+                    self.send_response(200)
+                    self.send_header('Content-type','text-html')
+                    self.end_headers()
+                    self.wfile.write(result_doc)
+                    return
+                else:
+                    self.send_response(400)
+                    return
+            elif action == 'routes':
                 result_doc = view_all(col, admin)
             elif action == 'amount':
                 result_doc = mr_test(col, admin)
+            else:
+                self.send_response(405) #501?
+                return
 
             self.send_response(200)
             self.send_header('Content-type','text-html')
@@ -127,6 +149,7 @@ class MonHTTPRequestHandler(BaseHTTPRequestHandler):
                 u_name = p['name'][0]
 
                 print "params: " + u_name
+                #todo
                 result = add_user(u_name)
             else:
                 self.send_response(405) #501?
