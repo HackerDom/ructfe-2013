@@ -29,7 +29,7 @@ protected:
 class client : public socket_t
 {
 public:
-	client(int sockNumber, sockaddr clientSock, int pSock);
+	client(int sockNumber, sockaddr clientSock);
 	
 	bool needRead();
 	std::string receiveString();
@@ -38,7 +38,6 @@ public:
 	
 private:
 	sockaddr sclient;
-	int parent;
 };
 
 class server : public socket_t
