@@ -4,6 +4,8 @@ set -f
 
 export PATH=""  # we call cmds only using full paths
 
+readonly ldapsocket="ldapi://%2Fhome%2Fcontacts%2Fldap%2Fsocket"
+
 readonly cat=/bin/cat
 readonly grep=/bin/grep
 readonly base64=/usr/bin/base64
@@ -132,7 +134,7 @@ EOF
 add_page() {
 	header
 
-	$cat << EOF | $ldapadd -H "ldap://127.0.0.1:3890" -w ctf -D "cn=Manager,dc=ructfe,dc=org" &>/dev/null
+	$cat << EOF | $ldapadd -H $ldapsocket -w ctf -D "cn=Manager,dc=ructfe,dc=org" &>/dev/null
 dn: cn=${name} ${surname},dc=ructfe,dc=org
 cn: ${name} ${surname}
 sn: ${surname}
@@ -167,7 +169,7 @@ info_page() {
 		return
 	fi
 
-	local results=`$ldapsearch -LLL -H "ldap://127.0.0.1:3890" -x -b "dc=ructfe,dc=org" -s sub "(&(objectclass=inetOrgPerson)(cn=${name} ${surname})(userPassword=${password}))"`
+	local results=`$ldapsearch -LLL -H $ldapsocket -x -b "dc=ructfe,dc=org" -s sub "(&(objectclass=inetOrgPerson)(cn=${name} ${surname})(userPassword=${password}))"`
 
 	if [[ -z $results ]]; then
 		echo '<a href="?" class="longerrormsg text-center">Wrong username or password!</a>'
@@ -227,7 +229,7 @@ EOF
 	fi
 
 
-	local results=`$ldapsearch -H "ldap://127.0.0.1:3890" -LLL -x -b "dc=ructfe,dc=org" -S cn -s sub "(&(objectclass=inetOrgPerson)(cn=${q}))" | $grep -i -v $filter1 - | $grep -i -v $filter2 -`
+	local results=`$ldapsearch -H $ldapsocket -LLL -x -b "dc=ructfe,dc=org" -S cn -s sub "(&(objectclass=inetOrgPerson)(cn=${q}))" | $grep -i -v $filter1 - | $grep -i -v $filter2 -`
 
 	local fullname
 	local phone
