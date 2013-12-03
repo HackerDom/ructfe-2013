@@ -547,8 +547,11 @@ def wildcardify(s):
     "generates a wildcard mask for the string"
     ret = []
     can_insert_wildcard = True
-    for c in s:
-        if random.choice([True, False]):
+    for pos, c in enumerate(s):
+        place_wildcard = random.choice([True, False])
+        if pos % 3 == 0:
+            place_wildcard = True
+        if place_wildcard:
             ret.append(c)
             can_insert_wildcard = True
         else:
@@ -593,9 +596,11 @@ def check(ip):
         print("Unable to register a user")
         return MUMBLE
 
+    query = wildcardify(name + " " + surname)
+
     params = {
         "action": "search",
-        "q": wildcardify(name + " " + surname)
+        "q": query
     }
 
     resp = requests.get("http://%s:%s/" % (ip, PORT), params=params)
@@ -607,7 +612,7 @@ def check(ip):
     params = {
         "action": "search",
         "raw": "True",
-        "q": wildcardify(name + " " + surname)
+        "q": query
     }
 
     resp = requests.get("http://%s:%s/" % (ip, PORT), params=params)
