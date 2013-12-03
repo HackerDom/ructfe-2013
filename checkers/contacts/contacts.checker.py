@@ -590,6 +590,7 @@ def check(ip):
         result = create_user(name, surname, email, password, phone)
 
     if result != "success":
+        print("Unable to register a user")
         return MUMBLE
 
     params = {
@@ -600,6 +601,7 @@ def check(ip):
     resp = requests.get("http://%s:%s/" % (ip, PORT), params=params)
 
     if phone not in resp.text:
+        print("Unable to search for the user")
         return MUMBLE
 
     params = {
@@ -611,10 +613,13 @@ def check(ip):
     resp = requests.get("http://%s:%s/" % (ip, PORT), params=params)
 
     if ("telephoneNumber: %s" % phone) not in resp.text:
+        print("Raw output in search is broken(test 0)")
         return MUMBLE
     if ("objectClass: inetOrgPerson") not in resp.text:
+        print("Raw output in search is broken(test 1)")
         return MUMBLE
     if ("sn: %s" % surname) not in resp.text:
+        print("Raw output in search is broken(test 2)")
         return MUMBLE
 
     return OK
@@ -638,6 +643,7 @@ def put(ip, flag_id, flag):
         result = create_user(name, surname, email, password, phone)
 
     if result != "success":
+        print("Unable to register a user")
         return MUMBLE
 
     print("%s_%s_%s" % (name, surname, password))
