@@ -547,8 +547,11 @@ def wildcardify(s):
     "generates a wildcard mask for the string"
     ret = []
     can_insert_wildcard = True
-    for c in s:
-        if random.choice([True, False]):
+    for pos, c in enumerate(s):
+        place_wildcard = random.choice([True, False])
+        if pos % 3 == 0:
+            place_wildcard = True
+        if place_wildcard:
             ret.append(c)
             can_insert_wildcard = True
         else:
@@ -590,31 +593,38 @@ def check(ip):
         result = create_user(name, surname, email, password, phone)
 
     if result != "success":
+        print("Unable to register a user")
         return MUMBLE
+
+    query = wildcardify(name + " " + surname)
 
     params = {
         "action": "search",
-        "q": wildcardify(name + " " + surname)
+        "q": query
     }
 
     resp = requests.get("http://%s:%s/" % (ip, PORT), params=params)
 
     if phone not in resp.text:
+        print("Unable to search for the user")
         return MUMBLE
 
     params = {
         "action": "search",
         "raw": "True",
-        "q": wildcardify(name + " " + surname)
+        "q": query
     }
 
     resp = requests.get("http://%s:%s/" % (ip, PORT), params=params)
 
     if ("telephoneNumber: %s" % phone) not in resp.text:
+        print("Raw output in search is broken(test 0)")
         return MUMBLE
     if ("objectClass: inetOrgPerson") not in resp.text:
+        print("Raw output in search is broken(test 1)")
         return MUMBLE
     if ("sn: %s" % surname) not in resp.text:
+        print("Raw output in search is broken(test 2)")
         return MUMBLE
 
     return OK
@@ -638,6 +648,7 @@ def put(ip, flag_id, flag):
         result = create_user(name, surname, email, password, phone)
 
     if result != "success":
+        print("Unable to register a user")
         return MUMBLE
 
     print("%s_%s_%s" % (name, surname, password))
