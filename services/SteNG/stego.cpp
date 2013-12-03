@@ -33,19 +33,19 @@ std::vector <pixel> put (sng & pic, const std::string & s) {
 		pixel p1 = get_next (x, w, h); x.insert (p1);
 		pixel p2 = get_next (x, w, h); x.insert (p2);
 
-		pcolor c1 = pic.getpixel (p1.x, p1.y);
+		pcolor c1 = pic.pixel (p1.x, p1.y);
 		char c = (* it) >> 4;
 		c1.r = (c1.r & ~1) | ((c >> 3) & 1);
 		c1.g = (c1.g & ~1) | ((c >> 2) & 1);
 		c1.b = (c1.b & ~3) | (c & 3);
-		pic.setpixel (p1.x, p1.y, c1);
+		pic.pixel (p1.x, p1.y, c1);
 
-		pcolor c2 = pic.getpixel (p2.x, p2.y);
+		pcolor c2 = pic.pixel (p2.x, p2.y);
 		c = (* it) & ((1 << 4) - 1);
 		c2.r = (c2.r & ~1) | ((c >> 3) & 1);
 		c2.g = (c2.g & ~1) | ((c >> 2) & 1);
 		c2.b = (c2.b & ~3) | (c & 3);
-		pic.setpixel (p2.x, p2.y, c2);
+		pic.pixel (p2.x, p2.y, c2);
 
 		r.push_back (p1);
 		r.push_back (p2);
@@ -60,7 +60,7 @@ std::string get (const sng & pic, const std::vector <pixel> & vec) {
 	unsigned char c = 0;
 	int i = 0;
 	for (std::vector <pixel>::const_iterator it = vec.begin (); it != vec.end (); ++ it) {
-		pcolor x = pic.getpixel (it->x, it->y);
+		pcolor x = pic.pixel (it->x, it->y);
 		c = (c << 4) | ((x.r & 1) << 3) | ((x.g & 1) << 2) | (x.b & 3);
 
 		if (! ((++ i) & 1))

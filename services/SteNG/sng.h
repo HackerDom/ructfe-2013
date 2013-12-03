@@ -40,6 +40,7 @@ struct sng_tIME {
 	unsigned char second;
 
 	sng_tIME ();
+	sng_tIME (short year, unsigned char month, unsigned char day, unsigned char hour, unsigned char minute, unsigned char second);
 };
 
 struct sng_tEXt {
@@ -98,8 +99,20 @@ public:
 	long height () const;
 	long width () const;
 
-	pcolor getpixel (unsigned int x, unsigned int y) const;
-	void setpixel (unsigned int x, unsigned int y, pcolor c);	
+	pcolor pixel (unsigned int x, unsigned int y) const;
+	void pixel (unsigned int x, unsigned int y, pcolor c);	
+
+	std::string keyword () const;
+	void keyword (const std::string & s);
+
+	std::string text () const;
+	void text (const std::string & s);
+
+	std::string time () const;
+	void time (short y, unsigned char m, unsigned char d, unsigned char hh, unsigned char mm, unsigned char ss);
+
+	std::string private_ (const std::string & chunk) const;
+	void private_ (const std::string & chunk, const std::string & text);
 
 	friend std::ostream & operator << (std::ostream & os, const sng & p);
 };

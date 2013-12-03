@@ -131,6 +131,14 @@ sng_tIME::sng_tIME () :
 	minute (0),
 	second (0) { }
 
+sng_tIME::sng_tIME (short year, unsigned char month, unsigned char day, unsigned char hour, unsigned char minute, unsigned char second) :
+	year (year),
+	month (month),
+	day (day),
+	hour (hour),
+	minute (minute),
+	second (second) { }
+
 sng_tIME parse_tIME (const std::string & s) {
 	sng_tIME r;
 
@@ -240,20 +248,18 @@ sng_IMAGE parse_IMAGE (const std::string & s, bool has_palette) {
 	return r;
 }
 
-sng_private parse_private (const std::string & s) {
-	sng_private r;
+std::string::size_type normalize (const std::string & s, std::string::size_type it) {
+	return it == std::string::npos ? s.length () : it;
+}
 
-	std::istringstream is (s);
-	std::string line;
-	while (std::getline (is, line)) {
-		std::istringstream iss (_ (line));
-		std::string k, v;
+void parse_private (sng_private & r, const std::string & s, const std::string & chunk) {
+	std::string::size_type tag_begin = normalize (chunk, chunk.find_first_not_of (" \t"));
+	std::string::size_type tag_end = normalize (chunk, chunk.find_last_not_of (" \t"));
 
-		while (iss >> k >> v)
-			r.data [_ (k)] = _ (v);
-	}
+	std::string::size_type data_begin = normalize (s, s.find_first_of ("\""));
+	std::string::size_type data_end = normalize (s, s.find_first_of ("\"", data_begin + 1));
 
-	return r;
+	r.data [chunk.substr (tag_begin, tag_end - tag_begin + 1)] = s.substr (data_begin + 1, data_end - data_begin - 1);
 }
 
 sng::sng (const std::string & s) {
@@ -265,18 +271,12 @@ sng::sng (const std::string & s) {
 
 		if (it != std::string::npos) {
 			std::string::size_type tag_begin = it;
-			std::string::size_type tag_end = s.find_first_of (" \n\t", it);
-
-			if (tag_end == std::string::npos)
-				tag_end = s.length ();
+			std::string::size_type tag_end = normalize (s, s.find_first_of (" \n\t{", it));
 
 			std::string tag = _ (s.substr (tag_begin, tag_end - tag_begin));
 
-			std::string::size_type fields_begin = s.find_first_of ('{', tag_end);
-			std::string::size_type fields_end = s.find_first_of ('}', tag_end);
-
-			if (fields_end == std::string::npos)
-				fields_end = s.length ();
+			std::string::size_type fields_begin = normalize (s, s.find_first_of ('{', tag_end));
+			std::string::size_type fields_end = normalize (s, s.find_first_of ('}', fields_begin));
 
 			std::string fields;
 			if (fields_begin != std::string::npos && fields_end != std::string::npos)
@@ -304,7 +304,7 @@ sng::sng (const std::string & s) {
 			else if (tag == "IMAGE")
 				m_IMAGE = parse_IMAGE (fields, has_palette);
 			else if (tag == "private")
-				m_private = parse_private (fields);
+				parse_private (m_private, fields, s.substr (tag_end, fields_begin - tag_end));
 		}
 	}	
 }
@@ -317,7 +317,7 @@ long sng::height () const {
 	return m_IHDR.height;
 }
 
-pcolor sng::getpixel (unsigned int x, unsigned int y) const {
+pcolor sng::pixel (unsigned int x, unsigned int y) const {
 	if (x >= width () || y >= height ())
 		return pcolor ();
 
@@ -325,7 +325,7 @@ pcolor sng::getpixel (unsigned int x, unsigned int y) const {
 	return m_IHDR.palette ? m_PLTE.colors [r.idx] : r.c;
 }
 
-void sng::setpixel (unsigned int x, unsigned int y, pcolor c) {
+void sng::pixel (unsigned int x, unsigned int y, pcolor c) {
 	if (x >= width () || y >= height ())
 		return;
 
@@ -346,12 +346,56 @@ void sng::setpixel (unsigned int x, unsigned int y, pcolor c) {
 		m_IMAGE.pixels [y] [x].c = c;
 }
 
+std::string sng::keyword () const {
+	return m_tEXt.keyword;
+}
+
+void sng::keyword (const std::string & s) {
+	m_tEXt.keyword = s;
+}
+
+std::string sng::text () const {
+	return m_tEXt.text;
+}
+
+void sng::text (const std::string & s) {
+	m_tEXt.text = s;
+}
+
+std::string sng::time () const {
+	std::ostringstream os;
+	os << (1 + m_tIME.month) << "/" << (1 + m_tIME.day) << "/" << m_tIME.year << " " <<
+		(1 + m_tIME.hour) << ":" << (1 + m_tIME.minute) << ":" << (1 + m_tIME.second);
+
+	return os.str ();
+}
+
+void sng::time (short y, unsigned char m, unsigned char d, unsigned char hh, unsigned char mm, unsigned char ss) {
+	m_tIME = sng_tIME (y, m, d, hh, mm, ss);
+}
+
+std::string sng::private_ (const std::string & chunk) const {
+	if (! m_private.data.count (chunk))
+		return "";
+
+	return m_private.data.at (chunk);
+}
+
+void sng::private_ (const std::string & chunk, const std::string & text) {
+	if (chunk.empty ()) {
+		m_private.data.erase (chunk);
+		return;
+	}
+
+	m_private.data [chunk] = text;
+}
+
 std::ostream & operator << (std::ostream & os, const sng & p) {
 	/* IHDR */
 	os << "IHDR {" << std::endl <<
 		"\twidth: " << p.m_IHDR.width << std::endl <<
 		"\theight: " << p.m_IHDR.height << std::endl <<
-		"\tbitdepth: " << p.m_IHDR.depth << std::endl;
+		"\tbitdepth: " << static_cast <int> (p.m_IHDR.depth) << std::endl;
 	
 	if (p.m_IHDR.grayscale || p.m_IHDR.alpha || p.m_IHDR.palette || p.m_IHDR.color) {
 		os << "\tusing ";
@@ -432,11 +476,10 @@ std::ostream & operator << (std::ostream & os, const sng & p) {
 
 	/* private */
 	if (! p.m_private.data.empty ()) {
-		os << "private {" << std::endl;
 		for (std::map <std::string, std::string>::const_iterator it = p.m_private.data.begin (); it != p.m_private.data.end (); ++ it)
-			os << "\t" << it->first << ": " << it->second << std::endl;
-
-		os << "}";
+			os << "private " << it->first << " {" << std::endl <<
+				"\t\"" << it->second << "\"" << std::endl <<
+				"}" << std::endl;
 	}
 
 	return os;
