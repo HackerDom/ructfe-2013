@@ -559,13 +559,7 @@ def wildcardify(s):
                 continue
     return ''.join(ret)
 
-def check(ip):
-    name = random.choice(names)
-    surname = random.choice(surnames)
-    email = gen_random_string()
-    password = gen_random_string()
-    phone = gen_phone_number()
-
+def create_user(name, surname, email, password, phone):
     params = {
         "action": "add",
         "name" : name,
@@ -577,7 +571,25 @@ def check(ip):
 
     resp = requests.get("http://%s:%s/" % (ip, PORT), params=params)
 
-    if "Success" not in resp.text:
+    if "Success" in resp.text:
+        return "success"
+    if "exists" in resp.text:
+        return "exists"
+    return "fail"
+
+def check(ip):
+    name = random.choice(names)
+    surname = random.choice(surnames)
+    email = gen_random_string()
+    password = gen_random_string()
+    phone = gen_phone_number()
+
+    result = create_user(name, surname, email, password, phone)
+    if result == "exists":
+        name += gen_random_string()
+        result = create_user(name, surname, email, password, phone)
+
+    if result != "success":
         return MUMBLE
 
     params = {
@@ -620,18 +632,12 @@ def put(ip, flag_id, flag):
 
     phone = gen_phone_number()
 
-    params = {
-        "action": "add",
-        "name" : name,
-        "surname": surname,
-        "phone": phone,
-        "email": email,
-        "password": password
-    }
+    result = create_user(name, surname, email, password, phone)
+    if result == "exists":
+        name += gen_random_string()
+        result = create_user(name, surname, email, password, phone)
 
-    resp = requests.get("http://%s:%s/" % (ip, PORT), params=params)
-
-    if "Success" not in resp.text:
+    if result != "success":
         return MUMBLE
 
     print("%s_%s_%s" % (name, surname, password))
