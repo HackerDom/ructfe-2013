@@ -1,13 +1,13 @@
 package models
 
-import components.Chaos
+import components.{Guest, Chaos, AuthorisedUser}
 import models._
 
 import play.api.Play.current
 import play.api.db.slick._
 import play.api.db.slick.Config.driver.simple._
 import java.sql.Timestamp
-
+import scala.Some
 
 
 object Message {
@@ -29,8 +29,18 @@ case class Message(
                     author_id: Int
                     ) {
 
-}
+  lazy val isPublic = secret.isEmpty
 
+  val author = Query(Users).filter(_.id === this.author_id)
+  val owners = Query(Users).filter(_.id === this.author_id) union Query(SentMessages).filter(_.message_id === this.id).innerJoin(Users).map({case (_, user) => user})
+
+
+  def canRead(implicit user: User) = Messages.canRead.filter(_.id === id).exists
+  def canSend(implicit user: User) = Messages.canSend.filter(_.id === id).exists
+
+  def haveRead(implicit user: User) = Messages.haveRead.filter(_.id === id).exists
+
+}
 
 object Messages extends Table[Message]("MESSAGES") {
   def id = column[Int]("ID", O.PrimaryKey, O.AutoInc)
@@ -44,4 +54,16 @@ object Messages extends Table[Message]("MESSAGES") {
 
   def * = id.? ~ message ~ secret ~ mark ~ created.? ~ author_id <> (Message.apply _, Message.unapply _)
 
+  val all = Query(Messages)
+  val public = Query(Messages).filter(_.secret.isNull)
+
+  def canRead(u: AuthorisedUser):Query[Messages.type, Message] = u match {
+    case user:User => canRead(user)
+    case _ => public
+  }
+  def canRead(implicit user: User) = canSend union public union all.innerJoin(SentMessages).filter(_._2.user_id === user.id).map(_._1)
+  def canSend(implicit user: User) = all.filter(_.author_id === user.id)
+
+  def haveRead(implicit user: User) = canRead.innerJoin(SentMessages).filter(_._2.read === true).map(_._1)
+  def unread(implicit user: User) = canRead.innerJoin(SentMessages)
 }

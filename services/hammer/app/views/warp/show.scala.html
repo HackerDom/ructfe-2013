@@ -1,0 +1,14 @@
+@(message: Message)(implicit request: Request[_], user: components.AuthorisedUser, session: Session)
+@import org.apache.commons.codec.binary.Hex
+@import play.api.db.slick.Config.driver.simple._
+
+
+@main(s"Message ${message.id.get}") {
+    <div class="warp">
+        <div class="warp-author">@message.author_id</div>
+        <div class="warp-creation_time">@message.created</div>
+        <div class="warp-public">@message.message</div>
+        <div class="warp-secret">@message.secret</div>
+        <div class="warp-mark">@message.mark</div>
+    </div>
+}
