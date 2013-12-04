@@ -7,4 +7,4 @@ Type=simple
 User=pfs
 Group=pfs
 
-ExecStart=/home/pfs.rb /home/pfs/t
+ExecStart=/home/pfs/pfs.rb /home/pfs/t

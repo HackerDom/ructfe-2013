@@ -9,7 +9,7 @@ User=pfs
 Group=pfs
 
 Environment=MOJO_MODE=production
-ExecStart= /home/PFS daemon
+ExecStart= /home/pfs/PFS daemon
 
 [Install]
 WantedBy=multi-user.target
