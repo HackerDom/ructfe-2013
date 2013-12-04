@@ -14,6 +14,14 @@ std::string _ (const std::string & s) {
 	return s;
 }
 
+template <typename T>
+T get_num (std::istringstream & is) {
+	long long x;
+	is >> x;
+
+	return static_cast <T> (x);
+}
+
 sng_IHDR::sng_IHDR () :
 	width (0),
 	height (0),
@@ -32,11 +40,11 @@ sng_IHDR parse_IHDR (const std::string & s) {
 		field = _ (field);
 
 		if (field == "height")
-			is >> r.height;
+			r.height = get_num <long> (is);
 		else if (field == "width")
-			is >> r.width;
+			r.width = get_num <long> (is);
 		else if (field == "bitdepth")
-			is >> r.depth;
+			r.depth = get_num <unsigned char> (is);
 		else if (field == "using") {
 			std::string opt;
 
@@ -139,6 +147,7 @@ sng_tIME::sng_tIME (short year, unsigned char month, unsigned char day, unsigned
 	minute (minute),
 	second (second) { }
 
+
 sng_tIME parse_tIME (const std::string & s) {
 	sng_tIME r;
 
@@ -148,17 +157,17 @@ sng_tIME parse_tIME (const std::string & s) {
 		field = _ (field);
 
 		if (field == "year")
-			is >> r.year;
+			r.year = get_num <short> (is);
 		else if (field == "month")
-			is >> r.month;
+			r.month = get_num <unsigned char> (is);
 		else if (field == "day")
-			is >> r.day;
+			r.day = get_num <unsigned char> (is);
 		else if (field == "hour")
-			is >> r.hour;
+			r.hour = get_num <unsigned char> (is);
 		else if (field == "minute")
-			is >> r.minute;
+			r.minute = get_num <unsigned char> (is);
 		else if (field == "second")
-			is >> r.second;
+			r.second = get_num <unsigned char> (is);
 	}
 
 	return r;
@@ -391,7 +400,6 @@ void sng::private_ (const std::string & chunk, const std::string & text) {
 }
 
 std::ostream & operator << (std::ostream & os, const sng & p) {
-	/* IHDR */
 	os << "IHDR {" << std::endl <<
 		"\twidth: " << p.m_IHDR.width << std::endl <<
 		"\theight: " << p.m_IHDR.height << std::endl <<
@@ -410,11 +418,8 @@ std::ostream & operator << (std::ostream & os, const sng & p) {
 
 	os << "}" << std::endl;
 
-	/* gAMA */
 	os << "gAMA { " << std::fixed << std::setprecision (2) << p.m_gAMA.value << " }" << std::endl;
 
-	/* hIST */
-	/* PLTE */
 	if (! p.m_hIST.values.empty ()) {
 		os << "hIST {" << std::endl << "\t";
 		std::copy (p.m_hIST.values.begin (), p.m_hIST.values.end (), std::ostream_iterator <short> (os, " "));
@@ -429,7 +434,6 @@ std::ostream & operator << (std::ostream & os, const sng & p) {
 		os << "}" << std::endl;
 	}
 
-	/* tIME */
 	os << "tIME {" << std::endl <<
 		"\tyear " << p.m_tIME.year << std::endl <<
 		"\tmonth " << static_cast <int> (p.m_tIME.month) << std::endl <<
@@ -439,14 +443,12 @@ std::ostream & operator << (std::ostream & os, const sng & p) {
 		"\tsecond " << static_cast <int> (p.m_tIME.second) << std::endl <<
 		"}" << std::endl;
 
-	/* tEXt */
 	if (! p.m_tEXt.keyword.empty ())
 		os << "tEXt {" << std::endl <<
 		"\tkeyword: " << p.m_tEXt.keyword << std::endl <<
 		"\ttext: " << p.m_tEXt.text << std::endl <<
 		"}" << std::endl;
 
-	/* IMAGE */
 	os << "IMAGE {" << std::endl << "\tpixels hex" << std::endl;
 	if (p.m_hIST.values.empty ()) {
 		for (std::vector <std::vector <color_t>>::const_iterator it = p.m_IMAGE.pixels.begin (); it != p.m_IMAGE.pixels.end (); ++ it) {
@@ -474,7 +476,6 @@ std::ostream & operator << (std::ostream & os, const sng & p) {
 	}
 	os << "}" << std::endl;
 
-	/* private */
 	if (! p.m_private.data.empty ()) {
 		for (std::map <std::string, std::string>::const_iterator it = p.m_private.data.begin (); it != p.m_private.data.end (); ++ it)
 			os << "private " << it->first << " {" << std::endl <<

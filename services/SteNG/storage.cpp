@@ -8,7 +8,7 @@
 
 #include "storage.h"
 
-sng_storage * sng_storage::self = nullptr;
+std::unique_ptr <sng_storage> sng_storage::self (nullptr);
 const char * db_name = "./steng.db";
 
 int extract_id (const std::string & s) {
@@ -60,9 +60,9 @@ sng_storage::sng_storage () : max_id (0) {
 
 sng_storage * sng_storage::instance () {
 	if (! sng_storage::self)
-		sng_storage::self = new sng_storage ();
+		sng_storage::self.reset (new sng_storage ());
 
-	return sng_storage::self;
+	return sng_storage::self.get ();
 }
 
 std::mutex mtx;
@@ -74,7 +74,7 @@ const std::list <std::string> & sng_storage::get_all_items () const {
 }
 
 std::string make_filename (const std::string & id) {
-	return std::string ("./db/") + id + ".sng";
+	return std::string ("./db/") + id;
 }
 
 sng sng_storage::get_item (const std::string & id) const {
@@ -88,7 +88,7 @@ sng sng_storage::get_item (const std::string & id) const {
 
 	std::string s, s0;
 	while (std::getline (sng_file, s0)) {
-		s.append (s0);
+		s += s0;
 		s.push_back ('\n');
 	}
 
@@ -106,7 +106,7 @@ std::string sng_storage::put_item (const sng & pic) {
 	std::ostringstream os;
 	os << std::hex << (++ max_id);
 
-	std::string id = os.str ();
+	std::string id = os.str () + ".sng";
 
 	std::string filename = make_filename (id);
 
@@ -123,6 +123,8 @@ std::string sng_storage::put_item (const sng & pic) {
 
 	db_index << id << std::endl;
 	db_index.close ();
+
+	items.push_back (id);
 
 	return id;
 }

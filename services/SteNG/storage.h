@@ -3,10 +3,11 @@
 
 #include <list>
 #include <string>
+#include <memory>
 #include "sng.h"
 
 class sng_storage {
-	static sng_storage * self;
+	static std::unique_ptr <sng_storage> self;
 
 	std::list <std::string> items;
 	int max_id;
