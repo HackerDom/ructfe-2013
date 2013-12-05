@@ -14,6 +14,7 @@ create table MESSAGES (
 create table MESSAGES_TO_USERS(
   USER_ID int not null,
   MESSAGE_ID int not null,
+  READ int not null,
 
   unique(USER_ID,MESSAGE_ID),
   FOREIGN KEY (USER_ID) references USERS(ID),

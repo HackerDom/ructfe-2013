@@ -8,22 +8,13 @@
 #include <unistd.h>
 #include <memory>
 
-#define PORT 18360
-#define NUMBEROFCLIENTS 5
-
 class socket_t
 {
 public:
-	//~socket_t();
-	//for test
-	void closeSocket();
+	~socket_t();
 
 protected:
 	int sock;
-	const int family = AF_INET;
-	const int address = htonl(INADDR_ANY);
-	const int port = htons(PORT);
-	const int numberOfClients = NUMBEROFCLIENTS;
 };
 
 class client : public socket_t
@@ -31,10 +22,10 @@ class client : public socket_t
 public:
 	client(int sockNumber, sockaddr clientSock);
 	
-	bool needRead();
+	bool canRead(int timeout = 5);
 	std::string receiveString();
 	std::string receiveAll();
-	void sendString(std::string data);
+	void sendString(const std::string& data);
 	
 private:
 	sockaddr sclient;
@@ -43,9 +34,9 @@ private:
 class server : public socket_t
 {
 public:
-	server();
+	server(int port = 18360,  int numberOfClients = 5);
 
-	client acceptConnection();
+	std::shared_ptr<client> acceptConnection();
 
 private:
 	sockaddr_in addr;
