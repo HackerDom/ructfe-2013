@@ -37,7 +37,7 @@ hash str: {
 
 write{file;data}:{
      if (0<fdûsys.open{file;
-                       `O_CREAT`O_TRUNC`O_WRONLY;
+                       `O_CREAT`O_EXCL`O_WRONLY;
                        8Â6 4 4})
         {
         sys.write{fd;data;#data};
