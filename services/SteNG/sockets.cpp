@@ -1,49 +1,30 @@
 #include "sockets.h"
 #include "excHandler.h"
+     
 
-void socket_t::closeSocket()
-{
-	if (close(sock) == -1)
-        {
-                std::cout << "Error on close() func call, error: " << errno << std::endl;
-                
-        }
-}
-/*
 socket_t::~socket_t()
 {
-	if (close(sock) == -1)
-	{
-		std::cout << "Error on close() func call, error: " << errno << std::endl;
-		errors = -1;
-	}
+	close(sock);
 }
-*/
-server::server()
+
+server::server(int port, int numberOfClients)
 {
-	
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 		throw excHandler("socket"); 
 
         memset(&addr, 0, sizeof(sockaddr_in));
-        addr.sin_family = family;
-        addr.sin_addr.s_addr = address;
-        addr.sin_port = port;
+        addr.sin_family = AF_INET;
+        addr.sin_addr.s_addr = htonl(INADDR_ANY);
+        addr.sin_port = htons(port);
 
         if (bind(sock, (sockaddr *) &addr, sizeof(sockaddr_in)) == -1)
-	{
-		close(sock);
 		throw excHandler("bind");
-	}
 
         if (listen(sock, numberOfClients) == -1)
-	{
-		close(sock);
-		throw excHandler("listen");        
-        }
+		throw excHandler("listen");
 }
 
-client server::acceptConnection()
+std::shared_ptr<client> server::acceptConnection()
 {
 	sockaddr clientAddr;
 	memset(&clientAddr, 0, sizeof(sockaddr));
@@ -53,7 +34,7 @@ client server::acceptConnection()
 	if ((client_sock = accept(sock, &clientAddr, &addrLen)) == -1)
 		excHandler("accept");
 
-	return client(client_sock, clientAddr);
+	return std::shared_ptr<client>(new client(client_sock, clientAddr));
 }
 
 client::client(int sockNumber, sockaddr clientSock) : sclient(clientSock)
@@ -81,11 +62,10 @@ std::string client::receiveString()
 std::string client::receiveAll()
 {
 	char buffer[1024];
-	memset(&buffer, 0, 1024);
 	int received;
 	std::string data;
 
-	while (needRead())
+	while (canRead())
 	{
 		if ((received = recv(sock, &buffer, 1024, 0)) == -1)
 			throw excHandler("recv");
@@ -93,27 +73,24 @@ std::string client::receiveAll()
 		if (received == 0)
 			return data;
 		
+		buffer[received] = '\0';
 		data += buffer;
-		memset(&buffer, 0, 1024);
 	}
 		
 	return data;
 }
 
-bool client::needRead()
+bool client::canRead(int timeout)
 {
 	fd_set readset;
         FD_ZERO(&readset);
 	FD_SET(sock, &readset);
-	timeval timeout;
-        timeout.tv_sec = 1;
-        timeout.tv_usec = 5;
+	timeval  stimeout;
+        stimeout.tv_sec = timeout;
+        stimeout.tv_usec = 0;
 
-	if (select(1+sock, &readset, NULL, NULL, &timeout) == -1)
-	{
-		close(sock);
+	if (select(1+sock, &readset, NULL, NULL, &stimeout) == -1)
 		throw excHandler("select");
-	}
 			
 	if (FD_ISSET(sock, &readset))
 		return true;
@@ -121,11 +98,15 @@ bool client::needRead()
 	return false;
 }
 
-void client::sendString(std::string data)
+void client::sendString(const std::string & data)
 {
-	if (send(sock, data.c_str(), data.size(), 0) == -1)
+	int c, offset = 0, size = data.length();
+	const char* current = data.c_str();
+
+	while (offset < size)
 	{
-		close(sock);
-		throw excHandler("send");
+		if ((c = send(sock, &current[offset], size-offset, 0)) == -1)
+			throw excHandler("send");
+		offset += c;
 	}
 }
