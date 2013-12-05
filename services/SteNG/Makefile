@@ -1,6 +1,6 @@
 .PHONY : all
 
-CHECKER=extract
+CHECKER=./checker/extract
 SERVICE=steng
 
 CHECKER_SRC=extract.cpp sng.cpp stego.cpp
@@ -10,7 +10,6 @@ all: $(CHECKER) $(SERVICE)
 
 $(CHECKER): Makefile $(CHECKER_SRC)
 	g++ -std=c++11 -o $(CHECKER) $(CHECKER_SRC)
-	mv $(CHECKER) ./checker/
 
 $(SERVICE): Makefile $(SERVICE_SRC)
 	g++ -std=c++11 -pthread -o $(SERVICE) $(SERVICE_SRC)
