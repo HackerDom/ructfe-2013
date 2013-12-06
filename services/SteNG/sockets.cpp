@@ -1,16 +1,28 @@
 #include "sockets.h"
 #include "excHandler.h"
-     
+
+socket_t::socket_t() : closed(false)
+{}
 
 socket_t::~socket_t()
 {
+	closed = true;
 	close(sock);
+}
+
+bool socket_t::isClosed()
+{
+	return closed;
 }
 
 server::server(int port, int numberOfClients)
 {
 	if ((sock = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 		throw excHandler("socket"); 
+	
+	int on = 1;
+	if(setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &on ,sizeof(on)) == -1)
+		throw excHandler("setsockopt");
 
         memset(&addr, 0, sizeof(sockaddr_in));
         addr.sin_family = AF_INET;
@@ -51,7 +63,11 @@ std::string client::receiveString()
 	while ((received = recv(sock, &letter, 1, 0)) != -1)
 	{
 		if ((letter == '\n') || (received == 0))
+		{
+			if ((received == 0) && (canRead()))
+				closed = true;
 			return data;
+		}
 
 		data += letter;
 	}
@@ -61,17 +77,22 @@ std::string client::receiveString()
 
 std::string client::receiveAll()
 {
-	char buffer[1024];
+	char buffer[1025];
 	int received;
 	std::string data;
 
 	while (canRead())
 	{
-		if ((received = recv(sock, &buffer, 1024, 0)) == -1)
+		if ((received = recv(sock, buffer, 1024, 0)) == -1)
 			throw excHandler("recv");
 		
 		if (received == 0)
+		{
+			if (data.length() == 0)
+				closed = true;
+
 			return data;
+		}
 		
 		buffer[received] = '\0';
 		data += buffer;
@@ -91,11 +112,17 @@ bool client::canRead(int timeout)
 
 	if (select(1+sock, &readset, NULL, NULL, &stimeout) == -1)
 		throw excHandler("select");
-			
+	
 	if (FD_ISSET(sock, &readset))
 		return true;
 
 	return false;
+}
+
+void client::sendStringEndl(const std::string & data)
+{
+	sendString(data);
+	sendString(std::string("\n"));
 }
 
 void client::sendString(const std::string & data)

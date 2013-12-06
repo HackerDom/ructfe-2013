@@ -11,10 +11,13 @@
 class socket_t
 {
 public:
+	socket_t();
 	~socket_t();
+	bool isClosed();
 
 protected:
 	int sock;
+	bool closed;
 };
 
 class client : public socket_t
@@ -25,6 +28,7 @@ public:
 	bool canRead(int timeout = 5);
 	std::string receiveString();
 	std::string receiveAll();
+	void sendStringEndl(const std::string& data);
 	void sendString(const std::string& data);
 	
 private:
