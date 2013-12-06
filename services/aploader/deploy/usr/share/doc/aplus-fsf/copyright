@@ -1,0 +1,11 @@
+This package created by Neil Roeth <neil@debian.org> Wed, 20 Mar 2002.
+
+A+ and the A+ Reference Manual are Copyright 1995-2008 Morgan Stanley Dean
+Witter & Co.  They are distributed under the GNU General Public License and
+the GNU Free Documentation License and are available from
+http://www.aplusdev.org/.
+
+On Debian systems, the complete text of the GNU General Public
+License can be found in /usr/share/common-licenses/GPL file.
+
+Questions, comments, etc. may be sent to help@aplusdev.org. 

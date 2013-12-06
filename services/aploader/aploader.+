@@ -1,25 +1,29 @@
 #! /usr/bin/a+ -q
 
-strip s: {
-  (~sÅ(" ", "\n"))/s
+strip{s;l}: {
+  (~sÅl)/s
 }
 
-read n: {
+r n: {
  xûnÒ' ';
  sys.read{0;x;n};
- strip x
+ strip{x;"\n"}
 }
 
-get: {
- nameûread 32;
- sys.chdir "files";
- sys.readmat name
+fget: {
+ nameûr 16;
+ strip{name;" "};
+ nameûhash{name};
+ read{name}
 }
 
-put: {
-  nameûread 32;
-  valûread 32;
-  sys.chdir("files");
+fput: {
+  nameûr 16;
+  valûr 32;
+  strip{name;" "};
+  strip{val;" "};
+  sys.chdir{"files"};
+  nameûhash{name};
   write{name;val}
 }
 
@@ -28,29 +32,45 @@ list: {
 }
 
 hash str: {
- str
+  wû4 4 Ò str;
+  tû12 Ò 1 Õ w; 
+  hdû20 Ò > x¡ b¡ 1#w;
+  hd,t
+}
+
+n y m: ô n ÷ ô m
+x c: {
+  wû¢1÷5Ùô¢1÷5Ùôc;
+  sû+/+/> 1 0 ¢1 y¡ 3 Ò <> 1 0 ¢1 ÷¡ 3 Ò < w;
+  rû(w ^ 4=s) © (3=s);
+  `chr © 48 + d{r}
+}
+
+b{v}: {
+  iû`int©v;
+  3 3 Ò 0 ¨i^®Ä2*É8 
+}
+
+d{v}: {
+  pû>5Ò<÷Ä2*É5;
+  +/ôp«v
 }
 
 write{file;data}:{
-     if ((`char=©data)^2=ÒÒdata) dataûclean{data};
-     if (0<fdûsys.open{file;
-                       `O_CREAT`O_TRUNC`O_WRONLY;
-                       8Â6 4 4})
-        {
-        sys.write{fd;data;#data};
-        sys.close{fd};
-        };
-     }
-
-clean{n}:Ø(cleanline¡<@1 n),¡<"\n"
-
-cleanline{x}:(-+/^\' '=÷x)Õx
-
-cû1Ùread 1
-
-case (c) {
-  'g';get;
-  'p';put;
-  'l';list;
+if (0<fdûsys.open{file;
+		  `O_CREAT`O_EXCL`O_WRONLY;
+		  8Â6 4 4})
+  {
+    sys.write{fd;data;#data};
+    sys.close{fd};
+  };
 }
+
+read{file}: {
+ sys.chdir{"files"};
+ sys.readmat file
+}
+  
+âr{4}
+
 sys.exit 0
