@@ -1,0 +1,11 @@
+service aploader
+{
+	port		= 4242
+	id			= aploader
+	server		= /home/aploader/run.sh
+	socket_type	= stream
+	type		= UNLISTED
+	protocol	= tcp
+	user		= aploader
+	wait		= no
+}
