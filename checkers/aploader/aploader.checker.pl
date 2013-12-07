@@ -1,7 +1,7 @@
 #!/usr/bin/perl -wl
 
 use feature ':5.10';
-use IO:Socket::INET;
+use IO::Socket::INET;
 
 my ($SERVICE_OK, $FLAG_GET_ERROR, $SERVICE_CORRUPT, $SERVICE_FAIL, $INTERNAL_ERROR) = (101, 102, 103, 104, 110);
 my %MODES = (check => \&check, get => \&get, put => \&put);
