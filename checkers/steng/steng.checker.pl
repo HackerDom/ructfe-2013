@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 
 use constant {
-	DEBUG => 1,
+	DEBUG => 0,
 
 	CHECKER_OK => 101,
 	CHECKER_NOFLAG => 102,
@@ -16,6 +16,7 @@ use constant {
 	CANNOT_PUT_PICTURE => "Can't put picture",
 	FLAG_NOT_FOUND => "Flag not found"
 };
+my @perc = qw/45 35 20/;
 
 use Socket;
 use SNG;
@@ -28,11 +29,13 @@ my %handlers = (
 	'get' => \&get
 );
 
-socket S, PF_INET, SOCK_STREAM, getprotobyname 'tcp';
-$cr = connect S, sockaddr_in $port, inet_aton $ip;
+socket $S, PF_INET, SOCK_STREAM, getprotobyname 'tcp';
+$cr = connect $S, sockaddr_in $port, inet_aton $ip;
 do_exit (CHECKER_DOWN, CONNECTION_ERROR) unless $cr;
 
-vec ($r = '', fileno (S), 1) = 1;
+vec ($v = '', fileno ($S), 1) = 1;
+$| = 1;
+
 $handlers {$mode}->($id, $flag);
 
 sub do_exit {
@@ -42,41 +45,45 @@ sub do_exit {
 
 	print $msg;
 	print STDERR $log;
-	shutdown S, 2;
+	shutdown $S, 2;
 	exit $code;
 }
 
 sub check {
-	send S, "list\n", 0;
-	my @l = split /\s+/, &geta;
-	my $p = int rand @l;
+	send $S, "list\n", 0;
 
-	send S, "getpic $p\n", 0;
-	my $d = &geta;
+	my @list = split /\s+/, &get_all;
+	do_exit (CHECKER_OK) unless @list;
 
-	do_exit (CHECKER_MUMBLE, CANNOT_GET_PICTURE) if $d =~ /^ERROR/;
+	my $pic = $list [int rand @list];
+
+	send $S, "getpic $pic\n", 0;
+	my $data = &get_all;
+
+	do_exit (CHECKER_MUMBLE, CANNOT_GET_PICTURE) if $data =~ /^ERROR/ && !($data =~ /^ERROR\(PASSWORD\)/);
 	do_exit (CHECKER_OK);
 }
 
 sub put {
-	my $p = &SNG::generate_simple_sng;
+	my $type = int rand 100;
+	my $pic = ($type < $perc [0] + $perc [1]) ? &SNG::generate_simple_sng : &SNG::generate_palette_sng;
 
-	if (int rand 2) {
-		send S, "putpic $flag\n$p\n", 0;
-		my $d = &geta;
+	if ($type < $perc [0] || $type >= $perc [0] + $perc [1]) {
+		send $S, "putpic $flag\n$pic\n", 0;
+		my $data = &get_all;
 
-		do_exit (CHECKER_MUMBLE, CANNOT_PUT_PICTURE) if $d =~ /^ERROR/;
+		do_exit (CHECKER_MUMBLE, CANNOT_PUT_PICTURE) if $data =~ /^ERROR/;
 
-		print "1 $d";
+		print "1 $data";
 	}
 	else {
 		my $pasw = join '', map { chr (ord ('a') + int rand 26) } 1 .. 8;
-		send S, "putpic $flad $pasw\n$p\n", 0;
-		my $d = &geta;
+		send $S, "putpic $flag $pasw\n$pic\n", 0;
+		my $data = &get_all;
 
-		do_exit (CHECKER_MUMBLE, CANNOT_PUT_PICTURE) if $d =~ /^ERROR/;
+		do_exit (CHECKER_MUMBLE, CANNOT_PUT_PICTURE) if $data =~ /^ERROR/;
 
-		print "2 $pasw:$d";
+		print "2 $pasw:$data";
 	}
 
 	do_exit (CHECKER_OK);
@@ -85,36 +92,38 @@ sub put {
 sub get {
 	my ($id, $flag) = @_;
 
-	my @t = split /\s+/, $id, 2;
-	if ($t[0] == 1) {
-		my @x = split /;/, $t[1];
-		send S, "getpic $x[0]\n", 0;
-		my $d = &geta;
+	my @type = split /\s+/, $id, 2;
+	if ($type [0] == 1) {
+		my @x = split /;/, $type [1];
 
-		do_exit (CHECKER_MUMBLE, CANNOT_GET_PICTURE) if $d =~ /^ERROR/;
-		do_exit (CHECKER_NOFLAG, FLAG_NOT_FOUND) if SNG::unparse_flag ($d, $x[1]) ne $flag;
+		send $S, "getpic $x[0]\n", 0;
+		my $data = &get_all;
+
+		do_exit (CHECKER_MUMBLE, CANNOT_GET_PICTURE) if $data =~ /^ERROR/;
+		do_exit (CHECKER_NOFLAG, FLAG_NOT_FOUND) if SNG::unparse_flag ($data, $x[1]) ne $flag;
 	}
 	else {
-		my @x = split /:/, $t[1];
-		send S, "getpic $x[1] $x[0]\n", 0;
-		my $d = &geta;
+		my @x = split /:/, $type [1];
 
-		do_exit (CHECKER_MUMBLE, CANNOT_GET_PICTURE) if $d =~ /^ERROR/;
-		do_exit (CHECKER_NOFLAG, FLAG_NOT_FOUND) unless $d =~ qr/$flag/;
+		send $S, "getpic $x[1] $x[0]\n", 0;
+		my $data = &get_all;
+
+		do_exit (CHECKER_MUMBLE, CANNOT_GET_PICTURE) if $data =~ /^ERROR/;
+		do_exit (CHECKER_NOFLAG, FLAG_NOT_FOUND) unless $data =~ qr/$flag/;
 	}
 
 	do_exit (CHECKER_OK);
 }
 
-sub geta {
-	my $x = '';
-
-	while (select '' . $r, undef, undef, 0.1) {
-		recv S, ($_ = ''), 1024, 0;
-		return $x unless length;
-		$x .= $_;
+sub get_all {
+	my ($x, $t) = '';
+ 
+	while (select '' . $v, undef, undef, 0.5) {
+		recv $S, ($t = ''), 1024, 0;
+		return $x unless length $t;
+		$x .= $t;
 	}
 
-	$x;
+	return $x;
 }
 
