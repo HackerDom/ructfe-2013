@@ -19,7 +19,7 @@ exports.index = function(req, res) {
 
 exports.home = function(req, res) {
     var id = req.params.id;
-    users.getUserFromId(req, res, id, function(user) {
+    users.getUserFromId(id, function(user) {
         tweets.getTweets(user, function(tweets) {
             res.render('home', {
                 'cookie_user': res.user,
@@ -53,7 +53,7 @@ exports.checkrandom = function(req, res) {
     if (id && random) {
         crypto.getIdByRandom(id, random, function(id) {
             if (id) {
-                users.getUserFromId(req, res, id, function(user) {
+                users.getUserFromId(id, function(user) {
                     users.createSession(req, res, user);
                     res.redirect('/');
                 });
@@ -69,7 +69,7 @@ exports.checkrandom = function(req, res) {
 exports.checkpub = function(req, res) {
     var id = req.body.id;
     if (id) {
-        users.getUserFromId(req, res, id.replace(" ",""), function(user) {
+        users.getUserFromId(id.replace(" ",""), function(user) {
             if (user) {
                 var random = crypto.random(64);
                 var randomId = crypto.saveRandom(user, random);
@@ -112,7 +112,7 @@ exports.retweet = function(req, res) {
 exports.tryfollow = function(req, res) {
     var userId = req.params.id;
     if (res.user && userId) {
-        users.getUserFromId(req, res, userId, function(user) {
+        users.getUserFromId(userId, function(user) {
             if (user) {
                 user.pending_followers[res.user.id] = userId;
                 users.saveUser(user);
@@ -126,13 +126,17 @@ exports.tryfollow = function(req, res) {
 
 exports.follow = function(req, res) {
     var userId = req.params.id;
-    if (res.user && userId) {
-        if (userId in res.user.pending_followers) {
-            res.user.followers.unshift(userId);
-            delete res.user.pending_followers[userId];
-            users.saveUser(res.user);
-            res.redirect('/');
-        }
+    if (res.user &&
+        userId &&
+        userId in res.user.pending_followers) {
+            users.getUserFromId(userId, function(user) {
+                user.tweets = res.user.tweets.concat(user.tweets);
+                res.user.followers.unshift(user.id);
+                delete res.user.pending_followers[user.id];
+                users.saveUser(res.user);
+                res.redirect('/');
+            });
+    } else {
+        res.redirect('/signin');
     }
-    res.redirect('/signin');
 }
