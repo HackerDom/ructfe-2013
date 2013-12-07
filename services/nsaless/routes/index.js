@@ -24,7 +24,7 @@ exports.home = function(req, res) {
             res.render('home', {
                 'cookie_user': res.user,
                 'url_user': user,
-                'tweets': tweets
+                'tweets': tweets,
             });
         });
     });
@@ -109,3 +109,30 @@ exports.retweet = function(req, res) {
     }
 }
 
+exports.tryfollow = function(req, res) {
+    var userId = req.params.id;
+    if (res.user && userId) {
+        users.getUserFromId(req, res, userId, function(user) {
+            if (user) {
+                user.pending_followers[res.user.id] = userId;
+                users.saveUser(user);
+                res.redirect('/' + userId);
+            } else {
+                res.redirect('/signin');
+            }
+        });
+    }
+}
+
+exports.follow = function(req, res) {
+    var userId = req.params.id;
+    if (res.user && userId) {
+        if (userId in res.user.pending_followers) {
+            res.user.followers.unshift(userId);
+            delete res.user.pending_followers[userId];
+            users.saveUser(res.user);
+            res.redirect('/');
+        }
+    }
+    res.redirect('/signin');
+}
