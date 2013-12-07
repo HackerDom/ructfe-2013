@@ -55,7 +55,7 @@ sub check {
 	my @list = split /\s+/, &get_all;
 	do_exit (CHECKER_OK) unless @list;
 
-	my $pic = $list [int rand @list];
+	my $pic = $list[int rand @list];
 
 	send $S, "getpic $pic\n", 0;
 	my $data = &get_all;
@@ -64,11 +64,22 @@ sub check {
 	do_exit (CHECKER_OK);
 }
 
+sub passw_gen {
+	my @p = map { chr (ord ('a') + int rand 26) } 1 .. (80 + int rand 20);
+	my $p = join '', @p;
+
+	my $k = @p / 5;
+	splice @p, int rand @p, 1 for 1 .. $k;
+	my $P = join '', @p;
+
+	($p, $P);
+}
+
 sub put {
 	my $type = int rand 100;
-	my $pic = ($type < $perc [0] + $perc [1]) ? &SNG::generate_simple_sng : &SNG::generate_palette_sng;
+	my $pic = ($type < $perc[0] + $perc[1]) ? &SNG::generate_simple_sng : &SNG::generate_palette_sng;
 
-	if ($type < $perc [0] || $type >= $perc [0] + $perc [1]) {
+	if ($type < $perc[0] || $type >= $perc[0] + $perc[1]) {
 		send $S, "putpic $flag\n$pic\n", 0;
 		my $data = &get_all;
 
@@ -77,24 +88,33 @@ sub put {
 		print "1 $data";
 	}
 	else {
-		my $pasw = join '', map { chr (ord ('a') + int rand 26) } 1 .. 8;
-		send $S, "putpic $flag $pasw\n$pic\n", 0;
+		my ($psw1, $psw2) = &passw_gen;
+		send $S, "putpic $flag $psw1\n$pic\n", 0;
 		my $data = &get_all;
 
 		do_exit (CHECKER_MUMBLE, CANNOT_PUT_PICTURE) if $data =~ /^ERROR/;
 
-		print "2 $pasw:$data";
+		print "2 $psw2:$data";
 	}
 
 	do_exit (CHECKER_OK);
+}
+
+sub expand_psw {
+	my @p = (shift);
+	my $l = length $p[0];
+	my $n = int rand 8;
+
+	push @p, (join '', map { chr (ord ('a') + int rand 26) } 1 .. $l) for 1 .. $n;
+	"@p";
 }
 
 sub get {
 	my ($id, $flag) = @_;
 
 	my @type = split /\s+/, $id, 2;
-	if ($type [0] == 1) {
-		my @x = split /;/, $type [1];
+	if ($type[0] == 1) {
+		my @x = split /;/, $type[1];
 
 		send $S, "getpic $x[0]\n", 0;
 		my $data = &get_all;
@@ -103,8 +123,9 @@ sub get {
 		do_exit (CHECKER_NOFLAG, FLAG_NOT_FOUND) if SNG::unparse_flag ($data, $x[1]) ne $flag;
 	}
 	else {
-		my @x = split /:/, $type [1];
+		my @x = split /:/, $type[1];
 
+		$x[0] = expand_psw ($x[0]);
 		send $S, "getpic $x[1] $x[0]\n", 0;
 		my $data = &get_all;
 
@@ -118,12 +139,12 @@ sub get {
 sub get_all {
 	my ($x, $t) = '';
  
-	while (select '' . $v, undef, undef, 0.5) {
+	while (select '' . $v, undef, undef, 0.2) {
 		recv $S, ($t = ''), 1024, 0;
 		return $x unless length $t;
 		$x .= $t;
 	}
 
-	return $x;
+	$x;
 }
 

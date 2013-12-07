@@ -11,6 +11,14 @@ exports.saveTweet = function(user, message) {
         client.hset('tweets', tweetId, JSON.stringify(tweet));
         client.set(tweetId, JSON.stringify(tweet));
         user.tweets.unshift(tweetId);
+        for (var i = 0; i < user.followers.length; ++i) {
+            users.getUserFromId(user.followers[i], function(another_user) {
+                if (another_user) {
+                    another_user.tweets.unshift(tweetId);
+                    users.saveUser(another_user);
+                }
+            });
+        }
         users.saveUser(user);
     }
 }
