@@ -4,19 +4,31 @@ var bignum = require("bignum");
 var crypto =  require('./crypto')
 var users = require('./users')
 
-exports.saveTweet = function(user, tweet) {
+exports.saveTweet = function(user, message) {
     if (user) {
         var tweetId = crypto.random(64);
-        client.hset('tweets', tweetId, tweet);
+        var tweet = {'id': tweetId, 'tweet': message};
+        client.hset('tweets', tweetId, JSON.stringify(tweet));
+        client.set(tweetId, JSON.stringify(tweet));
         user.tweets.unshift(tweetId);
         users.saveUser(user);
     }
 }
 
 exports.getTweets = function(user, callback) {
-    client.hmget('tweets', user.tweets, function(err, reply) {
-        callback(reply);
-    });
+    if (user) {
+        client.hmget('tweets', user.tweets, function(err, reply) {
+            if (reply) {
+                callback(reply.map(function(tweet) {
+                    return JSON.parse(tweet); 
+                }));
+            } else {
+                callback(undefined);
+            }
+        });
+    } else {
+        callback(undefined);
+    }
 }
 
 exports.store_tweet = function (id, message) {
