@@ -52,7 +52,7 @@ def get_by_id(id, col):
 
 
 def get_map_func(admin_name):
-    map_f = "function() { if (this.admin == " + admin_name + ") emit(this.admin, this.amount); }"
+    map_f = "function() { if (this.admin == '" + admin_name + "') emit(this.admin, this.amount); }"
     return Code(map_f)
 
 
@@ -95,7 +95,6 @@ def try_create_user(query, db):
         p = urlparse.parse_qs(query)
         admin = p['admin'][0]
         user = p['user'][0]
-        pswd = p['pswd'][0]
         col = collection.Collection(db, USERS)
         admin_exists = col.find_one({"admin": admin})
         if admin_exists is None:
@@ -103,7 +102,7 @@ def try_create_user(query, db):
         user_exists = col.find_one({"user": user})
         if user_exists is not None:
             return "User already exists"
-        id = col.insert({"admin": admin, "user": user, 'pswd': pswd})
+        id = col.insert({"admin": admin, "user": user})
         if id:
             return "Success"
         else:
@@ -116,18 +115,17 @@ def try_create_admin(query, db):
     try:
         p = urlparse.parse_qs(query)
         admin = p['admin'][0]
-        pswd = p['pswd'][0]
         col = collection.Collection(db, USERS)
         admin_exists = col.find_one({"admin": admin})
         if admin_exists is not None:
             return "Admin already exists", ""
-        id = col.insert({"admin": admin, "user": admin, 'pswd': pswd})
+        id = col.insert({"admin": admin, "user": admin})
         if id:
             return "Success", admin
         else:
             return "Can't create new admin", ""
     except KeyError:
-        return "You have to set [admin] and [pswd] parameters in order to register new admin", ""
+        return "You have to set [admin] parameter in order to register new admin", ""
 
 
 def get_hmac(message):
@@ -149,7 +147,6 @@ class MonHTTPRequestHandler(BaseHTTPRequestHandler):
             print action
             p = urlparse.parse_qs(parsed.query)
             admin = p['admin'][0]
-            #hm = p['hm'][0]
 
             db = connect_db(DBNAME)
             col = collection.Collection(db, COLNAME)
@@ -163,9 +160,10 @@ class MonHTTPRequestHandler(BaseHTTPRequestHandler):
                 print "no hmac sent"
                 self.send_error(401)
                 return
-            hm = self.headers['cookie']['hm']
-            print "hmac: " + hm
-            if hm != get_hmac(admin):
+            hm = self.headers['cookie']
+            h_mac = hm.split("=")
+
+            if h_mac[1] != get_hmac(admin):
                 self.send_error(401)
                 return
 
@@ -187,13 +185,12 @@ class MonHTTPRequestHandler(BaseHTTPRequestHandler):
             elif action == 'amount':
                 result_doc = mr_test(col, admin)
             else:
-                self.send_response(405) #501?
+                self.send_response(405)
                 return
 
             self.send_response(200)
             self.send_header('Content-type', 'text-html')
             self.end_headers()
-            self.wfile.write("Results: \n")
             for doc in result_doc:
                 self.wfile.write(doc)
                 self.wfile.write("\n")
@@ -237,11 +234,17 @@ class MonHTTPRequestHandler(BaseHTTPRequestHandler):
                     o_id = p['id'][0]
                 else:
                     o_id = ""
-                amount = p['amount'][0]
+
+                try:
+                    amount = int(p['amount'][0])
+                except ValueError:
+                    self.send_response(400)
+                    return
+
                 admin = p['admin'][0]
                 user = p['user'][0]
                 route = p['route'][0]
-                print "params: " + o_id + "; " + amount
+                print "params: " + o_id + "; " + str(amount)
                 if o_id == "":
                     result = add(amount, admin, user, route, col)
                 else:
@@ -277,10 +280,12 @@ def gen_key_if_not_exists():
     f.write(key)
 
 def run():
-    print('taxi service is starting...')
+    print 'taxi service is starting...'
     server_address = ('127.0.0.1', 8081)
     httpd = HTTPServer(server_address, MonHTTPRequestHandler)
-    print('Welcome to our taxi service! You can order trips, view your users\' routes and monitor your riding costs')
+    print 'Welcome to our taxi service!'
+    print 'You can order trips, view your users\' routes and monitor your riding costs'
+    print 'Please notice that we charge you extra 10% VAT according to our Ural state laws'
     gen_key_if_not_exists()
     httpd.serve_forever()
 
