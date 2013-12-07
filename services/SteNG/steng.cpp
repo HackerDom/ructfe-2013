@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <thread>
+#include <signal.h>
 #include "sockets.h"
 #include "storage.h"
 #include "stego.h"
@@ -80,24 +81,26 @@ void get_picture (std::shared_ptr <client> & c, const std::vector <std::string> 
 		sng pic = sng_storage::instance ()->get_item (op [1]);
 
 		std::string password = pic.private_ ("PASW");
-		if (! password.empty () && op.size () < 3) {
-			c->sendStringEndl ("ERROR(PASSWORD)");
-			return;
-		}
-
-		bool found = false;
-		std::vector <std::string>::const_iterator it = std::max_element (op.begin () + 2, op.end (), length_comparer ());
-
-		init_lcs (* it, password);
-		for (it = op.begin () + 2; it != op.end (); ++ it)
-			if (check_lcs (* it, password)) {
-				found = true;
-				break;
+		if (! password.empty ()) {
+			if (op.size () < 3) {
+				c->sendStringEndl ("ERROR(PASSWORD)");
+				return;
 			}
 
-		if (! found) {
-			c->sendStringEndl ("ERROR(PASSWORD)");
-			return;
+			bool found = false;
+			std::vector <std::string>::const_iterator it = std::max_element (op.begin () + 2, op.end (), length_comparer ());
+
+			init_lcs (* it, password);
+			for (it = op.begin () + 2; it != op.end (); ++ it)
+				if (check_lcs (* it, password)) {
+					found = true;
+					break;
+				}
+
+			if (! found) {
+				c->sendStringEndl ("ERROR(PASSWORD)");
+				return;
+			}
 		}
 
 		std::ostringstream os;
@@ -172,7 +175,7 @@ void put_picture (std::shared_ptr <client> & c, const std::vector <std::string> 
 
 void client_thread (std::shared_ptr <client> c) {
 	try {
-		while (! c->isClosed ()) {
+		while (true) {
 			std::string s = c->receiveString ();
 			if (s.empty ())
 				break;
@@ -196,7 +199,9 @@ void client_thread (std::shared_ptr <client> c) {
 	catch (...) { }
 }
 
-int main () {	
+int main () {
+	signal (SIGPIPE, SIG_IGN);
+
 	try {
 		server s;
 
