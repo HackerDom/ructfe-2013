@@ -1,6 +1,6 @@
 import time
 import BaseHTTPServer
-
+import urlparse
 from Crypto.Cipher import AES
 
 HOST_NAME = '0.0.0.0'
@@ -12,12 +12,18 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def do_GET(self):
         try:
-            if self.path == "/list":
-                result = list(self)
-            elif self.path == "/get":
-                result = get(self)
-            elif self.path == "/put":
-                result = put(self)
+            parsed_path = urlparse.urlparse(self.path)
+            parsed_qs = urlparse.parse_qs(parsed_path.query)
+
+            if parsed_path.path == "/list":
+                result = self.list()
+            elif parsed_path.path == "/get":
+                id = parsed_qs["id"][0]
+                key = parsed_qs["key"][0]
+                result = self.get(id, key)
+            elif parsed_path.path == "/put":
+                mes = parsed_qs["mes"][0]
+                result = self.put(mes)
             else:
                 self.send_response(404)
                 self.send_header("Content-type", "text/plain")
@@ -42,15 +48,22 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
 
     def list(self):
-        return self.path
+        return "\n".join(["\t".join([key,value]) for (key,value) in self.messages.items()])
 
-    def get(self):
-        return self.path
+    def get(self, id, key_hex):
+        enc_hex = self.messages[id]
+        mes = CryptoHelper.decrypt(enc_hex.decode("HEX"), key_hex.decode("HEX"))
+        return mes
 
-    def put(self):
-        with open("/proc/random", "rb") as f:
+    def put(self, mes):
+        with open("/dev/random", "rb") as f:
             key = f.read(32)
-        return self.path
+            id = f.read(8).encode("HEX")
+
+        enc = CryptoHelper.encrypt(mes, key).encode("HEX")
+        self.messages[id] = enc
+
+        return "\t".join([id, key.encode("HEX")])
 
 class CryptoHelper:
 
