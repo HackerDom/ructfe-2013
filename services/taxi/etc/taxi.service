@@ -1,0 +1,14 @@
+[Unit]
+Description=Taxi service
+After=mongodb.service
+
+[Service]
+Type=simple
+User=taxi
+Group=taxi
+
+WorkingDirectory=/home/taxi
+ExecStart=/usr/bin/python2 /home/taxi/taxi.py
+
+[Install]
+WantedBy=multi-user.target
