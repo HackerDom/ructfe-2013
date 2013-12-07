@@ -9,6 +9,7 @@ libraryDependencies ++= Seq(
   anorm,
   cache,
   "com.typesafe.play" %% "play-slick" % "0.5.0.8",
+  "com.github.play2war.ext" %% "redirect-playlogger" % "1.0.1",
   "commons-codec" % "commons-codec" % "1.8",
   "org.webjars" %% "webjars-play" % "2.2.1",
   "org.webjars" % "bootstrap" % "2.3.2",
