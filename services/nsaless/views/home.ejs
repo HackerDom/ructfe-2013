@@ -16,7 +16,9 @@
         <% if (tweets) { %>
            <% for (var i = 0; i < tweets.length; ++i) { %>
             <hr/>
-            <%= tweets[i] %>
+                <%= tweets[i].tweet %>
+                <br/>
+                <a href="/retweet/<%= tweets[i].id %>">Retweet</a>
             <hr/>
             <% } %>
         <% } %>

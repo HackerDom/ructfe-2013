@@ -1,5 +1,4 @@
 var crypto = require("./crypto");
-
 var tweets = require("./tweets")
 var users = require("./users")
 
@@ -100,6 +99,13 @@ exports.tweet = function(req, res) {
 }
 
 exports.retweet = function(req, res) {
-    res.end()
+    var tweetId = req.params.id;
+    if (res.user) {
+        res.user.tweets.unshift(tweetId);
+        users.saveUser(res.user);
+        res.redirect('/');
+    } else {
+        res.redirect('/signin');
+    }
 }
 
