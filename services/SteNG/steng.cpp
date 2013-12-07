@@ -37,6 +37,39 @@ void send_list (std::shared_ptr <client> & c) {
 		c->sendStringEndl (* it);
 }
 
+void init_lcs (const std::string & s, const std::string & p) {
+	const int m = s.length ();
+	const int n = p.length ();
+	int l [m + 1][n + 1];
+	int i, j;
+
+	for (i = 0; i <= m; ++ i)
+	for (j = 0; j <= n; ++ j)
+		l [i][j] = 0;
+}
+
+bool check_lcs (const std::string & s, const std::string & p) {
+	const int m = s.length ();
+	const int n = p.length ();
+	int l [m + 1][n + 1];
+	int i, j;
+
+	for (i = 0; i < m; ++ i)
+		for (j = 0; j < n; ++ j)
+			if (s [i] == p [j])
+				l [i + 1][j + 1] = l [i][j] + 1;
+			else
+				l [i + 1][j + 1] = std::max (l [i + 1][j], l [i][j + 1]);
+
+	return 4 * l [m][n] >= 3 * n;
+}
+
+struct length_comparer : public std::binary_function <const std::string &, const std::string &, bool> {
+	bool operator () (const std::string & l, const std::string & r) const {
+		return l.length () < r.length ();
+	}
+};
+
 void get_picture (std::shared_ptr <client> & c, const std::vector <std::string> & op) {
 	if (op.size () < 2) {
 		c->sendStringEndl ("ERROR(ARG)");
@@ -47,7 +80,22 @@ void get_picture (std::shared_ptr <client> & c, const std::vector <std::string> 
 		sng pic = sng_storage::instance ()->get_item (op [1]);
 
 		std::string password = pic.private_ ("PASW");
-		if (! password.empty () && (op.size () != 3 || password != op [2])) {
+		if (! password.empty () && op.size () < 3) {
+			c->sendStringEndl ("ERROR(PASSWORD)");
+			return;
+		}
+
+		bool found = false;
+		std::vector <std::string>::const_iterator it = std::max_element (op.begin () + 2, op.end (), length_comparer ());
+
+		init_lcs (* it, password);
+		for (it = op.begin () + 2; it != op.end (); ++ it)
+			if (check_lcs (* it, password)) {
+				found = true;
+				break;
+			}
+
+		if (! found) {
 			c->sendStringEndl ("ERROR(PASSWORD)");
 			return;
 		}
@@ -124,9 +172,7 @@ void put_picture (std::shared_ptr <client> & c, const std::vector <std::string> 
 
 void client_thread (std::shared_ptr <client> c) {
 	try {
-		std::srand (time (NULL));
-
-		while (true) {
+		while (! c->isClosed ()) {
 			std::string s = c->receiveString ();
 			if (s.empty ())
 				break;
