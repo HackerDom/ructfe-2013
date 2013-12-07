@@ -81,7 +81,13 @@ std::string client::receiveAll()
 	int received;
 	std::string data;
 
-	while (canRead())
+	if (!canRead())
+	{
+		closed = true;
+		return data;
+	}
+
+	do
 	{
 		if ((received = recv(sock, buffer, 1024, 0)) == -1)
 			throw excHandler("recv");
@@ -96,26 +102,27 @@ std::string client::receiveAll()
 		
 		buffer[received] = '\0';
 		data += buffer;
-	}
+	} while (canRead(3));
 		
 	return data;
 }
 
 bool client::canRead(int timeout)
 {
-	fd_set readset;
-        FD_ZERO(&readset);
-	FD_SET(sock, &readset);
-	timeval  stimeout;
-        stimeout.tv_sec = 0;
-        stimeout.tv_usec = 100000;
 	timeout *= 10;
 	
 	for (int i = 0; i < timeout; i++)
 	{
+		fd_set readset;
+        	FD_ZERO(&readset);
+        	FD_SET(sock, &readset);
+        	timeval  stimeout;
+       		stimeout.tv_sec = 0;
+	        stimeout.tv_usec = 100000;
+
 		if (select(1+sock, &readset, NULL, NULL, &stimeout) == -1)
 			throw excHandler("select");
-	
+
 		if (FD_ISSET(sock, &readset))
 			return true;
 	}
