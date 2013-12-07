@@ -54,7 +54,7 @@ public class TeamCheckThread extends Thread
 				if (delayed != null)
 				{
 					stage = "Get delayed flag";
-					wrapper.ExecuteAction("get", delayed.getFlagId() + " " + delayed.getFlagData());
+					wrapper.ExecuteAction("get", "\"" + delayed.getFlagId() + "\" " + delayed.getFlagData());
 					flagManager.InsertFlag(team.getId(), service.getId(), delayed.getFlagId(), delayed.getFlagData());
 				}
 				
@@ -63,14 +63,14 @@ public class TeamCheckThread extends Thread
 			}
 			else  {
 				stage = "Get new flag";
-				wrapper.ExecuteAction("get", flagId + " " + flagData);
+				wrapper.ExecuteAction("get", "\"" + flagId + "\" " + flagData);
 				flagManager.InsertFlag(team.getId(), service.getId(), flagId, flagData);
 			}
 			
 			stage = "Check random previous flag";
 			IdFlagPair old = flagManager.GetRandomAliveFlag(team.getId(), service.getId());
 			if (old != null) {
-				wrapper.ExecuteAction("get", old.toString());
+				wrapper.ExecuteAction("get", "\"" + old.getFlagId() + "\" " + old.getFlagData());
 			}
 			
 			dbAccessChecks.Insert(team.getId(), service.getId(), CheckerExitCode.OK.toInt(), "", "", 1);
