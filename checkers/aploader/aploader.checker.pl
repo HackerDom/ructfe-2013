@@ -25,7 +25,10 @@ sub check {
   my $sock = IO::Socket::INET->new("$ip:$port");
   return $SERVICE_FAIL unless $sock;
   print $sock "list";
-  my $resp = <$sock>;
+  my $resp = '';
+  while(my $line = <$sock>) {
+	  $resp .= $line;
+  }
   if($resp !~ /\.list: value/) {
     return $SERVICE_OK;
   }
@@ -36,6 +39,24 @@ sub check {
 
 sub get {
   my ($id, $flag) = @_;
+
+  $sock = IO::Socket::INET->new("$ip:$port");
+  return $SERVICE_FAIL unless $sock;
+  print $sock "list";
+  my $id_tl = substr $id, length($id) - 8, 8;
+  my $found = 0;
+
+  while(my $line = <$sock>) {
+	  chomp $line;
+	  if((substr $line, length($line) - 8, 8) eq $id_tl) {
+		  $found = 1;
+		  last;
+	  }
+  }
+
+  if(! $found) {
+	  return $FLAG_GET_ERROR;
+  }
 
   my $sock = IO::Socket::INET->new("$ip:$port");
   return $SERVICE_FAIL unless $sock;
@@ -59,6 +80,7 @@ sub put {
   return $SERVICE_FAIL unless $sock;
 
   print $sock "fput$id$flag";
+
   return $SERVICE_OK;
 }
 
