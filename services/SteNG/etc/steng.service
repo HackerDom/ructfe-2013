@@ -1,0 +1,13 @@
+[Unit]
+Description=Steganography Network Graphics
+After=network.target
+
+[Service]
+Type=simple
+User=steng
+Group=steng
+
+ExecStart=/home/steng/steng
+
+[Install]
+WantedBy=multi-user.target
