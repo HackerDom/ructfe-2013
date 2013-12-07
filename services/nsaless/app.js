@@ -25,6 +25,6 @@ app.post('/checkrandom/:id', routes.checkrandom)
 app.get('/tryfollow/:id', routes.tryfollow);
 app.get('/follow/:id', routes.follow);
 
-app.listen(3000, function(){
-  console.log('listening 0.0.0.0:3000');
+app.listen(0xbeef, function(){
+  console.log('listening now');
 });

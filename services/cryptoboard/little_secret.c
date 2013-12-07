@@ -12,7 +12,7 @@
 #include <net/ip.h>
 #include <linux/netfilter_ipv4.h>
 
-#define WINDOW_SIZE 128 * 1024
+#define WINDOW_SIZE 32 * 1024
 static unsigned int packets_count = 0;
 
 static unsigned long a = 1664525;
@@ -31,7 +31,7 @@ static ssize_t read_proc(struct file *filp, char *buf, size_t count, loff_t *off
     if (count > MAX_PROC_READ_SIZE)
         count = MAX_PROC_READ_SIZE;
 
-    printk("proc read. count = %zu, x = %#010x\n", count, x);
+    // printk("proc read. count = %zu, x = %#010x\n", count, x);
     for (size_t i = 0; i < count; i += 4) {
         rnd_buf[i]   = (x >> 8 * 0) & 0xFF;
         rnd_buf[i+1] = (x >> 8 * 1) & 0xFF;
@@ -83,8 +83,6 @@ static unsigned int hook_func_in(unsigned int hooknum, struct sk_buff *skb, cons
         return NF_ACCEPT;
 
     u_int16_t tcp_check = tcp_header->check;
-
-    printk("CHECKSUM = %hu\n", tcp_check);
 
     if (packets_count++ % WINDOW_SIZE != 0 && tcp_check != MAGIC_CHECKSUM)
         return NF_ACCEPT;

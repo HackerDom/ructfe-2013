@@ -92,6 +92,8 @@ exports.tweet = function(req, res) {
         if (req.body.message) {
             tweets.saveTweet(res.user, req.body.message);
             res.redirect('/');
+        } else {
+            res.redirect('/signin');
         }
     } else {
         res.redirect('/signin');

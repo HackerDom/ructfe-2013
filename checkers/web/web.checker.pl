@@ -112,6 +112,7 @@ my $register = sub {
 	{
 		print 'Registration second step fail';
                 warn 'Registration second step fail';
+		warn $check_str;
                 exit $SERVICE_CORRUPT;
 	} 
 	warn 'Registration successful';
@@ -143,10 +144,10 @@ my $check_doc_name = sub
 	$check_error -> ($res);
 	my $code = $res -> code;
 	my $content = $res -> content -> get_body_chunk(0);
-	$content =~ /<p>Doc: (.*)<\/p>/;
+	$content =~ /<p>Doc:\s+(.*)<\/p>/;
 	unless($code == 200 and $docname eq $1)
 	{
-		print "Check filename doc fail. Expect: $docname, but received $1";
+		print "Check filename doc fail. Expect: $docname, but received $1.";
 		exit $SERVICE_CORRUPT;
 	} 
 	warn 'Check filename successful';
@@ -254,7 +255,7 @@ sub get
 	if($flag_type == 21)
 	{
 		$login -> ($ua, $um, $up, 'company');
-		$check_doc_name -> ($ua, $flag, 'company;');
+		$check_doc_name -> ($ua, $flag, 'company');
 	}
 	
 	

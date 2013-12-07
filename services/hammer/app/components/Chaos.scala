@@ -22,8 +22,6 @@ object Chaos {
 
     val hasher =  Cipher.getInstance(influence)
     hasher.init(Cipher.ENCRYPT_MODE, pass)
-    hasher.doFinal(message.getBytes())
-
-
+    hasher.doFinal(message.getBytes()).slice(0, 127)
   }
 }

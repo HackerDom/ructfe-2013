@@ -6,6 +6,7 @@ import models._
 import play.api.Play.current
 import play.api.db.slick._
 import play.api.db.slick.Config.driver.simple._
+import org.apache.commons.codec.binary.Hex
 import java.sql.Timestamp
 import scala.Some
 
@@ -16,8 +17,25 @@ object Message {
   }
   def create(message:String, secret:Option[String])(implicit author: User): Message = {
     val now = new Timestamp(new java.util.Date().getTime())
-    Message(None, message, secret, Chaos.makeMark(message+secret), Some(now), author.id.get)
+    val pub = secret.map({crypt(message, _)}).getOrElse(message)
+    Message(None, pub, secret, Chaos.makeMark(message+secret), Some(now), author.id.get)
   }
+
+  def cipher(message: Seq[Byte], key:Seq[Byte]):Seq[Byte] = {
+
+    message.zipWithIndex.map({case (b, i) =>
+      (b ^ key(i % key.length)).toByte
+    })
+  }
+
+  def crypt(message: String, key: String):String = {
+    Hex.encodeHexString(cipher(message.getBytes(), key.getBytes()).toArray)
+  }
+  
+  def decrypt(encoded: String, key:String):String = {
+    new String(cipher(Hex.decodeHex(encoded.toArray), key.getBytes()).toArray)
+  }
+  def markFromHex(hex: String) = Hex.decodeHex(hex.to[Array])
 }
 
 case class Message(
@@ -30,6 +48,10 @@ case class Message(
                     ) {
 
   lazy val isPublic = secret.isEmpty
+  lazy val hexMark = Hex.encodeHexString(mark)
+
+  lazy val cleanedMessage = message
+  lazy val realMessage = if(isPublic) message else Message.decrypt(message, secret.get)
 
   val author = Query(Users).filter(_.id === this.author_id)
   val owners = Query(Users).filter(_.id === this.author_id) union Query(SentMessages).filter(_.message_id === this.id).innerJoin(Users).map({case (_, user) => user})

@@ -1,14 +1,67 @@
-@(message: Message)(implicit request: Request[_], user: components.AuthorisedUser, session: Session)
+@(message: Message, author: User)(implicit request: Request[_], user: User, session: scala.slick.session.Session)
+
 @import org.apache.commons.codec.binary.Hex
 @import play.api.db.slick.Config.driver.simple._
 
 
 @main(s"Message ${message.id.get}") {
-    <div class="warp">
-        <div class="warp-author">@message.author_id</div>
-        <div class="warp-creation_time">@message.created</div>
-        <div class="warp-public">@message.message</div>
-        <div class="warp-secret">@message.secret</div>
-        <div class="warp-mark">@message.mark</div>
+    <div class="row">
+        <div class="span8">
+            <div class="row">
+                <strong class="span2">Author</strong>
+                <span id="warp-author" class="span6">@author.name</span>
+            </div>
+            <div class="row">
+                <strong class="span2">Created at</strong>
+                <span class="span6" id="warp-creation_time">@message.created.get.format("hh:mm:ss dd/MM/YYYY")</span>
+            </div>
+            <div class="row">
+                <strong class="span2">Public message</strong>
+                <div id="warp-public" class="span6">@Html(message.message) </div>
+            </div>
+            @if(! message.isPublic && message.canRead.run) {
+                <div class="row">
+                    <strong class="span2">Secret</strong>
+                    <span id="warp-secret" class="span6">@message.secret</span>
+                </div>
+                <div class="row">
+                    <strong class="span2">Real message</strong>
+                    <div id="warp-decrypt" class="span6">@Html(message.realMessage)</div>
+                </div>
+            }
+            <div class="row">
+                <strong class="span2">Mark of Chaos</strong>
+                <span id="warp-mark" class="span6">@message.hexMark</span>
+            </div>
+        </div>
+
+        @if(message.canRead.run) {
+            <div class="sender span4">
+                <legend>
+                    You can send this message
+                </legend>
+
+                <fieldset class="warp-send-form form-inline">
+                    <select id="warp-sender-select" class="input-large">
+                        @models.Users.haveNo(message).list.map { u =>
+                            <option value="@u.id"> @u.name </option>
+                        }
+                    </select>
+                    <a id="send-btn" class="btn" href="#">Send</a>
+                </fieldset>
+            </div>
+
+            <script>
+                $(document ).ready(function () {
+                    $("#warp-sender-select" ).select2()
+                })
+                $("#send-btn").click(function () {
+                    if( select2("val")) {
+                        var url = "@routes.Warp.send(message.id.get, -1)".replace("-1", $("#warp-sender-select").select2("val"))
+                        $(this ).attr("href", url);
+                    }
+                })
+            </script>
+        }
     </div>
 }

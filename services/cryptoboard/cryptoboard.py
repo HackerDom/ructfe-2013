@@ -1,3 +1,4 @@
+#!/usr/bin/python2
 import time
 import BaseHTTPServer
 import urlparse
@@ -8,10 +9,22 @@ PORT_NUMBER = 4369
 
 class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
-    messages = {}
-
     def do_GET(self):
         try:
+            try:
+                self.messages
+            except AttributeError as e:
+                self.messages = {}
+                try:
+                    with open("messages", "r") as fm:
+                        for line in fm.readlines():
+                            (id, enc_mes) = line.rstrip().split("\t")
+                            self.messages[id] = enc_mes
+                except IOError:
+                    pass
+                self.snapshot = open("messages", "a")
+
+
             parsed_path = urlparse.urlparse(self.path)
             parsed_qs = urlparse.parse_qs(parsed_path.query)
 
@@ -56,12 +69,14 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         return mes
 
     def put(self, mes):
-        with open("/dev/random", "rb") as f:
+        with open("/proc/random", "rb") as f:
             key = f.read(32)
             id = f.read(8).encode("HEX")
 
         enc = CryptoHelper.encrypt(mes, key).encode("HEX")
         self.messages[id] = enc
+        self.snapshot.write("\t".join([id, enc]) + "\n")
+        self.snapshot.flush()
 
         return "\t".join([id, key.encode("HEX")])
 
@@ -102,7 +117,9 @@ class CryptoHelper:
         return message[:-padlen]
 
 if __name__ == '__main__':
+    print "Server init..."
     httpd = BaseHTTPServer.HTTPServer((HOST_NAME, PORT_NUMBER), MyHandler)
+
     print time.asctime(), "Server Starts - %s:%s" % (HOST_NAME, PORT_NUMBER)
     try:
         httpd.serve_forever()

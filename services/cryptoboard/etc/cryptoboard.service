@@ -1,0 +1,15 @@
+[Unit]
+Description=Cryptoboard service
+Requires=random.service
+After=random.service
+
+[Service]
+Type=simple
+User=cryptoboard
+Group=cryptoboard
+
+WorkingDirectory=/home/cryptoboard
+ExecStart=/usr/bin/python2 /home/cryptoboard/cryptoboard.py
+
+[Install]
+WantedBy=multi-user.target
