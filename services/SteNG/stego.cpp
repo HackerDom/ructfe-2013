@@ -1,6 +1,8 @@
 #include "stego.h"
 
 #include <set>
+#include <cstdlib>
+#include <ctime>
 
 bool operator < (const pixel & lhs, const pixel & rhs) {
 	if (lhs.x < rhs.x) return true;
@@ -20,6 +22,8 @@ pixel get_next (const std::set <pixel> & old, long w, long h) {
 }
 
 std::vector <pixel> stego::put (sng & pic, const std::string & s) {
+	std::srand (time (NULL));
+
 	std::vector <pixel> r;
 	std::set <pixel> x;
 
