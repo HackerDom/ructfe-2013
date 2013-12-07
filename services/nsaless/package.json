@@ -7,6 +7,7 @@
     , "ejs" : "*"
     , "redis" : "*"
     , "bignum" : "*"
+    , "jsdom" : "*"
   }
 , "repository" : {
     "type" : "git"

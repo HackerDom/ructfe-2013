@@ -32,7 +32,8 @@ exports.createUser = function(req, res) {
     return {
         'id': bignum.rand(bignum(2).pow(64)).toString(),
         'followers': [],
-        'tweets': []
+        'tweets': [],
+        'pending_followers': {}
     };
 }
 
