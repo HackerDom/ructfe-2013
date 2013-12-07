@@ -44,6 +44,7 @@ sub get {
   return $SERVICE_FAIL unless $sock;
 
   my $resp = <$sock>;
+  chomp $resp;
 
   return $resp eq $flag ? $SERVICE_OK : $FLAG_GET_ERROR;
 }
