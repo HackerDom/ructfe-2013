@@ -23,6 +23,7 @@ exit $MODES{$mode}->(@ARGV);
 
 sub check {
   my $sock = IO::Socket::INET->new("$ip:$port");
+  return $SERVICE_FAIL unless $sock;
   print $sock "list";
   my $resp = <$sock>;
   if($resp !~ /\.list: value/) {
@@ -37,6 +38,7 @@ sub get {
   my ($id, $flag) = @_;
 
   my $sock = IO::Socket::INET->new("$ip:$port");
+  return $SERVICE_FAIL unless $sock;
 
   print $sock "fget$id";
   return $SERVICE_FAIL unless $sock;
