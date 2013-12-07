@@ -25,7 +25,7 @@ class client : public socket_t
 public:
 	client(int sockNumber, sockaddr clientSock);
 	
-	bool canRead(int timeout = 5);
+	bool canRead(int timeout = 10);
 	std::string receiveString();
 	std::string receiveAll();
 	void sendStringEndl(const std::string& data);
