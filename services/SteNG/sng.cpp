@@ -26,7 +26,6 @@ sng_IHDR::sng_IHDR () :
 	width (0),
 	height (0),
 	depth (0), 
-	grayscale (false),
 	color (false),
 	palette (false),
 	alpha (false) { }
@@ -51,9 +50,7 @@ sng_IHDR parse_IHDR (const std::string & s) {
 			while (is >> opt) {
 				opt = _ (opt);
 
-				if (opt == "grayscale")
-					r.grayscale = true;
-				else if (opt == "color")
+				if (opt == "color")
 					r.color = true;
 				else if (opt == "palette")
 					r.palette = true;
@@ -197,9 +194,9 @@ sng_tEXt parse_tEXt (const std::string & s) {
 sng_IMAGE::sng_IMAGE () :
 	pixels (0) { }
 
-unsigned char hex2byte (std::string::const_iterator & it) {
-	unsigned char r = 0;
-	for (int i = 0; i < 2; ++ i) {
+int hex2byte (std::string::const_iterator & it, unsigned char depth) {
+	int r = 0;
+	for (int i = 0; i < (depth >> 2); ++ i) {
 		r <<= 4;
 
 		if (std::isdigit (* it)) r += * it - '0';
@@ -211,15 +208,15 @@ unsigned char hex2byte (std::string::const_iterator & it) {
 	return r;
 }
 
-color_t hex2color (const std::string & s) {
+color_t hex2color (const std::string & s, unsigned char depth) {
 	color_t c;
 
 	std::string::const_iterator it = s.begin ();
-	c.c.r = hex2byte (it);
-	c.c.g = hex2byte (it);
-	c.c.b = hex2byte (it);
+	c.c.r = hex2byte (it, depth);
+	c.c.g = hex2byte (it, depth);
+	c.c.b = hex2byte (it, depth);
 	if (it != s.end ())
-		c.c.a = hex2byte (it);
+		c.c.a = hex2byte (it, depth);
 
 	return c;
 }
@@ -230,7 +227,7 @@ color_t::color_t () :
 color_t::color_t (unsigned char idx) :
 	idx (idx) { }
 
-sng_IMAGE parse_IMAGE (const std::string & s, bool has_palette) {
+sng_IMAGE parse_IMAGE (const std::string & s, unsigned char depth, bool has_palette) {
 	sng_IMAGE r;
 
 	std::istringstream is (s);
@@ -244,29 +241,25 @@ sng_IMAGE parse_IMAGE (const std::string & s, bool has_palette) {
 			std::string::const_iterator it = line.begin ();
 
 			while (it != line.end ())
-				r.pixels.back ().push_back (color_t (hex2byte (it)));
+				r.pixels.back ().push_back (color_t (hex2byte (it, 8)));
 		}
 		else {
 			std::istringstream iss (line);
 			std::string c;
 			while (iss >> c)
-				r.pixels.back ().push_back (hex2color (c));
+				r.pixels.back ().push_back (hex2color (c, depth));
 		}
 	}
 
 	return r;
 }
 
-std::string::size_type normalize (const std::string & s, std::string::size_type it) {
-	return it == std::string::npos ? s.length () : it;
-}
-
 void parse_private (sng_private & r, const std::string & s, const std::string & chunk) {
-	std::string::size_type tag_begin = normalize (chunk, chunk.find_first_not_of (" \t"));
-	std::string::size_type tag_end = normalize (chunk, chunk.find_last_not_of (" \t"));
+	std::string::size_type tag_begin = chunk.find_first_not_of (" \t");
+	std::string::size_type tag_end = chunk.find_last_not_of (" \t");
 
-	std::string::size_type data_begin = normalize (s, s.find_first_of ("\""));
-	std::string::size_type data_end = normalize (s, s.find_first_of ("\"", data_begin + 1));
+	std::string::size_type data_begin = s.find_first_of ("\"");
+	std::string::size_type data_end = data_begin == std::string::npos ? std::string::npos : s.find_first_of ("\"", data_begin + 1);
 
 	r.data [chunk.substr (tag_begin, tag_end - tag_begin + 1)] = s.substr (data_begin + 1, data_end - data_begin - 1);
 }
@@ -280,12 +273,12 @@ sng::sng (const std::string & s) {
 
 		if (it != std::string::npos) {
 			std::string::size_type tag_begin = it;
-			std::string::size_type tag_end = normalize (s, s.find_first_of (" \n\t{", it));
+			std::string::size_type tag_end = s.find_first_of (" \n\t{", it);
 
 			std::string tag = _ (s.substr (tag_begin, tag_end - tag_begin));
 
-			std::string::size_type fields_begin = normalize (s, s.find_first_of ('{', tag_end));
-			std::string::size_type fields_end = normalize (s, s.find_first_of ('}', fields_begin));
+			std::string::size_type fields_begin = s.find_first_of ('{', tag_end);
+			std::string::size_type fields_end = s.find_first_of ('}', fields_begin);
 
 			std::string fields;
 			if (fields_begin != std::string::npos && fields_end != std::string::npos)
@@ -311,7 +304,7 @@ sng::sng (const std::string & s) {
 			else if (tag == "tEXt")
 				m_tEXt = parse_tEXt (fields);
 			else if (tag == "IMAGE")
-				m_IMAGE = parse_IMAGE (fields, has_palette);
+				m_IMAGE = parse_IMAGE (fields, m_IHDR.depth, has_palette);
 			else if (tag == "private")
 				parse_private (m_private, fields, s.substr (tag_end, fields_begin - tag_end));
 		}
@@ -405,36 +398,18 @@ std::ostream & operator << (std::ostream & os, const sng & p) {
 		"\theight: " << p.m_IHDR.height << std::endl <<
 		"\tbitdepth: " << static_cast <int> (p.m_IHDR.depth) << std::endl;
 	
-	if (p.m_IHDR.grayscale || p.m_IHDR.alpha || p.m_IHDR.palette || p.m_IHDR.color) {
+	if (p.m_IHDR.alpha || p.m_IHDR.palette || p.m_IHDR.color) {
 		os << "\tusing ";
 
 		if (p.m_IHDR.alpha) os << "alpha ";
 		if (p.m_IHDR.color) os << "color ";
-		if (p.m_IHDR.grayscale) os << "grayscale ";
 		if (p.m_IHDR.palette) os << "palette ";
 		
 		os << std::endl;
 	}
 
-	os << "}" << std::endl;
-
-	os << "gAMA { " << std::fixed << std::setprecision (2) << p.m_gAMA.value << " }" << std::endl;
-
-	if (! p.m_hIST.values.empty ()) {
-		os << "hIST {" << std::endl << "\t";
-		std::copy (p.m_hIST.values.begin (), p.m_hIST.values.end (), std::ostream_iterator <short> (os, " "));
-		os << std::endl << "}" << std::endl;
-
-		os << "PLTE {" << std::endl;
-		for (std::vector <pcolor>::const_iterator it = p.m_PLTE.colors.begin (); it != p.m_PLTE.colors.end (); ++ it)
-			os << "\t(" <<
-				std::setw (3) << static_cast <int> (it->r) << "," <<
-				std::setw (3) << static_cast <int> (it->g) << "," <<
-				std::setw (3) << static_cast <int> (it->b) << ")" << std::endl;
-		os << "}" << std::endl;
-	}
-
-	os << "tIME {" << std::endl <<
+	os << "}" << std::endl << "gAMA { " << std::fixed << std::setprecision (2) << p.m_gAMA.value << " }" << std::endl <<
+		"tIME {" << std::endl <<
 		"\tyear " << p.m_tIME.year << std::endl <<
 		"\tmonth " << static_cast <int> (p.m_tIME.month) << std::endl <<
 		"\tday " << static_cast <int> (p.m_tIME.day) << std::endl <<
@@ -443,6 +418,15 @@ std::ostream & operator << (std::ostream & os, const sng & p) {
 		"\tsecond " << static_cast <int> (p.m_tIME.second) << std::endl <<
 		"}" << std::endl;
 
+	if (! p.m_hIST.values.empty ()) {
+		os << "PLTE {" << std::endl;
+		for (std::vector <pcolor>::const_iterator it = p.m_PLTE.colors.begin (); it != p.m_PLTE.colors.end (); ++ it)
+			os << "\t(" << std::setw (3) << it->r << "," << std::setw (3) << it->g << "," << std::setw (3) << it->b << ")" << std::endl;
+		os << "}" << std::endl << "hIST {" << std::endl << "\t";
+		std::copy (p.m_hIST.values.begin (), p.m_hIST.values.end (), std::ostream_iterator <short> (os, " "));
+		os << std::endl << "}" << std::endl;
+	}
+
 	if (! p.m_tEXt.keyword.empty ())
 		os << "tEXt {" << std::endl <<
 		"\tkeyword: " << p.m_tEXt.keyword << std::endl <<
@@ -450,15 +434,16 @@ std::ostream & operator << (std::ostream & os, const sng & p) {
 		"}" << std::endl;
 
 	os << "IMAGE {" << std::endl << "\tpixels hex" << std::endl;
+	int w = p.m_IHDR.depth >> 2;
 	if (p.m_hIST.values.empty ()) {
 		for (std::vector <std::vector <color_t>>::const_iterator it = p.m_IMAGE.pixels.begin (); it != p.m_IMAGE.pixels.end (); ++ it) {
 			for (std::vector <color_t>::const_iterator jt = it->begin (); jt != it->end (); ++ jt) {
-				os << std::setfill ('0') << std::setw (2) << std::hex << static_cast <int> (jt->c.r) <<
-				      std::setfill ('0') << std::setw (2) << static_cast <int> (jt->c.g) <<
-				      std::setfill ('0') << std::setw (2) << static_cast <int> (jt->c.b);
+				os << std::setfill ('0') << std::setw (w) << std::hex << jt->c.r <<
+				      std::setfill ('0') << std::setw (w) << jt->c.g <<
+				      std::setfill ('0') << std::setw (w) << jt->c.b;
 
 				if (p.m_IHDR.alpha)
-					os << std::setfill ('0') << std::setw (2) << static_cast <int> (jt->c.a);
+					os << std::setfill ('0') << std::setw (w) << jt->c.a;
 
 				os << " ";
 			}

@@ -26,7 +26,7 @@ int main (int argc, char ** argv) {
 		s.push_back ('\n');
 	}
 
-	std::cout << get (sng (s), v);
+	std::cout << stego::get (sng (s), v);
 
 	return 0;
 }

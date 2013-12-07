@@ -22,6 +22,20 @@ int extract_id (const std::string & s) {
 	return r;
 }
 
+bool init_dir () {
+	struct stat s;
+	const char * dir = "./db";
+
+	if (stat (dir, & s) == -1) {
+		if (ENOENT == errno) 
+			return mkdir (dir, S_IRWXU | S_IRWXG) != -1;
+
+		return false;
+	}
+	
+	return S_ISDIR (s.st_mode);
+}
+
 sng_storage::sng_storage () : max_id (0) {
 	std::ifstream db_index (db_name);
 	if (! db_index.is_open ()) {
@@ -38,16 +52,7 @@ sng_storage::sng_storage () : max_id (0) {
 			throw sng_storage::init_exception ();
 	}
 
-	struct stat st;
-	if (stat ("./db", & st) == -1) {
-		if (errno == ENOENT) {
-			if (mkdir ("./db", S_IRWXU | S_IRWXG | S_IROTH | S_IXOTH) == -1)
-				throw sng_storage::init_exception ();
-		}
-		else
-			throw sng_storage::init_exception ();
-	}
-	else if (! S_ISDIR (st.st_mode))
+	if (! init_dir ())
 		throw sng_storage::init_exception ();
 
 	std::string s;
@@ -68,7 +73,7 @@ sng_storage * sng_storage::instance () {
 std::mutex mtx;
 
 const std::list <std::string> & sng_storage::get_all_items () const {
-	std::unique_lock <std::mutex> lock (mtx);
+	std::lock_guard <std::mutex> lock (mtx);
 
 	return items;
 }
@@ -78,7 +83,7 @@ std::string make_filename (const std::string & id) {
 }
 
 sng sng_storage::get_item (const std::string & id) const {
-	std::unique_lock <std::mutex> lock (mtx);
+	std::lock_guard <std::mutex> lock (mtx);
 
 	std::string filename = make_filename (id);
 
@@ -101,7 +106,7 @@ sng sng_storage::get_item (const std::string & id) const {
 }
 
 std::string sng_storage::put_item (const sng & pic) {
-	std::unique_lock <std::mutex> lock (mtx);
+	std::lock_guard <std::mutex> lock (mtx);
 
 	std::ostringstream os;
 	os << std::hex << (++ max_id);

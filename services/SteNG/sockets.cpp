@@ -64,7 +64,7 @@ std::string client::receiveString()
 	{
 		if ((letter == '\n') || (received == 0))
 		{
-			if ((received == 0) && (canRead()))
+			if ((received == 0) && (canRead(0)))
 				closed = true;
 			return data;
 		}
@@ -81,7 +81,7 @@ std::string client::receiveAll()
 	int received;
 	std::string data;
 
-	while (canRead())
+	while (canRead(0))
 	{
 		if ((received = recv(sock, buffer, 1024, 0)) == -1)
 			throw excHandler("recv");

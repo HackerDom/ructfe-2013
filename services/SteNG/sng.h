@@ -11,7 +11,6 @@ struct sng_IHDR {
 	long width;
 	unsigned char depth;
 
-	bool grayscale;
 	bool color;
 	bool palette;
 	bool alpha;
@@ -51,7 +50,7 @@ struct sng_tEXt {
 };
 
 struct pcolor {
-	unsigned char r, g, b, a;
+	int r, g, b, a;
 
 	pcolor ();
 	pcolor (int r, int g, int b, int a);
