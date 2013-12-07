@@ -2,7 +2,7 @@ var redis = require("redis"),
     client = redis.createClient();
 var bignum = require("bignum");
 
-exports.getUserFromId = function(req, res, id, callback) {
+exports.getUserFromId = function(id, callback) {
     var user = null
     client.hget('users', id, function(err, reply) {
         if (reply != null) {
@@ -18,7 +18,7 @@ exports.getUserFromCookie = function(req, res, callback) {
     if (session_id) {
         client.get(session_id, function(err, reply) {
             if (reply) {
-                exports.getUserFromId(req, res, reply, callback);
+                exports.getUserFromId(reply, callback);
             } else {
                 callback(user);
             }
