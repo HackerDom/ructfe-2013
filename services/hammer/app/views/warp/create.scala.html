@@ -1,0 +1,48 @@
+@(createForm: Form[(String, Option[String])])(implicit request: Request[_], user: components.AuthorisedUser, session: Session)
+
+@import org.apache.commons.codec.binary.Hex
+@import play.api.db.slick.Config.driver.simple._
+@import helper._
+@import helpers.BootstrapHelper._
+
+
+@main(s"Create message") {
+    @helper.form(action = routes.Warp.do_create(), 'class -> "form-horizontal") {
+        <fieldset>
+            <legend>Warp message creation</legend>
+
+            @textarea(
+                createForm("public"),
+                '_error -> createForm.globalError,
+                '_label -> "Public part",
+                'id     -> "public-text",
+                'rows   -> 7,
+                'cols   -> 90,
+                'class  -> "span7",
+                'placeholder -> "Your message here...",
+                'autofocus -> true
+
+            )
+            @inputText(
+                createForm("private"),
+                '_error -> createForm.error("password"),
+                '_label -> "Private part",
+                '_hint  -> "If private part is empty then all message would be public",
+                'placeholder -> "Secret here..."
+            )
+        </fieldset>
+        <div class="control-group">
+            <div class="controls">
+                <input type="submit" class="btn btn-primary" value="Create message">
+            </div>
+        </div>
+
+        <script type="text/javascript">
+            $('#public-text').wysihtml5({
+                "image" : false,
+                "colors" : false,
+                "html" : true
+            });
+        </script>
+    }
+}

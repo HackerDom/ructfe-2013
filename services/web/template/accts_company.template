@@ -1,0 +1,14 @@
+<table class="accts">
+<thead>
+<tr>
+
+<th>ACCT</th>
+<th>Type</th>
+<th>Balance</th>
+<th>Max_sum</th>
+</tr>
+</thead>
+<tbody>
+_tbody_
+</tbody>
+</table>

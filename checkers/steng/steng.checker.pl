@@ -2,15 +2,15 @@
 
 use constant {
 	DEBUG => 0,
+	PORT => 18360,
+	TIMEOUT => 6,
 
 	CHECKER_OK => 101,
 	CHECKER_NOFLAG => 102,
 	CHECKER_MUMBLE => 103,
 	CHECKER_DOWN => 104,
-	CHECKER_ERROR => 110
-};
+	CHECKER_ERROR => 110,
 
-use constant {
 	CONNECTION_ERROR => "Could not connect to service",
 	CANNOT_GET_PICTURE => "Can't get picture",
 	CANNOT_PUT_PICTURE => "Can't put picture",
@@ -21,7 +21,6 @@ my @perc = qw/45 35 20/;
 use Socket;
 use SNG;
 
-my $port = 18360;
 my ($mode, $ip, $id, $flag) = @ARGV;
 my %handlers = (
 	'check' => \&check,
@@ -30,7 +29,7 @@ my %handlers = (
 );
 
 socket $S, PF_INET, SOCK_STREAM, getprotobyname 'tcp';
-$cr = connect $S, sockaddr_in $port, inet_aton $ip;
+$cr = connect $S, sockaddr_in PORT, inet_aton $ip;
 do_exit (CHECKER_DOWN, CONNECTION_ERROR) unless $cr;
 
 vec ($v = '', fileno ($S), 1) = 1;
@@ -120,7 +119,7 @@ sub get {
 		my $data = &get_all;
 
 		do_exit (CHECKER_MUMBLE, CANNOT_GET_PICTURE) if $data =~ /^ERROR/;
-		do_exit (CHECKER_NOFLAG, FLAG_NOT_FOUND) if SNG::unparse_flag ($data, $x[1]) ne $flag;
+		do_exit (CHECKER_NOFLAG, FLAG_NOT_FOUND) if !$data || SNG::unparse_flag ($data, $x[1]) ne $flag;
 	}
 	else {
 		my @x = split /:/, $type[1];
@@ -137,14 +136,14 @@ sub get {
 }
 
 sub get_all {
-	my ($x, $t) = '';
- 
-	while (select '' . $v, undef, undef, 0.2) {
-		recv $S, ($t = ''), 1024, 0;
-		return $x unless length $t;
-		$x .= $t;
+	my $x = '';
+
+	while (select '' . $v, undef, undef, TIMEOUT) {
+		recv $S, ($_ = ''), 1024, 0;
+		return $x unless length;
+		$x .= $_;
 	}
 
-	$x;
+	return $x;
 }
 

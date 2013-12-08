@@ -14,7 +14,7 @@ import scala.Some
 
 
 object Warp extends Controller with Secured {
-  val registerForm = Form(
+  val createForm = Form(
     tuple( "public" -> nonEmptyText, "private" -> optional(text))
   )
 
@@ -22,8 +22,8 @@ object Warp extends Controller with Secured {
   def all = withAuthorisedUser { implicit user =>
     DBAction { implicit request =>
       val query = for {
-        (mes, author) <- Messages.all innerJoin Users
-      } yield (mes, author)
+        (msg, author) <- Messages innerJoin Users on (_.author_id === _.id)
+      } yield (msg,author)
 
       Ok(views.html.warp.list( query.list))
     }
@@ -32,18 +32,18 @@ object Warp extends Controller with Secured {
   def create = withUser { implicit user =>
     DBAction { implicit request =>
       val query = for {
-        (mes, author) <- Messages innerJoin Users
+        (mes, author) <- Messages innerJoin Users on (_.author_id === _.id)
       } yield (mes, author)
 
-      Ok(views.html.warp.list( query.list))
+      Ok(views.html.warp.create( createForm))
     }
   }
 
   def do_create = withUser { implicit user =>
     DBAction { implicit request =>
-      registerForm.bindFromRequest().fold(
+      createForm.bindFromRequest().fold(
         {
-          withErrors => BadRequest
+          withErrors => BadRequest(views.html.warp.create(createForm.bindFromRequest().withGlobalError("Can't create warp")))
         },
         {
           case (pub, priv ) => {
@@ -57,10 +57,18 @@ object Warp extends Controller with Secured {
   }
 
 
-  def show(messageId: Int) = withAuthorisedUser { implicit user =>
+  def show(messageId: Int) = withUser { implicit user =>
     DBAction { implicit request =>
-      Query(Messages).filter(_.id === messageId).firstOption.map( msg => Ok(views.html.warp.show(msg)))
-        .getOrElse(NotFound("No such message"))
+      Query(Messages).filter(_.id === messageId).innerJoin(Users).on(_.author_id === _.id).firstOption.map { case (msg:Message, author:User) =>
+
+        val query = Query(SentMessages).filter(_.user_id === user.id.get).filter(_.message_id === msg.id.get)
+        if(query.exists.run) {
+          query.map(_.read).update(true)
+        } else {
+          SentMessages.insert(SentMessage.create(user, msg, true))
+        }
+        Ok(views.html.warp.show(msg, author))
+      }.getOrElse(NotFound("No such message"))
     }
   }
 
@@ -86,7 +94,7 @@ object Warp extends Controller with Secured {
         message <- Query(Messages).where(_.id === messageId).firstOption
         to <- Query(Users).where(_.id === userId).firstOption
 
-        sent <- Some(SentMessage.create(to, message)) if message.author_id == user.id.get
+        sent <- Some(SentMessage.create(to, message)) if message.canSend.run
       } yield sent
 
       sent.map({ message =>
@@ -99,9 +107,25 @@ object Warp extends Controller with Secured {
   def own = withUser { implicit user =>
     DBAction { implicit request =>
       val my = for {
-        (msg, sent) <- Messages leftJoin SentMessages if msg.author_id == user.id || sent.user_id == user.id
-      } yield (msg, sent)
-      NotImplemented("Shows messages that i own")
+        (msg,  author) <- Messages innerJoin Users on (_.author_id === _.id) if (msg.author_id === user.id)
+      } yield (msg, author)
+      Ok(views.html.warp.list(my.list()))
+      //NotImplemented("Shows messages that i own")
+    }
+  }
+
+  def forme = formeMode()
+  def formeMode(mode:String = "all") = withUser { implicit user =>
+    DBAction { implicit request =>
+      var query = for {
+        ((msg, author), sent) <- Messages innerJoin Users on (_.author_id === _.id) leftJoin SentMessages on (_._1.id === _.message_id) if sent.user_id === user.id.get
+      } yield (msg, author, sent)
+      val my = mode match {
+        case "read" => query.filter(_._3.read === true)
+        case "unread" => query.filter(_._3.read === false)
+        case _ => query
+      }
+      Ok(views.html.warp.list(my.map({ t=> (t._1, t._2)}).list()))
     }
   }
 

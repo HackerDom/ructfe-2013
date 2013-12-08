@@ -6,12 +6,16 @@
     </div>
   </div>
   <div class="control-group">
-    <label class="control-label" for="type">type</label>
+    <label class="control-label" for="currency"> Type</label>
     <div class="controls">
-      <input class="span2" id="type"  name="type" type="text" placeholder="type">
-    </div>
-  </div>
+        <select name="currency">
+            <option value="$">$</option>
+            <option value="€">€</option>
+            <option value="=">=</option>
+         </select>
+     </div>
+</div>
   <button type="submit" class="btn">Add</button>
-    </div>
-  </div>
+
+
 </form>

@@ -11,14 +11,20 @@
             <legend>Registration form</legend>
             @inputText(
                 registrationForm("login"),
-                '_error -> registrationForm.globalError
+                '_error -> registrationForm.globalError,
+                '_label -> "Login"
             )
-            @inputPassword(registrationForm("password.main"))
+            @inputPassword(registrationForm("password.main"),
+                '_label -> "Password"
+            )
             @inputPassword(
                 registrationForm("password.confirm"),
-                '_error -> registrationForm.error("password")
+                '_error -> registrationForm.error("password"),
+                '_label -> "Password repeat"
             )
-            @inputText(registrationForm("name"))
+            @inputText(registrationForm("name"),
+                '_label -> "Name"
+            )
         </fieldset>
         <div class="control-group">
             <div class="controls">

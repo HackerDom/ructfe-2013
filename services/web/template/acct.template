@@ -1,10 +1,10 @@
 <table class="accts">
 <thead>
 <tr>
-<th>#</th>
 <th>ACCT</th>
 <th>Type</th>
 <th>Balance</th>
+<th>Max sum</th>
 </tr>
 </thead>
 <tbody>

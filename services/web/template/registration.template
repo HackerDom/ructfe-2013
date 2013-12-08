@@ -1,9 +1,17 @@
 <form class="form-horizontal" name="reg_form" method="POST" action="_link_">
   <legend>Registration</legend>
-  <div class="control-group">
-    <label class="control-label" for="name">name</label>
+  <label class="radio">
+  <input type="radio" name="type_table" value="user" id="type_table" checked>
+  Фз.л
+   </label>
+    <label class="radio">
+  <input type="radio" name="type_table" value="company"  id="type_table" checked>
+Юр.л
+</label>
+<div class="control-group">
+    <label class="control-label" for="email">email</label>
     <div class="controls">
-     <input class="span2" id="name"  name="name" type="text" placeholder="name">
+     <input class="span2" id="email"  name="email" type="email" placeholder="email">
     </div>
   </div>
     <div class="control-group">
@@ -17,40 +25,6 @@
     <div class="controls">
      <input class="span2" id="repassword"  name="repassword" type="password" placeholder="repassword">
     </div>
-  </div>
-
-  <div class="control-group">
-    <label class="control-label" for="email">email</label>
-    <div class="controls">
-     <input class="span2" id="email"  name="email" type="text" placeholder="email">
-    </div>
-  </div>
-
-  <label class="radio">
-  <input type="radio" name="gender" id="gender" value="Ms." checked>
-   Ms.
-   </label>
-    <label class="radio">
-  <input type="radio" name="gender" id="gender" value="Mr." checked>
-  Mr.
-</label>
-  <div class="control-group">
-    <label class="control-label" for="country">country</label>
-    <div class="controls">
-     <input class="span2" id="country"  name="country" type="text" placeholder="country">
-    </div>
-  </div>
-  <div class="control-group">
-    <label class="control-label" for="numbers">numbers</label>
-    <div class="controls">
-     <input class="span2" id="numbers"  name="numbers" type="text" placeholder="numbers">
-    </div>
-  </div>
-   <div class="control-group">
-    <label class="control-label" for="birthday">birthday</label>
-    <div class="controls">
-  <input type="date" name="birthday"  class="span2" id="birthday" >
-   </div>
   </div>
   <button type="submit" class="btn">Reg</button>
 </form>

@@ -1,8 +1,20 @@
-@(message: Message)(implicit request: Request[_], user: components.AuthorisedUser, session: Session)
-@import org.apache.commons.codec.binary.Hex
+@(message: Message, author: User)(implicit request: Request[_], user: components.AuthorisedUser, session: scala.slick.session.Session)
 @import play.api.db.slick.Config.driver.simple._
 
 
+<tr>
+    <td>@message.id.get</td>
+    <td>
+        <span class="message-text">@message.message.take(100)</span>
+    </td>
+    <td style="overflow: hidden; max-width: 10em">
+        <a href="@routes.Warp.show(message.id.get)">@message.hexMark</a>
+    </td>
+    <td>@author.name</td>
+    <td>@message.created.get.format("hh:mm:ss dd/mm/YYYY ")</td>
+</tr>
+
+<!--
 <div class="warp">
     <div class="warp-author">@message.author_id</div>
     <div class="warp-creation_time">@message.created</div>
@@ -12,3 +24,4 @@
         </a>
     </div>
 </div>
+-->
