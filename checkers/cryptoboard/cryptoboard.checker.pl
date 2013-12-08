@@ -23,6 +23,7 @@ exit $MODES{$mode}->(@ARGV);
 sub check {
   my $ua = HTTP::Tiny->new(timeout => 5);
   my $response = $ua->get("http://$ip:4369/list");
+  return $SERVICE_FAIL unless $response->{success};
   return $FLAG_GET_ERROR unless $response->{status} == 200;
   return $SERVICE_OK;
 }
@@ -34,8 +35,9 @@ sub get {
 
   my $ua = HTTP::Tiny->new(timeout => 5);
   my $response = $ua->get("http://$ip:4369/get?id=$id&key=$key");
+  return $SERVICE_FAIL unless $response->{success};
   return $FLAG_GET_ERROR unless $response->{status} == 200;
-  return $response->{content} eq $flag ? $SERVICE_OK : $FLAG_GET_ERROR;
+  return $response->{content} eq $flag ? $SERVICE_OK : $SERVICE_CORRUPT;
 }
 
 sub put {
@@ -47,8 +49,8 @@ sub put {
   
   @tokens = split /\s/, $new_id;
   exit $SERVICE_CORRUPT if $#tokens != 1;
-  
-  return $SERVICE_FAIL unless $response->{status} == 200;
+  return $SERVICE_FAIL unless $response->{success};
+  return $FLAG_GET_ERROR unless $response->{status} == 200;
 
   print STDOUT $new_id;
   return $SERVICE_OK;
