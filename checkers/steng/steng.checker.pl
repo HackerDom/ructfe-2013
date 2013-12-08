@@ -3,7 +3,7 @@
 use constant {
 	DEBUG => 0,
 	PORT => 18360,
-	TIMEOUT => 10,
+	TIMEOUT => 6,
 
 	CHECKER_OK => 101,
 	CHECKER_NOFLAG => 102,
