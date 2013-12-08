@@ -5,7 +5,7 @@ import urlparse
 from Crypto.Cipher import AES
 
 HOST_NAME = '0.0.0.0'
-PORT_NUMBER = 4369
+PORT_NUMBER = 4368
 
 class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
@@ -69,7 +69,7 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         return mes
 
     def put(self, mes):
-        with open("/proc/random", "rb") as f:
+        with open("/dev/random", "rb") as f:
             key = f.read(32)
             id = f.read(8).encode("HEX")
 
