@@ -1,8 +1,20 @@
-<form class="navbar-form pull-right" name="auth" method="POST" action="_login_link_">
-<input class="span2" id="login"  name="login" type="text" placeholder="login">
-<input class="span2" name="passwd" type="password" placeholder="Password">
-    <input type="checkbox" name="remember" value="remember"> Запомнить
+      <div class="well span3">
+                        <legend>RuCTFe Login</legend>
+                           <form method="POST" name="auth" method="POST" action="_login_link_">
+                                <div class="make-switch" data-on="primary" data-off="info" data-on-label="Commercial" data-off-label="Personal">
+                                <input type="checkbox" name="type"  value="company" checked>
+                                </div><p>
+                                
+                                <input class="span2" style="margin-top:10px" name="email" type="text" placeholder="email">
+                                <input class="span2" name="passwd" type="password" placeholder="Password">
+                                
+                                <label class="checkbox">
+                                <input type="checkbox" value="1" name="remember">Remember Me
+                                </label>
+                                <button type="submit" name="submit" class="btn btn-block btn-success btn-large"><i class="icon-lock"></i>Enter</button>
+                                <a href="_reg_link_" class="span1 btn btn-primary btn-small" style="margin-top:10px">Registration</a>
+                        </form>
+                </div>
 
-<button type="submit" class="btn">Sign in</button>
-<a href="_reg_link_">reg</a>
-		</form>
+
+
