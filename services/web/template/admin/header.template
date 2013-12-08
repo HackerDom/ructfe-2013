@@ -1,0 +1,24 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+  <meta charset="utf-8">
+  <title>_title_</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <link rel="stylesheet" type="text/css" href="http://mybootstrap.ru/wp-content/themes/clear-theme/styles/site.css" media="screen" />
+  <link rel="stylesheet" type="text/css" href="http://mybootstrap.ru/wp-content/themes/clear-theme/styles/bootstrap.css" media="screen" />
+  <link rel="stylesheet" type="text/css" href="http://mybootstrap.ru/wp-content/themes/clear-theme/styles/bootstrap-responsive.css" media="screen" />
+  <link rel="stylesheet" type="text/css" href="http://mybootstrap.ru/wp-content/themes/clear-theme/styles/docs.css" media="screen" />
+  <link rel="stylesheet" type="text/css" href="http://mybootstrap.ru/wp-content/themes/clear-theme/styles/prettify.css" media="screen" />
+  <!-- Fav and touch icons -->
+  <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/img/apple-touch-icon-144-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/img/apple-touch-icon-114-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/img/apple-touch-icon-72-precomposed.png">
+  <link rel="apple-touch-icon-precomposed" href="/img/apple-touch-icon-57-precomposed.png">
+  <link rel="shortcut icon" href="/img/favicon.png">
+  </head>
+  <body>
+          _login_
+

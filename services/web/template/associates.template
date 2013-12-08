@@ -1,0 +1,12 @@
+<table class="accts">
+<thead>
+<tr>
+<th>#</th>
+<th>Company </th>
+<th>E-mail</th>
+</tr>
+</thead>
+<tbody>
+_tbody_
+</tbody>
+</table>
