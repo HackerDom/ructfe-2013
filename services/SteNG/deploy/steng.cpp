@@ -1,41 +1,31 @@
-#include <string>
-#include <list>
-#include <vector>
-#include <iostream>
-#include <sstream>
-#include <iterator>
-#include <algorithm>
-#include <cstdlib>
-#include <ctime>
-#include <thread>
-#include <signal.h>
+#include "strlib.hxx"
 #include "sockets.h"
 #include "storage.h"
 #include "stego.h"
 #include "sng.h"
 #include "excHandler.h"
 
+#include <string>
+#include <vector>
+#include <iostream>
+#include <sstream>
+#include <iterator>
+#include <cstdlib>
+#include <ctime>
+#include <thread>
+#include <algorithm>
+#include <signal.h>
+
 std::ostream & operator << (std::ostream & os, const pixel & p) {
 	os << p.x << ":" << p.y;
 	return os;
 }
 
-std::vector <std::string> split (const std::string & s, char delim) {
-	std::istringstream is (s);
-	std::vector <std::string> v;
-	std::string x;
-
-	while (std::getline (is, x, delim))
-		v.push_back (x);
-
-	return v;
-}
-
 void send_list (std::shared_ptr <client> & c) {
 	const std::list <std::string> & items = sng_storage::instance ()->get_all_items ();
 
-	for (std::list <std::string>::const_iterator it = items.begin (); it != items.end (); ++ it)
-		c->sendStringEndl (* it);
+	for (const auto & it : items)
+		c->sendStringEndl (it);
 }
 
 void init_lcs (const std::string & s, const std::string & p) {
@@ -78,20 +68,20 @@ void get_picture (std::shared_ptr <client> & c, const std::vector <std::string> 
 	}
 
 	try {
-		sng pic = sng_storage::instance ()->get_item (op [1]);
+		auto pic = sng_storage::instance ()->get_item (op [1]);
 
-		std::string password = pic.private_ ("PASW");
+		auto password = pic.private_ ("PASW");
 		if (! password.empty ()) {
 			if (op.size () < 3) {
 				c->sendStringEndl ("ERROR(PASSWORD)");
 				return;
 			}
 
-			bool found = false;
-			std::vector <std::string>::const_iterator it = std::max_element (op.begin () + 2, op.end (), length_comparer ());
+			auto found = false;
+			auto it = std::max_element (std::begin (op) + 2, std::end (op), length_comparer ());
 
 			init_lcs (* it, password);
-			for (it = op.begin () + 2; it != op.end (); ++ it)
+			for (it = std::begin (op) + 2; it != std::end (op); ++ it)
 				if (check_lcs (* it, password)) {
 					found = true;
 					break;
@@ -108,79 +98,84 @@ void get_picture (std::shared_ptr <client> & c, const std::vector <std::string> 
 
 		c->sendString (os.str ());
 	}
-	catch (sng_storage::not_found_exception &) {
+	catch (sng_storage::not_found_error &) {
 		c->sendStringEndl ("ERROR(NOTFOUND)");
 	}
-	catch (sng_storage::read_exception &) {
+	catch (sng_storage::read_error &) {
 		c->sendStringEndl ("ERROR(DBREAD)");
+	}
+	catch (sng::parse_error &) {
+		c->sendStringEndl ("ERROR(PARSE)");
 	}
 }
 
 void init_time (sng & pic) {
-	time_t t = time (NULL);
+	auto t = time (nullptr);
 
-	struct tm * t_ = gmtime (& t);
+	auto t_ = gmtime (& t);
 	pic.time (t_->tm_year, t_->tm_mon, t_->tm_mday - 1, t_->tm_hour, t_->tm_min, t_->tm_sec);
 }
 
 void put_picture (std::shared_ptr <client> & c, const std::vector <std::string> & op) {
-	sng pic (c->receiveAll ());
+	try {
+		sng pic (c->receiveAll ());
 
-	switch (op.size ()) {
-	case 2: {
-		init_time (pic);
+		switch (op.size ()) {
+		case 2: {
+			init_time (pic);
 
-		std::vector <pixel> v = stego::put (pic, op [1]);
-		if (v.empty ()) {
-			c->sendStringEndl ("ERROR(STEGO)");
-			return;
+			auto v = stego::put (pic, op [1]);
+			if (v.empty ()) {
+				c->sendStringEndl ("ERROR(STEGO)");
+				return;
+			}
+
+			try {
+				std::ostringstream os;
+				os << sng_storage::instance ()->put_item (pic) << ";" << join (v, " ") << std::endl;
+
+				c->sendString (os.str ());
+			}
+			catch (sng_storage::write_error &) {
+				c->sendStringEndl ("ERROR(DBWRITE)");
+			}
+
+			break;
 		}
 
-		try {
-			std::ostringstream os;
+		case 3: {
+			pic.private_ ("PASW", op [2]);
+			pic.keyword ("flag");
+			pic.text (op [1]);
 
-			os << sng_storage::instance ()->put_item (pic) << ";";
-			std::copy (v.begin (), v.end (), std::ostream_iterator <pixel> (os, " "));
-			os << std::endl;
+			try {
+				c->sendStringEndl (sng_storage::instance ()->put_item (pic));
+			}
+			catch (sng_storage::write_error &) {
+				c->sendStringEndl ("ERROR(DBWRITE)");
+			}
 
-			c->sendString (os.str ());
+			break;
 		}
-		catch (sng_storage::write_exception &) {
-			c->sendStringEndl ("ERROR(DBWRITE)");
-		}
 
-		break;
+		default:
+			c->sendStringEndl ("ERROR(ARG)");
+			break;
+		}
 	}
-
-	case 3: {
-		pic.private_ ("PASW", op [2]);
-		pic.keyword ("flag");
-		pic.text (op [1]);
-
-		try {
-			c->sendStringEndl (sng_storage::instance ()->put_item (pic));
-		}
-		catch (sng_storage::write_exception &) {
-			c->sendStringEndl ("ERROR(DBWRITE)");
-		}
-
-		break;
-	}
-
-	default:
-		c->sendStringEndl ("ERROR(ARG)");
-		break;
+	catch (sng::parse_error &) {
+		c->sendStringEndl ("ERROR(PARSE)");
 	}
 }
 
 void client_thread (std::shared_ptr <client> c) {
 	try {
-		while (true) {
-			std::string s = c->receiveString ();
+		while (! c->isClosed ()) {
+			auto s = c->receiveString ();
 			if (s.empty ())
 				break;
 
-			std::vector <std::string> op = split (s, ' ');
+			auto op = split (s, ' ');
 			if (op.empty ())
 				continue;
 
@@ -196,7 +191,9 @@ void client_thread (std::shared_ptr <client> c) {
 				c->sendStringEndl ("Unknown command");
 		}
 	}
-	catch (...) { }
+	catch (...) {
+		c->sendStringEndl ("ERROR(Unknown)");
+	}
 }
 
 int main () {
@@ -206,12 +203,12 @@ int main () {
 		server s;
 
 		while (true) {
-			std::shared_ptr <client> c = s.acceptConnection ();
+			auto c = s.acceptConnection ();
 			std::thread (client_thread, c).detach ();
 		}
 	}
 	catch (excHandler & e) {
-		std::cerr << "ERROR: " << e.getFuncName () << std::endl;
+		std::cerr << "Socket error: " << e.getFuncName () << std::endl;
 		return 1;
 	}
 
