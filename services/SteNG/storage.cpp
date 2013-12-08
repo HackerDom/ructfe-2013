@@ -9,14 +9,17 @@
 #include "storage.h"
 
 std::unique_ptr <sng_storage> sng_storage::self (nullptr);
-const char * db_name = "./steng.db";
+
+auto db_name = "./steng.db";
+auto db_dir = "./db";
+auto ext = ".sng";
 
 int extract_id (const std::string & s) {
-	size_t ext = s.find ('.');
-	std::string name = s.substr (0, ext);
+	auto ext = s.find ('.');
+	auto name = s.substr (0, ext);
 
 	std::istringstream is (name);
-	int r = 0;
+	int r;
 
 	is >> std::hex >> r;
 	return r;
@@ -24,11 +27,10 @@ int extract_id (const std::string & s) {
 
 bool init_dir () {
 	struct stat s;
-	const char * dir = "./db";
 
-	if (stat (dir, & s) == -1) {
+	if (stat (db_dir, & s) == -1) {
 		if (ENOENT == errno) 
-			return mkdir (dir, S_IRWXU | S_IRWXG) != -1;
+			return mkdir (db_dir, S_IRWXU | S_IRWXG) != -1;
 
 		return false;
 	}
@@ -42,18 +44,18 @@ sng_storage::sng_storage () : max_id (0) {
 		std::ofstream ofs (db_name);
 
 		if (! ofs.is_open ())
-			throw sng_storage::init_exception ();
+			throw sng_storage::init_error ();
 
 		ofs.close ();
 
 		db_index.open (db_name);
 
 		if (! db_index.is_open ())
-			throw sng_storage::init_exception ();
+			throw sng_storage::init_error ();
 	}
 
 	if (! init_dir ())
-		throw sng_storage::init_exception ();
+		throw sng_storage::init_error ();
 
 	std::string s;
 	while (db_index >> s) {
@@ -72,24 +74,25 @@ sng_storage * sng_storage::instance () {
 
 std::mutex mtx;
 
-const std::list <std::string> & sng_storage::get_all_items () const {
+const std::list <std::string> & sng_storage::get_all_items () const throw () {
 	std::lock_guard <std::mutex> lock (mtx);
 
 	return items;
 }
 
 std::string make_filename (const std::string & id) {
-	return std::string ("./db/") + id;
+	return std::string (db_dir) + '/' + id;
 }
 
-sng sng_storage::get_item (const std::string & id) const {
+sng sng_storage::get_item (const std::string & id) const
+	throw (sng_storage::not_found_error, sng_storage::read_error, sng::parse_error) {
 	std::lock_guard <std::mutex> lock (mtx);
 
-	std::string filename = make_filename (id);
+	auto filename = make_filename (id);
 
 	std::ifstream sng_file (filename);
 	if (! sng_file.is_open ())
-		throw sng_storage::not_found_exception ();
+		throw sng_storage::not_found_error ();
 
 	std::string s, s0;
 	while (std::getline (sng_file, s0)) {
@@ -98,33 +101,32 @@ sng sng_storage::get_item (const std::string & id) const {
 	}
 
 	if (! sng_file.eof () && ! sng_file.good ())
-		throw sng_storage::read_exception ();
+		throw sng_storage::read_error ();
 
 	sng_file.close ();
 
 	return sng (s);
 }
 
-std::string sng_storage::put_item (const sng & pic) {
+std::string sng_storage::put_item (const sng & pic) throw (sng_storage::write_error) {
 	std::lock_guard <std::mutex> lock (mtx);
 
 	std::ostringstream os;
 	os << std::hex << (++ max_id);
 
-	std::string id = os.str () + ".sng";
-
-	std::string filename = make_filename (id);
+	auto id = os.str () + ext;
+	auto filename = make_filename (id);
 
 	std::ofstream sng_file (filename);
 	if (! sng_file.is_open ())
-		throw sng_storage::write_exception ();
+		throw sng_storage::write_error ();
 
 	sng_file << pic;
 	sng_file.close ();
 
 	std::ofstream db_index (db_name, std::ios_base::app);
 	if (! db_index.is_open ())
-		throw sng_storage::write_exception ();
+		throw sng_storage::write_error ();
 
 	db_index << id << std::endl;
 	db_index.close ();

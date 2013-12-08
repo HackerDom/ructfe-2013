@@ -3,7 +3,7 @@
 use constant {
 	DEBUG => 0,
 	PORT => 18360,
-	TIMEOUT => 6,
+	TIMEOUT => 4,
 
 	CHECKER_OK => 101,
 	CHECKER_NOFLAG => 102,
@@ -51,7 +51,7 @@ sub do_exit {
 sub check {
 	send $S, "list\n", 0;
 
-	my @list = split /\s+/, &get_all;
+	my @list = split /\s+/, &get_string; #&get_all;
 	do_exit (CHECKER_OK) unless @list;
 
 	my $pic = $list[int rand @list];
@@ -80,7 +80,7 @@ sub put {
 
 	if ($type < $perc[0] || $type >= $perc[0] + $perc[1]) {
 		send $S, "putpic $flag\n$pic\n", 0;
-		my $data = &get_all;
+		my $data = &get_string;
 
 		do_exit (CHECKER_MUMBLE, CANNOT_PUT_PICTURE) if $data =~ /^ERROR/;
 
@@ -89,7 +89,7 @@ sub put {
 	else {
 		my ($psw1, $psw2) = &passw_gen;
 		send $S, "putpic $flag $psw1\n$pic\n", 0;
-		my $data = &get_all;
+		my $data = &get_string;
 
 		do_exit (CHECKER_MUMBLE, CANNOT_PUT_PICTURE) if $data =~ /^ERROR/;
 
@@ -135,15 +135,31 @@ sub get {
 	do_exit (CHECKER_OK);
 }
 
+sub get_string {
+	my $x = '';
+	for (1 .. (TIMEOUT * 100)) {
+		next unless select '' . $v, undef, undef, 0.01;
+		while (select '' . $v, undef, undef, 0) {
+			recv $S, ($_ = ''), 1, 0;
+			return unless length;
+
+			$x .= $_;
+			return $x if /\n/;
+		}
+	}
+}
+
 sub get_all {
 	my $x = '';
+	for (1 .. (TIMEOUT * 100)) {
+		next unless select '' . $v, undef, undef, 0.01;
+		while (select '' . $v, undef, undef, 0) {
+			recv $S, ($_ = ''), 1024, 0;
+			return unless length;
 
-	while (select '' . $v, undef, undef, TIMEOUT) {
-		recv $S, ($_ = ''), 1024, 0;
-		return $x unless length;
-		$x .= $_;
+			$x .= $_;
+		}
 	}
-
-	return $x;
+	$x;
 }
 

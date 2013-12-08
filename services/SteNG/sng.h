@@ -56,8 +56,6 @@ struct pcolor {
 	pcolor (int r, int g, int b, int a);
 };
 
-bool operator == (const pcolor & lhs, const pcolor & rhs);
-
 struct sng_PLTE {
 	std::vector <pcolor> colors;
 
@@ -93,30 +91,32 @@ class sng {
 	sng_private m_private;
 
 public:
+	class parse_error { };
+
 	sng (const std::string & s);
 
-	long height () const;
-	long width () const;
+	long height () const throw ();
+	long width () const throw ();
 
-	pcolor pixel (unsigned int x, unsigned int y) const;
-	void pixel (unsigned int x, unsigned int y, pcolor c);	
+	pcolor pixel (unsigned int x, unsigned int y) const throw ();
+	void pixel (unsigned int x, unsigned int y, pcolor c) throw ();
 
-	std::string keyword () const;
-	void keyword (const std::string & s);
+	std::string keyword () const throw ();
+	void keyword (const std::string & s) throw ();
 
-	std::string text () const;
-	void text (const std::string & s);
+	std::string text () const throw ();
+	void text (const std::string & s) throw ();
 
-	std::string time () const;
-	void time (short y, unsigned char m, unsigned char d, unsigned char hh, unsigned char mm, unsigned char ss);
+	std::string time () const throw ();
+	void time (short y, unsigned char m, unsigned char d, unsigned char hh, unsigned char mm, unsigned char ss) throw ();
 
-	std::string private_ (const std::string & chunk) const;
-	void private_ (const std::string & chunk, const std::string & text);
+	std::string private_ (const std::string & chunk) const throw ();
+	void private_ (const std::string & chunk, const std::string & text) throw ();
 
-	friend std::ostream & operator << (std::ostream & os, const sng & p);
+	friend std::ostream & operator << (std::ostream & os, const sng & p) throw ();
 };
 
-std::ostream & operator << (std::ostream & os, const sng & p);
+std::ostream & operator << (std::ostream & os, const sng & p) throw ();
 
 #endif
 
