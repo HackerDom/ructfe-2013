@@ -92,6 +92,8 @@ class Checker (host:String, port:Int) extends FlatSpec with Firefox with Matcher
     }
   }
 
+  def generateReference(id: String) = "<a href=\"http://google.com/?q=" +id+ "\">report</a>"
+
   def goBase = if (currentUrl != baseUrl) go to baseUrl
   def goSite = if (currentUrl.contains(baseUrl)) go to baseUrl
 
@@ -196,7 +198,7 @@ class Checker (host:String, port:Int) extends FlatSpec with Firefox with Matcher
 
     eventually {
       Thread.sleep(100)
-      if(priv.isDefined) {
+      if(priv.nonEmpty) {
         find("warp-decrypt").value.text should be(pub)
         find("warp-secret").value.text should be(priv.get)
       } else {
@@ -244,7 +246,7 @@ class Checker (host:String, port:Int) extends FlatSpec with Firefox with Matcher
     click on partialLinkText("Incoming")
     click on partialLinkText("All")
 
-    val messagesFrom = findAll(cssSelector(".warp-td-author")).toArray//.filter(_.text == name)
+    val messagesFrom = findAll(cssSelector(".warp-td-author")).toArray.filter(_.text === name)
 
 
     println(messagesFrom.map(_.text).mkString(" "))
@@ -253,11 +255,15 @@ class Checker (host:String, port:Int) extends FlatSpec with Firefox with Matcher
 
     messagesFrom.map({ message =>
       val id = Integer.parseInt(message.attribute("data-id").get)
-      find(cssSelector(s"#warp-td-id-$id a")).get.attribute("href").get
+
+      val link = find(cssSelector(s"#warp-td-mark-$id > a")).get
+      link.attribute("href").get
     }).exists({ link =>
       go to link
-      find("warp-decrypt").map(_.text == flag).getOrElse(false)
+      find("warp-decrypt").exists(_.text === flag)
     }) should be(true)
+
+    Integer.parseInt(find("warp-id").get.text)
   }
 
   def get(id: String, flag: String) = {
@@ -271,6 +277,7 @@ class Checker (host:String, port:Int) extends FlatSpec with Firefox with Matcher
     doLogin(login, password)
 
     doCheckMessageFrom(adminName, flag)
+    doCreate("We've got your message, check out " + generateReference(id), None)
   }
 
   def check() = {
