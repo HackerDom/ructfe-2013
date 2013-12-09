@@ -1,11 +1,13 @@
 .PHONY : all
 
+CXX=g++
+OPTS=-std=c++11
+
 SERVICE=steng
 
-SERVICE_SRC=strlib.cpp steng.cpp sng.cpp stego.cpp storage.cpp sockets.cpp excHandler.cpp
+SERVICE_SRC=strlib.cpp sng.cpp stego.cpp steng.cpp storage.cpp sockets.cpp excHandler.cpp
 
-all: $(SERVICE)
+all: Makefile $(SERVICE_SRC) 
+	$(CXX) $(OPTS) -pthread -o $(SERVICE) $(SERVICE_SRC)
 
-$(SERVICE): Makefile $(SERVICE_SRC)
-	g++ -std=c++11 -pthread -o $(SERVICE) $(SERVICE_SRC)
 

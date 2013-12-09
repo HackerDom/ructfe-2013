@@ -93,10 +93,7 @@ void get_picture (std::shared_ptr <client> & c, const std::vector <std::string> 
 			}
 		}
 
-		std::ostringstream os;
-		os << pic;
-
-		c->sendString (os.str ());
+		c->sendString (pic.to_raw_string ());
 	}
 	catch (sng_storage::not_found_error &) {
 		c->sendStringEndl ("ERROR(NOTFOUND)");
@@ -113,7 +110,7 @@ void init_time (sng & pic) {
 	auto t = time (nullptr);
 
 	auto t_ = gmtime (& t);
-	pic.time (t_->tm_year, t_->tm_mon, t_->tm_mday - 1, t_->tm_hour, t_->tm_min, t_->tm_sec);
+	pic.time (1900 + t_->tm_year, 1 + t_->tm_mon, t_->tm_mday, t_->tm_hour, t_->tm_min, t_->tm_sec);
 }
 
 void put_picture (std::shared_ptr <client> & c, const std::vector <std::string> & op) {
@@ -131,10 +128,8 @@ void put_picture (std::shared_ptr <client> & c, const std::vector <std::string> 
 			}
 
 			try {
-				std::ostringstream os;
-				os << sng_storage::instance ()->put_item (pic) << ";" << join (v, " ") << std::endl;
-
-				c->sendString (os.str ());
+				c->sendString (sng_storage::instance ()->put_item (pic));
+				c->sendStringEndl (std::string (";") + join (v, " "));
 			}
 			catch (sng_storage::write_error &) {
 				c->sendStringEndl ("ERROR(DBWRITE)");
@@ -191,16 +186,15 @@ void client_thread (std::shared_ptr <client> c) {
 				c->sendStringEndl ("Unknown command");
 		}
 	}
-	catch (...) {
-		c->sendStringEndl ("ERROR(Unknown)");
-	}
+	catch (excHandler &) { }
+	catch (...) { }
 }
 
 int main () {
 	signal (SIGPIPE, SIG_IGN);
 
 	try {
-		server s;
+		server s (18360, SOMAXCONN);
 
 		while (true) {
 			auto c = s.acceptConnection ();

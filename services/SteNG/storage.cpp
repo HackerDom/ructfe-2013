@@ -121,7 +121,7 @@ std::string sng_storage::put_item (const sng & pic) throw (sng_storage::write_er
 	if (! sng_file.is_open ())
 		throw sng_storage::write_error ();
 
-	sng_file << pic;
+	sng_file << pic.to_raw_string ();
 	sng_file.close ();
 
 	std::ofstream db_index (db_name, std::ios_base::app);

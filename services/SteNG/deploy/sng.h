@@ -113,10 +113,8 @@ public:
 	std::string private_ (const std::string & chunk) const throw ();
 	void private_ (const std::string & chunk, const std::string & text) throw ();
 
-	friend std::ostream & operator << (std::ostream & os, const sng & p) throw ();
+	std::string to_raw_string () const throw ();
 };
-
-std::ostream & operator << (std::ostream & os, const sng & p) throw ();
 
 #endif
 

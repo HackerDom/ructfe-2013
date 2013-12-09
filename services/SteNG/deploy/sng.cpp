@@ -121,8 +121,8 @@ sng_hIST parse_hIST (const std::string & s) {
 
 sng_tIME::sng_tIME () :
 	year (1970),
-	month (0),
-	day (0),
+	month (1),
+	day (1),
 	hour (0),
 	minute (0),
 	second (0) { }
@@ -134,7 +134,6 @@ sng_tIME::sng_tIME (short year, unsigned char month, unsigned char day, unsigned
 	hour (hour),
 	minute (minute),
 	second (second) { }
-
 
 sng_tIME parse_tIME (const std::string & s) {
 	sng_tIME r;
@@ -383,8 +382,8 @@ void sng::text (const std::string & s) throw () {
 
 std::string sng::time () const throw () {
 	std::ostringstream os;
-	os << (1 + m_tIME.month) << "/" << (1 + m_tIME.day) << "/" << m_tIME.year << " " <<
-		(1 + m_tIME.hour) << ":" << (1 + m_tIME.minute) << ":" << (1 + m_tIME.second);
+	os << static_cast <int> (m_tIME.month) << "/" << static_cast <int> (m_tIME.day) << "/" << m_tIME.year << " " <<
+		static_cast <int> (m_tIME.hour) << ":" << static_cast <int> (m_tIME.minute) << ":" << static_cast <int> (m_tIME.second);
 
 	return os.str ();
 }
@@ -409,55 +408,57 @@ void sng::private_ (const std::string & chunk, const std::string & text) throw (
 	m_private.data [chunk] = text;
 }
 
-std::ostream & operator << (std::ostream & os, const sng & p) throw () {
+std::string sng::to_raw_string () const throw () {
+	std::ostringstream os;
+
 	os << "IHDR {" << std::endl <<
-		"\twidth: " << p.m_IHDR.width << std::endl <<
-		"\theight: " << p.m_IHDR.height << std::endl <<
-		"\tbitdepth: " << static_cast <int> (p.m_IHDR.depth) << std::endl;
+		"\twidth: " << m_IHDR.width << std::endl <<
+		"\theight: " << m_IHDR.height << std::endl <<
+		"\tbitdepth: " << static_cast <int> (m_IHDR.depth) << std::endl;
 	
-	if (p.m_IHDR.alpha || p.m_IHDR.palette || p.m_IHDR.color) {
+	if (m_IHDR.alpha || m_IHDR.palette || m_IHDR.color) {
 		os << "\tusing ";
 
-		if (p.m_IHDR.alpha) os << "alpha ";
-		if (p.m_IHDR.color) os << "color ";
-		if (p.m_IHDR.palette) os << "palette ";
+		if (m_IHDR.alpha) os << "alpha ";
+		if (m_IHDR.color) os << "color ";
+		if (m_IHDR.palette) os << "palette ";
 		
 		os << std::endl;
 	}
 
-	os << "}" << std::endl << "gAMA { " << std::fixed << std::setprecision (2) << p.m_gAMA.value << " }" << std::endl <<
+	os << "}" << std::endl << "gAMA { " << std::fixed << std::setprecision (2) << m_gAMA.value << " }" << std::endl <<
 		"tIME {" << std::endl <<
-		"\tyear " << p.m_tIME.year << std::endl <<
-		"\tmonth " << static_cast <int> (p.m_tIME.month) << std::endl <<
-		"\tday " << static_cast <int> (p.m_tIME.day) << std::endl <<
-		"\thour " << static_cast <int> (p.m_tIME.hour) << std::endl <<
-		"\tminute " << static_cast <int> (p.m_tIME.minute) << std::endl <<
-		"\tsecond " << static_cast <int> (p.m_tIME.second) << std::endl <<
+		"\tyear " << m_tIME.year << std::endl <<
+		"\tmonth " << static_cast <int> (m_tIME.month) << std::endl <<
+		"\tday " << static_cast <int> (m_tIME.day) << std::endl <<
+		"\thour " << static_cast <int> (m_tIME.hour) << std::endl <<
+		"\tminute " << static_cast <int> (m_tIME.minute) << std::endl <<
+		"\tsecond " << static_cast <int> (m_tIME.second) << std::endl <<
 		"}" << std::endl;
 
-	if (! p.m_hIST.values.empty ()) {
+	if (! m_hIST.values.empty ()) {
 		os << "PLTE {" << std::endl;
-		for (const auto & it : p.m_PLTE.colors)
+		for (const auto & it : m_PLTE.colors)
 			os << "\t(" << std::setw (3) << it.r << "," << std::setw (3) << it.g << "," << std::setw (3) << it.b << ")" << std::endl;
-		os << "}" << std::endl << "hIST {" << std::endl << "\t" << join (p.m_hIST.values, " ") << std::endl << "}" << std::endl;
+		os << "}" << std::endl << "hIST {" << std::endl << "\t" << join (m_hIST.values, " ") << std::endl << "}" << std::endl;
 	}
 
-	if (! p.m_tEXt.keyword.empty ())
+	if (! m_tEXt.keyword.empty ())
 		os << "tEXt {" << std::endl <<
-		"\tkeyword: " << p.m_tEXt.keyword << std::endl <<
-		"\ttext: " << p.m_tEXt.text << std::endl <<
+		"\tkeyword: " << m_tEXt.keyword << std::endl <<
+		"\ttext: " << m_tEXt.text << std::endl <<
 		"}" << std::endl;
 
 	os << "IMAGE {" << std::endl << "\tpixels hex" << std::endl;
-	int w = p.m_IHDR.depth >> 2;
-	if (p.m_hIST.values.empty ()) {
-		for (const auto & it : p.m_IMAGE.pixels) {
+	int w = m_IHDR.depth >> 2;
+	if (m_hIST.values.empty ()) {
+		for (const auto & it : m_IMAGE.pixels) {
 			for (const auto & jt : it) {
 				os << std::setfill ('0') << std::setw (w) << std::hex << jt.c.r <<
 				      std::setfill ('0') << std::setw (w) << jt.c.g <<
 				      std::setfill ('0') << std::setw (w) << jt.c.b;
 
-				if (p.m_IHDR.alpha)
+				if (m_IHDR.alpha)
 					os << std::setfill ('0') << std::setw (w) << jt.c.a;
 
 				os << " ";
@@ -467,7 +468,7 @@ std::ostream & operator << (std::ostream & os, const sng & p) throw () {
 		}
 	}
 	else {
-		for (const auto & it : p.m_IMAGE.pixels) {
+		for (const auto & it : m_IMAGE.pixels) {
 			for (const auto & jt : it)
 				os << std::setfill ('0') << std::setw (2) << std::hex << static_cast <int> (jt.idx);
 
@@ -476,13 +477,13 @@ std::ostream & operator << (std::ostream & os, const sng & p) throw () {
 	}
 	os << "}" << std::endl;
 
-	if (! p.m_private.data.empty ()) {
-		for (const auto & it : p.m_private.data)
+	if (! m_private.data.empty ()) {
+		for (const auto & it : m_private.data)
 			os << "private " << it.first << " {" << std::endl <<
 				"\t\"" << it.second << "\"" << std::endl <<
 				"}" << std::endl;
 	}
 
-	return os;
+	return os.str ();
 }
 

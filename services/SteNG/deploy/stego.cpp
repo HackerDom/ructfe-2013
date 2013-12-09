@@ -8,8 +8,12 @@
 #include <iterator>
 
 bool operator < (const pixel & lhs, const pixel & rhs) {
-	if (lhs.x < rhs.x) return true;
-	if (lhs.x > rhs.x) return false;
+	if (lhs.x < rhs.x)
+		return true;
+
+	if (lhs.x > rhs.x)
+		return false;
+
 	return lhs.y < rhs.y;
 }
 
