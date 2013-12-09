@@ -28,7 +28,7 @@ void send_list (std::shared_ptr <client> & c) {
 		c->sendStringEndl (it);
 }
 
-void init_lcs (const std::string & s, const std::string & p) {
+void init (const std::string & s, const std::string & p) {
 	const int m = s.length ();
 	const int n = p.length ();
 	int l [m + 1][n + 1];
@@ -39,7 +39,7 @@ void init_lcs (const std::string & s, const std::string & p) {
 		l [i][j] = 0;
 }
 
-bool check_lcs (const std::string & s, const std::string & p) {
+bool check_psw (const std::string & s, const std::string & p) {
 	const int m = s.length ();
 	const int n = p.length ();
 	int l [m + 1][n + 1];
@@ -54,12 +54,6 @@ bool check_lcs (const std::string & s, const std::string & p) {
 
 	return 4 * l [m][n] >= 3 * n;
 }
-
-struct length_comparer : public std::binary_function <const std::string &, const std::string &, bool> {
-	bool operator () (const std::string & l, const std::string & r) const {
-		return l.length () < r.length ();
-	}
-};
 
 void get_picture (std::shared_ptr <client> & c, const std::vector <std::string> & op) {
 	if (op.size () < 2) {
@@ -77,12 +71,18 @@ void get_picture (std::shared_ptr <client> & c, const std::vector <std::string> 
 				return;
 			}
 
+			struct length_comparer : public std::binary_function <const std::string &, const std::string &, bool> {
+				bool operator () (const std::string & l, const std::string & r) const {
+					return l.length () < r.length ();
+				}
+			};
+
 			auto found = false;
 			auto it = std::max_element (std::begin (op) + 2, std::end (op), length_comparer ());
 
-			init_lcs (* it, password);
+			init (* it, password);
 			for (it = std::begin (op) + 2; it != std::end (op); ++ it)
-				if (check_lcs (* it, password)) {
+				if (check_psw (* it, password)) {
 					found = true;
 					break;
 				}
