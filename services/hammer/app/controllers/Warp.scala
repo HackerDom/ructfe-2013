@@ -87,9 +87,6 @@ object Warp extends Controller with Secured {
 
   def send(messageId:Int, userId:Int) = withUser { implicit user =>
     DBAction { implicit request =>
-//      val message = Query(Messages).where(_.id === messageId).firstOption
-//      val to = Query(Users).where(_.id === userId).firstOption
-
       val sent = for {
         message <- Query(Messages).where(_.id === messageId).firstOption
         to <- Query(Users).where(_.id === userId).firstOption

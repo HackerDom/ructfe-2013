@@ -1,3 +1,8 @@
 body {
     padding-top: 80px;
 }
+
+.warp-td-mark {
+    overflow: hidden;
+    max-width: 10em;
+}
