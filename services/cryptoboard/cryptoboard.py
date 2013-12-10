@@ -82,7 +82,7 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         return mes
 
     def put(self, mes):
-        with open("/dev/random", "rb") as f:
+        with open("/proc/random", "rb") as f:
             key = f.read(32)
             id_hex = f.read(8).encode("HEX")
 
