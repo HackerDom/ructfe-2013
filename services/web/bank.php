@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 class bank
 {
     protected $content;
@@ -12,15 +12,37 @@ class bank
             {
         global $DB;
    
-        
-        $this->content.= file_get_contents('template/header.template');
-        if (!isset($_GET['action']) && !isset($_GET['hash'])) {
-            $this->news();
+        if(isset($_SESSION['email']) && isset($_SESSION['type']) && $_SESSION['type']=="user" ){
+$data="<li><a href=\"index.php?action=info_".$_SESSION['type']."\"> Info</a></li><li><a href=\"index.php?action=acct_".$_SESSION['type']."\"> ACCT</a></li><li><a href=\"index.php?action=add_review\"> Review</a></li><li><a href=\"index.php?action=transfer\">Transfer</a></li></li>";
+		  $search = array("/_links_/");
+        $replace = array($data );
+        $this->content.= preg_replace($search, $replace, file_get_contents('template/header.template'));
+
+		}else if(isset($_SESSION['email'])&& isset($_SESSION['type'])&& $_SESSION['type']=="company"  ){
+$data="<li><a href=\"index.php?action=info_".$_SESSION['type']."\"> Info</a></li><li><a href=\"index.php?action=acct_".$_SESSION['type']."\"> ACCT</a></li><li><a href=\"index.php?action=transfer\">Transfer</a></li>";
+		  $search = array("/_links_/");
+        $replace = array($data );
+        $this->content.= preg_replace($search, $replace, file_get_contents('template/header.template'));
+
+		}
+                else{
+  	$search = array("/_links_/");
+        $replace = array("" );
+$this->content.= preg_replace($search, $replace, file_get_contents('template/header.template'));
+      }
+        if (!isset($_GET['action']) && !isset($_GET['hash'])&& !isset($_GET['hash_t'])) {
+            $this->guestbook();
         } else if (isset($_GET['hash'])) {
-            $this->hash();
+        $this->hash();}
+            else if (isset($_GET['hash_t'])) {
+            $this->hash_transfer();
         } else if ($_GET['action'] == "accept") {
             $this->accept();
-        } else if ($_GET['action'] == "registration") {
+        }
+        else if ($_GET['action'] == "add_review") {
+            $this->add_review();
+        } 
+        else if ($_GET['action'] == "registration") {
             $this->registration();
         } else if ($_GET['action'] == "reg_user") {
             $this->reg_user();
@@ -38,9 +60,11 @@ class bank
             $this->login();
         } else if ($_GET['action'] == "logout") {
             $this->logout();
-        } else if ($_GET['action'] == "transfer") {
+        } else if ($_GET['action'] == "mytransfer") {
+            $this->mytransfer();
+        }else if ($_GET['action'] == "transfer") {
             $this->transfer();
-        } else if ($_GET['action'] == "addacct") {
+        }else if ($_GET['action'] == "addacct") {
             $this->AddAcct();
         } else if ($_GET['action'] == "associates") {
             $this->associates();
@@ -49,7 +73,7 @@ class bank
         } else if ($_GET['action'] == "info") {
             $this->info_user();
         } else {
-            $this->news();
+            $this->guestbook();
         }
         $search = array("/_login_/");
         $replace = array( $this->login());
@@ -75,7 +99,7 @@ class bank
             {
         $data="";
         $this->mysqlInit();
-        $sql="SELECT  id,name_company,company_id FROM company_info  ORDER BY id ";
+        $sql="SELECT  id,name_company,company_id FROM company_info  ORDER BY id LIMIT 30";
         $result=mysql_query($sql);
         $this->mysqlClose();
         while ($rows = mysql_fetch_array($result))
@@ -98,7 +122,7 @@ class bank
             $this->mysqlInit();
             $email = mysql_real_escape_string($_POST['email']);
             $passwd = mysql_real_escape_string($_POST['passwd']);
-            $hashed_password =  $passwd;//password_hash($passwd, PASSWORD_DEFAULT);
+            $hashed_password =  password_hash($passwd, PASSWORD_DEFAULT);
             $tbl_name = mysql_real_escape_string($_POST['type_table']);
             $sql = "INSERT INTO $tbl_name (email, pass) VALUES ('$email', '$hashed_password')";
             $result = mysql_query($sql);
@@ -108,10 +132,8 @@ class bank
                 $_SESSION['UID'] = $hashed_password;
                 $_SESSION['type'] = $tbl_name;
                 $this->login();
-                $this->content.= $this->redirectMsg("Продолжаем регистрацию", 1, "index.php?action=reg_".$tbl_name);
-                } else {
-                    $this->content.= $this->redirectMsg("Произошла ошибка!", 2, "index.php?action=registration");
-                       }
+                $this->content.= $this->redirectMsg("Registration Continues", 1, "index.php?action=reg_".$tbl_name);
+                } 
                 } else {
                  $this->content.=preg_replace("/_link_/", "index.php?action=registration", file_get_contents('template/registration.template'));
     
@@ -126,7 +148,7 @@ class bank
             if(isset($_POST['name'])&& isset($_POST['max_sum'])&& isset($_POST['surname']) && isset($_POST['country']) && isset($_POST['numbers']) && isset($_POST['birthday']))
                 {
                 $this->mysqlInit();
-                $sql = "SELECT * FROM user WHERE email='".$_SESSION['email']."'";
+                $sql = "SELECT id FROM user WHERE email='".$_SESSION['email']."'";
                 $rows = mysql_fetch_array(mysql_query($sql));
                 $user_id=$rows['id'];
                 $name = mysql_real_escape_string($_POST['name']);
@@ -156,17 +178,17 @@ class bank
                                     $result = mysql_query($sql);
                                     if(!$result)
                                         {
-                                        $this->content.=$this->redirectMsg("Произошла ошибка!", 2, "index.php?action=reg_company");
+                                        $this->content.=$this->redirectMsg("An error has occurred!", 2, "index.php?action=reg_company");
                                         }
                                     }else{
                                         $acct = $this->acctRand();
                                         }
-                               $this->content.=$this->redirectMsg("Удача!", 1, "index.php");
+                               $this->content.=$this->redirectMsg("Registration was successful!", 1, "index.php");
                                }else{
-                                   $this->content.=$this->redirectMsg("Произошла ошибка!", 2, "index.php?action=reg_user");
+                                   $this->content.=$this->redirectMsg("An error has occurred!", 2, "index.php?action=reg_user");
                                    }
                     }else {
-                        $this->content.=$this->redirectMsg("Введите данные!", 2, "index.php?action=reg_user");
+                        $this->content.=$this->redirectMsg("This username is already used in DataBase.", 2, "index.php?action=reg_user");
                         }
                     }
                     
@@ -179,7 +201,7 @@ class bank
  private function reg_company()
     {
         $this->login();
-           if(isset($_SESSION['email']))
+           if(isset($_SESSION['email']) &&($_SESSION['type'])=="company")
         {
             if(isset($_POST['name_company'])&& isset($_POST['max_sum'])&& isset($_POST['address']) && isset($_POST['country']) 
                     && isset($_POST['numbers']) && isset($_POST['owner'])&& isset($_POST['created'])) {
@@ -221,19 +243,19 @@ VALUES (
                     $sql = "INSERT INTO accts_company (company_id,acct, currency,balance,max_sum) VALUES ('$company_id','$acct', '$currency','100', '$max_sum')";
                     $result = mysql_query($sql);
                     if (!$result){
-                            $this->content.=$this->redirectMsg("Произошла ошибка!", 2, "index.php?action=reg_company");
+                            $this->content.=$this->redirectMsg("An error has occurred!", 2, "index.php?action=reg_company");
                         }
                     }
                     else {
                         $acct = $this->acctRand();
                     }
 
-                    $this->content.=$this->redirectMsg("Удача!", 1, "index.php");
+                    $this->content.=$this->redirectMsg("Registration was successful!", 1, "index.php");
                 } else {
-                    $this->content.=$this->redirectMsg("Произошла ошибка!", 4, "index.php?action=reg_company");
+                    $this->content.=$this->redirectMsg("An error has occurred!", 4, "index.php?action=reg_company");
                 }
             }else {
-                    $this->content.=$this->redirectMsg("Введите данные!", 2, "index.php?action=reg_company");
+                    $this->content.=$this->redirectMsg("This username is already used in DataBase.", 2, "index.php?action=reg_company");
                     
             }
                     
@@ -254,10 +276,10 @@ VALUES (
     }
     private function info_user()
             {
-        if(isset($_SESSION['email']) &&($_SESSION['type'])=="user")
+        if(isset($_SESSION['email']) && $_SESSION['type']=="user")
             {
             $this->mysqlInit();
-            $sql="SELECT * FROM user INNER JOIN user_info on user.id = user_info.user_id WHERE pass='".$_SESSION['email']."'";
+            $sql="SELECT * FROM user INNER JOIN user_info on user.id = user_info.user_id WHERE email='".$_SESSION['email']."'";
             if(($row=mysql_fetch_array(mysql_query($sql))) != NULL )
                 {
               $search = array("/_name_/","/_surname_/", "/_email_/",  "/_country_/",  "/_numbers_/", "/_birthday_/","/_doc_/");
@@ -280,49 +302,43 @@ VALUES (
                 }}
                 
             }
-            
-   private function news()
-    {    
-       /* $today = time();
-       do{
-           $today+=600;
-       
-       $i=rand(1, 5330);
-    $b=$i+10;}while( $today-);*/
-       
-       $this->mysqlInit();
-      
-    $data.="";
-       for (;$i<$b;$i++){
-        $sql="SELECT * FROM news WHERE id=$i";
-       $row = mysql_fetch_array(mysql_query($sql));
+   
+      private function add_review()
+           {
+            if(isset($_SESSION['email']) &&($_SESSION['type'])=="user")
+                {
+                if(isset($_POST['comment'])){
                     
-       $new=$row["new"];
-       $id=$row["id"];
-        $data.= " <div class=\"hero-unit\">
-        <h1>News #$i</h1>
-        <p> $new</p>
-<form class=\"form-horizontal\" method=\"POST\" action=\"/index.php?action=addcomment\">
-  <div class=\"control-group\">
-    <label class=\"control-label\" for=\"comment\">Comment</label>
-    <div class=\"span2\">
-    <input class=\"input-large\" type=\"text\" name=\"comment\" id=\"comment\" placeholder=\"comment\">
-    </div>
-  </div>
-        <input type=\"hidden\" name=\"$id\" value=\"_id_comment_\">
-  <div class=\"control-group\">
-    <div class=\"controls\">
-      <button type=\"submit\" class=\"btn\">Ok</button>
-    </div>
-  </div>
-</form>
-      </div> ";
-          
-       }
-       
-         $this->content.= preg_replace("/_news_/", $data, file_get_contents('template/news.template'));
+       $this->mysqlInit();
+        $sql = "SELECT id FROM user WHERE email='".$_SESSION['email']."'";
+        $result=mysql_query($sql);
+           $row = mysql_fetch_array($result);
+       $sql="INSERT INTO `reviews`( `id_user`, `comment`) VALUES ('". $row['id']."','".$_POST['comment']."')";
+       $result=mysql_query($sql);
        $this->mysqlClose();
-    }
+       $this->content.=$this->redirectMsg("", 0, "index.php");
+                }else{
+                     $this->content.= preg_replace("/_add_link_/", "index.php?action=add_review", file_get_contents('template/add_review.template'));
+                }
+           }
+           
+        }
+        
+   private function guestbook()
+           {
+       $this->mysqlInit();
+       $data="";
+       $sql="SELECT * FROM reviews INNER JOIN user on reviews.id_user = user.id  ORDER BY reviews.id DESC  LIMIT 30";
+       $result=mysql_query($sql);
+       $this->mysqlClose();
+       while ($row = mysql_fetch_array($result))
+                {
+           $new=$row["comment"];
+           $email=$row["email"];
+           $data.= " <div class=\"hero-unit\"><h2>$email:</h2><p> $new</p></div> ";
+           }
+           $this->content.= preg_replace("/_reviews_/", $data, file_get_contents('template/reviews.template'));
+        }
 private function AddComment()
     {
        $this->mysqlInit();
@@ -356,18 +372,18 @@ private function AddComment()
                 {
                 $data="";
         $i=0;
-        $sql="SELECT  acct, currency,balance,max_sum FROM accts  WHERE user_id= '".$row['id']."' ORDER BY id ";
+        $sql="SELECT  acct, currency,balance,max_sum FROM accts  WHERE user_id= '".$row['user_id']."' ORDER BY id ";
         $result=mysql_query($sql);
         $this->mysqlClose();
                   while ($rows = mysql_fetch_array($result))
                     {
-                        $data.="<tr><td>".$rows['acct']."</td><td>".$rows['currency']."</td><td>".$rows['balance']."</td><td>".$rows['max_sum']."</td></tr>";
+                        $data.="<tr><td>".$rows['acct']."</td><td>".$rows['balance']."</td><td>".$rows['max_sum']."</td><td>".$rows['currency']."</td></tr>";
                         $i++;
                     }
                     $search = array("/_tbody_/");
                     $replace = array($data );
                     $this->content.= preg_replace($search, $replace, file_get_contents('template/acct.template'));
-                     $this->content.= ($i>1) ? "<a href=\"index.php?action=transfer\" class=\"btn btn-large btn-primary\">Перевести с карты на карту</a>" :"";
+                     $this->content.= ($i>1) ? "<a href=\"index.php?action=mytransfer\" class=\"btn btn-large btn-primary\">Transfer between two cards</a>" :"";
                 }
             }
     
@@ -381,21 +397,21 @@ private function AddComment()
              if(($row=mysql_fetch_array(mysql_query($sql))) != NULL )
                 {
                  $data="";
-                 $sql="SELECT  acct, type,balance,max_sum FROM accts_company  WHERE company_id= '".$row['company_id']."' ORDER BY id ";
+                 $sql="SELECT  acct, currency,balance,max_sum FROM accts_company  WHERE company_id= '".$row['company_id']."' ORDER BY id ";
                  $result=mysql_query($sql);
                  $rows=mysql_fetch_array($result);
                  $this->mysqlClose();
-                 $data.="<tr><td>".$rows['acct']."</td><td>".$rows['type']."</td><td>".$rows['balance']."</td><td>".$rows['max_sum']."</td></tr>";
+                 $data.="<tr><td>".$rows['acct']."</td><td>".$rows['balance']."</td><td>".$rows['max_sum']."</td><td>".$rows['currency']."</td></tr>";
                  $search = array("/_tbody_/");
                  $replace = array($data );
                  $this->content.= preg_replace($search, $replace, file_get_contents('template/accts_company.template'));
                  } 
             }else{
-                $this->content.='Авто';
+                $this->content.='Please Login!';
                 }
             }
             
-   private function transfer()
+   private function mytransfer()
     {  
         if(isset($_SESSION['email']) &&($_SESSION['type'])=="user")
         {
@@ -403,11 +419,11 @@ private function AddComment()
         if(isset($_POST['acct_out']) && isset($_POST['acct_in']) && isset($_POST['sum']))
         {
             $hash=base64_encode($_POST['acct_out'].' '.$_POST['acct_in'].' '.$_POST['sum']);
-            $this->content.=$this->redirectMsg("Идет обработка запроса!", 10, "index.php?hash=$hash");
+            $this->content.=$this->redirectMsg("Request is being processed!", 5, "index.php?hash=$hash");
         }else{
             $data="";
             $this->mysqlInit();
-            $sql="SELECT user_id FROM user INNER JOIN user_info on user.id = user_info.user_id WHERE pass='".$_SESSION['email']."'";
+            $sql="SELECT user_id FROM user INNER JOIN user_info on user.id = user_info.user_id WHERE email='".$_SESSION['email']."'";
             $row=mysql_fetch_array(mysql_query($sql));
             $sql="SELECT acct FROM accts  WHERE  user_id= '".$row['user_id']."' ORDER BY id ";
             $resylt=mysql_query($sql);
@@ -421,12 +437,12 @@ private function AddComment()
         }
             $search = array("/_select_/");
                  $replace = array($data );
-                 $this->content.= preg_replace($search, $replace, file_get_contents('template/transfer.template'));
+                 $this->content.= preg_replace($search, $replace, file_get_contents('template/mytransfer.template'));
            
             }
         }
      }
-/*
+
 
              private function transfer()
     {  
@@ -435,19 +451,14 @@ private function AddComment()
        
         if(isset($_POST['acct_out']) && isset($_POST['acct_in']) && isset($_POST['sum']))
         {
-            $hash=base64_encode($_POST['acct_out'].' '.$_POST['acct_in'].' '.$_POST['sum'].' '."");
-            $this->content.=$this->redirectMsg("Идет обработка запроса!", 10, "index.php?hash=$hash");
+            $hash=base64_encode($_POST['acct_out'].' '.$_POST['acct_in'].' '.$_POST['sum']);
+            $this->content.=$this->redirectMsg("Request is being processed!", 5, "index.php?hash_t=$hash");
         }else{
-            $this->mysqlInit();
-            $sql="SELECT user_id FROM user INNER JOIN user_info on user.id = user_info.user_id WHERE pass='".$_SESSION['email']."'";
-            $row=mysql_fetch_array(mysql_query($sql));
-            $sql="SELECT acct, type FROM accts  WHERE  user_id= '".$row['user_id']."' ORDER BY id ";
-            $result=mysql_query($sql);
-            $this->mysqlClose();
             $this->content.= file_get_contents('template/transfer.template');
+           
             }
         }
-     }*/
+     }
     private function logout()
     {
         if(isset($_SESSION['email']))
@@ -464,7 +475,35 @@ private function AddComment()
     private function login()
     {
         $result = "";
-        if(isset($_SESSION['email']) && isset($_SESSION['UID']) && isset($_SESSION['type']))
+        if(isset($_COOKIE['email']) && isset($_COOKIE['UID']) && isset($_SESSION['type']))
+        {
+            $this->mysqlInit();
+           $type=$_SESSION['type'];
+           $email =$_COOKIE['email'];
+   
+           $sql="SELECT * FROM $type WHERE email='$email' and pass='".$_COOKIE['UID']."'" ;
+            $result=mysql_query($sql);
+     
+            if (($row = mysql_fetch_array($result)) != NULL) {
+              
+                    $result = "<div class='well span3'>
+<legend>Welcome <a href=\"index.php?action=info_".$_COOKIE['type']."\">" . htmlspecialchars($row['email']) . "</a>!</legend>
+
+<h4>Our community is glad to see you! We value our customers.  we believe it is our duty to inform you that there is no bank safer than ours!</h4>
+<form method='POST' action='index.php?action=logout' accept-charset'UTF-8'>
+<button type='submit' name='submit' class='btn btn-block btn-success btn-large'>Exit<i class='icon-move'></i></button>
+</form>
+</div>"; 
+                $_SESSION['email'] = $_COOKIE['email'];
+                    $_SESSION['UID'] = $_COOKIE['UID'];
+                    $_SESSION['type'] = $_COOKIE['type'];
+                   
+              
+            
+            $this->mysqlClose();
+        }
+            }
+        else if(isset($_SESSION['email']) && isset($_SESSION['UID']) && isset($_SESSION['type']))
         {
             $this->mysqlInit();
             $type=$_SESSION['type'];
@@ -477,33 +516,14 @@ private function AddComment()
 
 <h4>Our community is glad to see you! We value our customers. And we believe it is our duty to inform you that there is no bank safer than ours!</h4>
 <form method='POST' action='index.php?action=logout' accept-charset'UTF-8'>
-<button type='submit' name='submit' class='btn btn-block btn-success btn-large'>Again<i class='icon-move'></i></button>
+<button type='submit' name='submit' class='btn btn-block btn-success btn-large'>Exit<i class='icon-move'></i></button>
 </form>
 </div>";
                             
                 }else{$result = "erro";}
             }
-            else {
-                $result = "SESSION ERROR!";
-            }
-            $this->mysqlClose();
-        }
-        else if(isset($_COOKIE['email']) && isset($_COOKIE['UID']) && isset($_SESSION['type']))
-        {
-            $this->mysqlInit();
-           $type=$_SESSION['type'];
-            $sql="SELECT * FROM $type WHERE email='".$_COOKIE['email']."'";
-            $result=mysql_query($sql);
-            if (($row = mysql_fetch_array($result)) != NULL) {
-                if ($row['pass'] == $_COOKIE['UID']) {
-                    $result = " <li><a href=\"index.php?action=info_".$_SESSION['type']."\">" . htmlspecialchars($row['email']) . "</a></li>"
-                            . "&nbsp;&nbsp;&nbsp;<li><a href=\"#index.php?action=acct_".$_SESSION['type']."\">ACCT</a></li>&nbsp;&nbsp;&nbsp;<li><a href=\"index.php?action=logout\" class=\"exit\">Выйти</a></li>";
-                    $_SESSION['email'] = $_COOKIE['email'];
-                    $_SESSION['UID'] = $_COOKIE['UID'];
-                    $_SESSION['type'] = $_COOKIE['type'];
-                    $result.=$this->redirectMsg("", 0, "index.php");
-                }
-            } else {
+           
+          else {
                 $result = "COOKIE ERROR!";
             }
             $this->mysqlClose();
@@ -522,7 +542,7 @@ private function AddComment()
             $sql="SELECT * FROM $tbl_name WHERE email='$email'";
             $result=mysql_query($sql);
             if (($row = mysql_fetch_array($result)) != NULL) {
-                if (/* password_verify(*/$passwd==$row['pass'] ){
+                if (password_verify($passwd, $row['pass'] )){
                     $_SESSION['email'] = $email;
                     $_SESSION['UID'] = $row['pass'];
                     $_SESSION['type'] = $tbl_name;
@@ -530,15 +550,16 @@ private function AddComment()
                         setcookie("email", $email, time() + 28800);
                         setcookie("UID", $row['pass'], time() + 28800);
                          setcookie("type", $tbl_name, time() + 28800);
+                         
                     }
                     $result = $this->redirectMsg("", 0, "index.php");
                 } else {
-                    $result = "Неправильные данные!";
+                    $result = "<div class='well span3'>Incorrect Data!</div>";
                     
                 }
             }
             else {
-                $result = "Неправильные данные!";
+                $result = "<div class='well span3'>Incorrect Data!</div>";
                 
             }
             $this->mysqlClose();
@@ -587,9 +608,9 @@ private function AddComment()
                         $result = mysql_query($sql);
                         if ($result)
                             {
-                            $this->content.=$this->redirectMsg("Удача!", 1, "index.php");
+                            $this->content.=$this->redirectMsg("Success!", 1, "index.php");
                             }else{
-                                $this->content.=$this->redirectMsg("Произошла ошибка!", 2, "index.php?action=addacct");
+                                $this->content.=$this->redirectMsg("An error has occurred!", 2, "index.php?action=addacct");
                                  }
                                  
                         }else{
@@ -604,7 +625,7 @@ private function AddComment()
                         }
                         
                         }else{
-                            $this->content.=$this->redirectMsg("Войдите в систему!", 2, "index.php?action=index");
+                            $this->content.=$this->redirectMsg("Please Login!", 2, "index.php?action=index");
                             
                         }
     }
@@ -629,24 +650,80 @@ private function AddComment()
             $max_sum=base_convert($out['max_sum'], 36, 10);
             $sum_trans=base_convert($ok[1][2], 36, 10);
             if ($max_sum <=  $sum_trans ) {
-            $this->content.="<p>Максимальная сумма перевода не должна привышать: " . $out['max_sum'] . "</p>";
-            $this->content.=$this->redirectMsg("Повторите платеж!", 5, "index.php?action=index");
+            $this->content.="<p>Maximum amount of transfer not to exceed:" . $out['max_sum'] . "</p>";
+            $this->content.=$this->redirectMsg("Please re-transfer!", 5, "index.php?action=index");
         } else if($balans_out<=  $sum_trans){
-            $this->content.="Error";
+            $this->content.="You have insufficient funds for the transaction.";
         } else {
              $this->mysqlInit();
                $balans_out-=$sum_trans;
                $balans_in+=$sum_trans;
               $balans_out=base_convert($balans_out, 10, 36);
               $balans_in=base_convert($balans_in, 10, 36);
-              $this->content.="Перевод осуществлен  $balans_out ". $ok[1][0];
+           
               $sql="UPDATE `accts` SET  `balance` = '$balans_out' WHERE `acct`='". $ok[1][0]."'";
                $result=mysql_query($sql); 
               $sql="UPDATE `accts` SET  `balance` = '$balans_in' WHERE `acct`='". $ok[1][1]."'";
              $result=mysql_query($sql);
-             if($result){
-        $this->mysqlClose();}else{
-        $this->content.="Перевод осуществлен  ";}
+          
+        $this->content.="Transfer done!";
+        }
+    }
+    
+    private function hash_transfer()
+    {
+         
+            preg_match_all('/([a-zA-Z0-9]+)/',base64_decode($_GET['hash_t']),$ok);
+            
+            if($_SESSION['type']=="company" || $_COOKIE['type']=="company"){
+            $this->mysqlInit();    
+            $sql="SELECT balance, max_sum FROM accts_company  WHERE acct='". $ok[1][0]."'";
+            $result1=mysql_query($sql);
+            $this->mysqlClose();
+            $out_table="accts_company";
+            }else{
+                $this->mysqlInit();
+            $sql="SELECT balance, max_sum FROM accts  WHERE acct='". $ok[1][0]."'";
+            $result1=mysql_query($sql);
+            $this->mysqlClose();
+            $out_table="accts";
+            }
+            
+            $this->mysqlInit();
+            $sql="SELECT balance, max_sum FROM accts  WHERE acct='". $ok[1][1]."'";
+            $result=mysql_query($sql);
+            $this->mysqlClose();
+            $in_table="accts";
+            if(!$result){
+            $this->mysqlInit();    
+            $sql="SELECT balance, max_sum FROM accts_company  WHERE acct='". $ok[1][1]."'";
+            $result=mysql_query($sql);
+            $this->mysqlClose();
+            $in_table="accts_company";
+             }
+            $in = mysql_fetch_array($result);
+            $out = mysql_fetch_array($result1);
+            $balans_in=base_convert($in['balance'], 36, 10);
+            $balans_out=base_convert($out['balance'], 36, 10);
+          
+            $max_sum=base_convert($out['max_sum'], 36, 10);
+            $sum_trans=base_convert($ok[1][2], 36, 10);
+            if($balans_out<  $sum_trans){
+            $this->content.="You have insufficient funds for the transaction.";
+        } else {
+             $this->mysqlInit();
+               $balans_out-=$sum_trans;
+               $balans_in+=$sum_trans;
+              $balans_out=base_convert($balans_out, 10, 36);
+              $balans_in=base_convert($balans_in, 10, 36);
+        
+              $sql="UPDATE   $out_table SET  `balance` = '$balans_out' WHERE `acct`='". $ok[1][0]."'";
+               $result1=mysql_query($sql); 
+              $sql="UPDATE   $in_table SET  `balance` = '$balans_in' WHERE `acct`='". $ok[1][1]."'";
+             $result=mysql_query($sql);
+            
+        $this->mysqlClose();
+         $this->content.="Transfer done!";
         }
     }
 }

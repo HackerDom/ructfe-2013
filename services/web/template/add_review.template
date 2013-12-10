@@ -1,0 +1,9 @@
+                        <legend>Comment</legend>
+                           <form  method="POST" action="_add_link_">
+                                    <label class="control-label" for="comment">Comment:</label>
+                                <input class="span10" name="comment" type="text" placeholder="comment">
+                                <button type="submit" name="submit" class="btn btn-block btn-success btn-large"><i class="icon-lock"></i>Enter</button>
+                        </form>
+     
+
+

@@ -92,16 +92,16 @@ class adminpanel {
             $sql="SELECT * FROM admins WHERE email='$email'";
             $result=mysql_query($sql);
             if (($row = mysql_fetch_array($result)) != NULL) {
-                if ($passwd == $row['pass']) {//password_verify($passwd, $row['passwd'] ))
+                if (password_verify($passwd, $row['pass'] )){
                     $_SESSION['email'] = $email;
                     $_SESSION['UID'] = $row['pass'];
                     $result = $this->redirectMsg("", 0, "badmin.php");
                 } else {
-                    $result = "Неправильные данные!";
+                    $result =  "Incorrect Data!";
                 }
             }
             else {
-                $result = "Неправильные данные!";
+                $result =  "Incorrect Data!";
             }
             $this->mysqlClose();
         }

@@ -1,9 +1,10 @@
 @import url(bootstrap.min.css);
 
-body {font-family: Buxton Sketch; font-size:18px; background: green;}
+body {font-family: Buxton Sketch; font-size:18px;background:#dddddd;}
 input {font-family: Buxton Sketch;}
 button {font-family: Buxton Sketch;}
 select {font-family: Buxton Sketch; font-size: 24px;}
 option {font-family: Buxton Sketch;}
 .navbar .brand {color: red;}
 .row {padding:20px 0;}
+.container {margin-right: auto; width: 1200px;}
