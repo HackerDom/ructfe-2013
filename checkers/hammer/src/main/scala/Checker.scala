@@ -226,21 +226,6 @@ class Checker (host:String, port:Int) extends FlatSpec with Firefox with Matcher
     }(PatienceConfig(timeout = Span(10, Seconds)))
   }
 
-  def put(id: String, flag: String) = {
-    goBase
-    doLogout
-
-    val login = Checker.userLogin(id)
-    val password = Checker.userPass(id)
-    val name = Checker.userName(id)
-
-    doRegister(login, password, name)
-    doLogout
-
-    doLoginOrRegister(adminLogin, adminPassword, adminName)
-    val msgid = doCreate(flag, Some(DigestUtils.sha256Hex(Checker.salt + id).substring(0,24)))
-    doSend(msgid, name)
-  }
 
   def doCheckMessageFrom(name: String, flag: String) = {
     click on partialLinkText("Incoming")
@@ -266,6 +251,44 @@ class Checker (host:String, port:Int) extends FlatSpec with Firefox with Matcher
     Integer.parseInt(find("warp-id").get.text)
   }
 
+  def getUnreadMessagesLinks = {
+
+    click on partialLinkText("Incoming")
+    click on partialLinkText("Unread")
+
+    val messages = findAll(cssSelector(".warp-td-author")).toArray.filter(_.text === name)
+
+    messages.map({ message =>
+      val id = Integer.parseInt(message.attribute("data-id").get)
+
+      val link = find(cssSelector(s"#warp-td-mark-$id > a")).get
+      link.attribute("href").get
+    })
+  }
+
+  def walkAllLinks(links: Seq[String])(action: => Unit) = {
+    links.foreach({ link =>
+      go to link
+      Thread.sleep(200)
+    })
+  }
+
+  def put(id: String, flag: String) = {
+    goBase
+    doLogout
+
+    val login = Checker.userLogin(id)
+    val password = Checker.userPass(id)
+    val name = Checker.userName(id)
+
+    doRegister(login, password, name)
+    doLogout
+
+    doLoginOrRegister(adminLogin, adminPassword, adminName)
+    val msgid = doCreate(flag, Some(DigestUtils.sha256Hex(Checker.salt + id).substring(0,24)))
+    doSend(msgid, name)
+  }
+
   def get(id: String, flag: String) = {
     goBase
     doLogout
@@ -281,7 +304,15 @@ class Checker (host:String, port:Int) extends FlatSpec with Firefox with Matcher
   }
 
   def check() = {
-    doRegister("123123123", "awe123123", "qweqe123")
+    goBase
+    doLogout
+
+    doLoginOrRegister(adminLogin, adminPassword, adminName)
+    val links = getUnreadMessagesLinks
+    walkAllLinks(links) {
+      val extLinks = findAll(cssSelector(s"#warp-decrypt a")).toArray.map({_.attribute("href")}).flatten
+      walkAllLinks(extLinks)
+    }
   }
 
   def test() = {
