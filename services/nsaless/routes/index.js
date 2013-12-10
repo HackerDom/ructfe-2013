@@ -10,11 +10,7 @@ exports.getUser = function(req, res, next) {
 }
 
 exports.index = function(req, res) {
-    if (res.user) {
-        res.redirect('/' + res.user.id);
-    } else {
-        res.redirect('/signin');
-    }
+    res.redirect(res.user ? '/' + res.user.id : '/signin');
 }
 
 exports.users = function(req, res) {
