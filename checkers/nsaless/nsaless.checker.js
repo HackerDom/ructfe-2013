@@ -155,8 +155,8 @@ var get = function(ip, id_key, flag) {
 };
 
 var check = function(ip, id, flag) {
-    console.log('check');
-    done(codes['SERVICE_OK']);
+    console.error('check');
+    done(utils.codes['SERVICE_OK']);
 };
 
 var handlers = {
@@ -170,7 +170,7 @@ var argv = process.argv;
 
 if (argv.length < 2) {
     console.log('argv length missmatch');
-    process.exit(codes['INTERNAL_ERROR']);
+    process.exit(utils.codes['INTERNAL_ERROR']);
 }
 
 handlers[argv[0]](argv[1], argv[2], argv[3]);
