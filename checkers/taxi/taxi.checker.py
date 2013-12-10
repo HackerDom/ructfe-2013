@@ -1,4 +1,5 @@
-#!/usr/bin/pythonimport argparse
+#!/usr/bin/python
+import argparse
 import sys
 import requests
 import ast
