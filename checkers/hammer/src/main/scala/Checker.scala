@@ -256,20 +256,14 @@ class Checker (host:String, port:Int) extends FlatSpec with Firefox with Matcher
     click on partialLinkText("Incoming")
     click on partialLinkText("Unread")
 
-    val messages = findAll(cssSelector(".warp-td-author")).toArray.filter(_.text === name)
+    findAll(cssSelector(".warp-td-mark > a")).toArray.map(_.attribute("href")).flatten
 
-    messages.map({ message =>
-      val id = Integer.parseInt(message.attribute("data-id").get)
-
-      val link = find(cssSelector(s"#warp-td-mark-$id > a")).get
-      link.attribute("href").get
-    })
   }
 
   def walkAllLinks(links: Seq[String])(action: => Unit) = {
     links.foreach({ link =>
       go to link
-      Thread.sleep(200)
+      action
     })
   }
 
@@ -310,8 +304,11 @@ class Checker (host:String, port:Int) extends FlatSpec with Firefox with Matcher
     doLoginOrRegister(adminLogin, adminPassword, adminName)
     val links = getUnreadMessagesLinks
     walkAllLinks(links) {
-      val extLinks = findAll(cssSelector(s"#warp-decrypt a")).toArray.map({_.attribute("href")}).flatten
-      walkAllLinks(extLinks)
+      val extLinks = findAll(cssSelector(s"#warp-public a")).toArray.map({_.attribute("href")}).flatten
+      System.err.println(extLinks.mkString(" "))
+      walkAllLinks(extLinks) {
+        Thread.sleep(100)
+      }
     }
   }
 
