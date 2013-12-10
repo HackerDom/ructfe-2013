@@ -7,6 +7,12 @@
     <body>
         <a href="/">Home</a>
         <br/>
+        <% if (followers.length) { %>
+            Followers:
+            <% for (var i = 0; i < followers.length; ++i) { %>
+                <div><%= followers[i] %></div>
+            <% } %>
+        <% } %>
         <% if (cookie_user && url_user) { %>
             <% if (cookie_user.id == url_user.id) { %>
                 <% for (key in cookie_user.pending_followers) { %>

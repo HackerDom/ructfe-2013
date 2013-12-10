@@ -21,6 +21,16 @@ exports.addFollower = function(user_id, follower_id) {
     });
 }
 
+exports.getFollowers = function(user_id, callback) {
+    client.hkeys(user_id + '_followers', function(err, reply) {
+        if (reply) {
+            callback(reply);
+        } else {
+            callback([]);
+        }
+    });
+}
+
 exports.getUserFromId = function(id, callback) {
     var user = null
     client.hget('users', id, function(err, reply) {
@@ -58,6 +68,18 @@ exports.createUser = function(req, res) {
 
 exports.saveUser = function(user) {
     client.hset('users', user.id ,JSON.stringify(user));
+}
+
+exports.getUsers = function(callback) {
+    client.hvals('users', function(err, reply) {
+        if (reply) {
+            callback(reply.map(function(user) {
+                return JSON.parse(user);
+            }));
+        } else {
+            callback([]);
+        }
+    });
 }
 
 exports.createSession = function(req, res, user) {

@@ -17,14 +17,23 @@ exports.index = function(req, res) {
     }
 }
 
+exports.users = function(req, res) {
+    users.getUsers(function(usrs) {
+        res.render('users', {'users': usrs});
+    });
+}
+
 exports.home = function(req, res) {
     var id = req.params.id;
     users.getUserFromId(id, function(user) {
         tweets.getTweets(user, function(tweets) {
-            res.render('home', {
-                'cookie_user': res.user,
-                'url_user': user,
-                'tweets': tweets,
+            users.getFollowers(user.id, function(followers) {
+                res.render('home', {
+                    'cookie_user': res.user,
+                    'url_user': user,
+                    'tweets': tweets,
+                    'followers': followers
+                });
             });
         });
     });

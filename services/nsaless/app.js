@@ -19,6 +19,7 @@ app.get('/signup', routes.signup);
 app.post('/tweet', routes.tweet);
 app.post('/checkpub', routes.checkpub);
 
+app.get('/users', routes.users);
 app.get('/retweet/:id', routes.retweet);
 app.get('/:id', routes.home)
 app.post('/checkrandom/:id', routes.checkrandom)
