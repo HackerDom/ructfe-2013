@@ -1,0 +1,64 @@
+<form enctype="multipart/form-data" class="form-horizontal" name="reg_form" method="POST" action="_link_">
+ <legend>Registration</legend>
+<div class="control-group">
+    <label class="control-label" for="name_company">name_company</label>
+    <div class="controls">
+     <input class="span2" id="name_company"  name="name_company" type="text" placeholder="name">
+    </div>
+ </div>
+<div class="control-group">
+    <label class="control-label" for="country">country</label>
+    <div class="controls">
+     <input class="span2" id="country"  name="country" type="text" placeholder="country">
+    </div>
+  </div>
+<div class="control-group">
+    <label class="control-label" for="address">address</label>
+    <div class="controls">
+     <input class="span2" id="address"  name="address" type="text" placeholder="numbers">
+    </div>
+    </div>
+<div class="control-group">
+    <label class="control-label" for="created">created</label>
+    <div class="controls">
+     <input class="span2" id="created"  name="created" type="date" placeholder="birthday">
+    </div>
+  </div>
+<div class="control-group">
+    <label class="control-label" for="numbers">numbers</label>
+    <div class="controls">
+     <input class="span2" id="numbers"  name="numbers" type="text" placeholder="numbers">
+    </div>
+    </div>
+<div class="control-group">
+    <label class="control-label" for="owner">owner</label>
+    <div class="controls">
+     <input class="span2" id="owner"  name="owner" type="text" placeholder="numbers">
+    </div>
+    </div>
+<div class="control-group">
+    <label class="control-label" for="doc">doc</label>
+    <div class="controls">
+     <input class="span2" id="doc"  name="doc" type="file" placeholder="doc">
+    </div>
+    </div>
+ <legend>Add card</legend>
+<div class="control-group">
+    <label class="control-label" for="max_sum">max_sum</label>
+    <div class="controls">
+     <input class="span2" id="max_sum"  name="max_sum" type="text" placeholder="max_sum">
+    </div>
+ </div>
+    <div class="control-group">
+    <label class="control-label" for="currency"> Type</label>
+    <div class="controls">
+        <select name="currency">
+            <option value="$">$</option>
+            <option value="€">€</option>
+            <option value="=">=</option>
+         </select>
+     </div>
+</div>
+<button type="submit" class="btn">Ok!</button>
+</form>
+</script>

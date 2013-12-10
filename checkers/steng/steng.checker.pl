@@ -2,15 +2,15 @@
 
 use constant {
 	DEBUG => 0,
+	PORT => 18360,
+	TIMEOUT => 4,
 
 	CHECKER_OK => 101,
 	CHECKER_NOFLAG => 102,
 	CHECKER_MUMBLE => 103,
 	CHECKER_DOWN => 104,
-	CHECKER_ERROR => 110
-};
+	CHECKER_ERROR => 110,
 
-use constant {
 	CONNECTION_ERROR => "Could not connect to service",
 	CANNOT_GET_PICTURE => "Can't get picture",
 	CANNOT_PUT_PICTURE => "Can't put picture",
@@ -21,7 +21,6 @@ my @perc = qw/45 35 20/;
 use Socket;
 use SNG;
 
-my $port = 18360;
 my ($mode, $ip, $id, $flag) = @ARGV;
 my %handlers = (
 	'check' => \&check,
@@ -30,7 +29,7 @@ my %handlers = (
 );
 
 socket $S, PF_INET, SOCK_STREAM, getprotobyname 'tcp';
-$cr = connect $S, sockaddr_in $port, inet_aton $ip;
+$cr = connect $S, sockaddr_in PORT, inet_aton $ip;
 do_exit (CHECKER_DOWN, CONNECTION_ERROR) unless $cr;
 
 vec ($v = '', fileno ($S), 1) = 1;
@@ -52,7 +51,7 @@ sub do_exit {
 sub check {
 	send $S, "list\n", 0;
 
-	my @list = split /\s+/, &get_all;
+	my @list = split /\s+/, &get_string; #&get_all;
 	do_exit (CHECKER_OK) unless @list;
 
 	my $pic = $list[int rand @list];
@@ -81,7 +80,7 @@ sub put {
 
 	if ($type < $perc[0] || $type >= $perc[0] + $perc[1]) {
 		send $S, "putpic $flag\n$pic\n", 0;
-		my $data = &get_all;
+		my $data = &get_string;
 
 		do_exit (CHECKER_MUMBLE, CANNOT_PUT_PICTURE) if $data =~ /^ERROR/;
 
@@ -90,7 +89,7 @@ sub put {
 	else {
 		my ($psw1, $psw2) = &passw_gen;
 		send $S, "putpic $flag $psw1\n$pic\n", 0;
-		my $data = &get_all;
+		my $data = &get_string;
 
 		do_exit (CHECKER_MUMBLE, CANNOT_PUT_PICTURE) if $data =~ /^ERROR/;
 
@@ -120,7 +119,7 @@ sub get {
 		my $data = &get_all;
 
 		do_exit (CHECKER_MUMBLE, CANNOT_GET_PICTURE) if $data =~ /^ERROR/;
-		do_exit (CHECKER_NOFLAG, FLAG_NOT_FOUND) if SNG::unparse_flag ($data, $x[1]) ne $flag;
+		do_exit (CHECKER_NOFLAG, FLAG_NOT_FOUND) if !$data || SNG::unparse_flag ($data, $x[1]) ne $flag;
 	}
 	else {
 		my @x = split /:/, $type[1];
@@ -136,15 +135,31 @@ sub get {
 	do_exit (CHECKER_OK);
 }
 
-sub get_all {
-	my ($x, $t) = '';
- 
-	while (select '' . $v, undef, undef, 0.2) {
-		recv $S, ($t = ''), 1024, 0;
-		return $x unless length $t;
-		$x .= $t;
-	}
+sub get_string {
+	my $x = '';
+	for (1 .. (TIMEOUT * 100)) {
+		next unless select '' . $v, undef, undef, 0.01;
+		while (select '' . $v, undef, undef, 0) {
+			recv $S, ($_ = ''), 1, 0;
+			return unless length;
 
+			$x .= $_;
+			return $x if /\n/;
+		}
+	}
+}
+
+sub get_all {
+	my $x = '';
+	for (1 .. (TIMEOUT * 100)) {
+		next unless select '' . $v, undef, undef, 0.01;
+		while (select '' . $v, undef, undef, 0) {
+			recv $S, ($_ = ''), 1024, 0;
+			return unless length;
+
+			$x .= $_;
+		}
+	}
 	$x;
 }
 

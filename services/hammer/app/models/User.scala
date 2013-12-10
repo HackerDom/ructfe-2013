@@ -2,8 +2,10 @@ package models
 
 
 
-import scala.slick.lifted._
+import play.api.Play.current
+import play.api.db.slick._
 import play.api.db.slick.Config.driver.simple._
+
 import org.apache.commons.codec.digest.DigestUtils
 import scala.util.Random
 import components.AuthorisedUser
@@ -39,5 +41,12 @@ object Users extends Table[User]("USERS") {
 
   def * = id.? ~ login ~ password ~ salt ~ name <>
         (User.apply _, User.unapply _)
+
+  def all = Query(Users)
+  def haveNo(message: Message) = for {
+    (user, msg) <- Users.all.leftJoin(SentMessages).on({(u, m) => (u.id === m.user_id).&&(m.message_id === message.id)}).filter(_._2.message_id.isNull)
+  } yield user
+  def byId(id: Int) = all.filter(_.id === id)
+
 
 }

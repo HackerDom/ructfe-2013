@@ -1,16 +1,21 @@
-<form class="form-horizontal" name="auth" method="POST" action="http://localhost/index.php?action=transfer">
-  <div class="control-group">
+<form class="form-horizontal" name="auth" method="POST" action="/index.php?action=transfer">
+ 
+    <div class="control-group">
     <label class="control-label" for="acct_out">acct_out</label>
     <div class="controls">
-     <input class="span2" id="acct_out"  name="acct_out" type="text" placeholder="acct_out">
-    </div>
-  </div>
-  <div class="control-group">
+        <select name="acct_out">
+           _select_
+         </select>
+     </div>
+</div>
+    <div class="control-group">
     <label class="control-label" for="acct_in">acct_in</label>
     <div class="controls">
-      <input class="span2" id="acct_in"  name="acct_in" type="text" placeholder="acct_in">
-    </div>
-  </div>
+        <select name="acct_in">
+          _select_
+         </select>
+     </div>
+</div>
  <div class="control-group">
     <label class="control-label" for="sum">Sum</label>
     <div class="controls">
@@ -19,6 +24,5 @@
     </div>
   </div>
   <button type="submit" class="btn">transfer</button>
-    </div>
-  </div>
+ 
 </form>

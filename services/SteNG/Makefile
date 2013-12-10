@@ -1,23 +1,30 @@
 .PHONY : all
 
-CHECKER=./checker/extract
+CXX=g++
+OPTS=-std=c++11
+
+CHECKER=extract
 SERVICE=steng
 PACKER=packer
 
-CHECKER_SRC=extract.cpp sng.cpp stego.cpp
-SERVICE_SRC=steng.cpp sng.cpp stego.cpp storage.cpp sockets.cpp excHandler.cpp
-PACKER_SRC=packer.cpp sng.cpp stego.cpp
+COMMON=strlib.cpp sng.cpp stego.cpp
+
+CHECKER_SRC=extract.cpp
+SERVICE_SRC=steng.cpp storage.cpp sockets.cpp excHandler.cpp
+PACKER_SRC=packer.cpp
 
 all: $(CHECKER) $(SERVICE) $(PACKER)
 
-$(CHECKER): Makefile $(CHECKER_SRC)
-	g++ -std=c++11 -o $(CHECKER) $(CHECKER_SRC)
+$(CHECKER): Makefile $(CHECKER_SRC) $(COMMON)
+	$(CXX) $(OPTS) -o $(CHECKER) $(COMMON) $(CHECKER_SRC)
+	cp $(CHECKER) ./checker/
 
-$(SERVICE): Makefile $(SERVICE_SRC)
-	g++ -std=c++11 -pthread -o $(SERVICE) $(SERVICE_SRC)
+$(SERVICE): Makefile $(SERVICE_SRC) $(COMMON)
+	$(CXX) $(OPTS) -pthread -o $(SERVICE) $(COMMON) $(SERVICE_SRC)
 
-$(PACKER): Makefile $(PACKER_SRC)
-	g++ -std=c++11 -o $(PACKER) $(PACKER_SRC)
+$(PACKER): Makefile $(PACKER_SRC) $(COMMON)
+	$(CXX) $(OPTS) -o $(PACKER) $(COMMON) $(PACKER_SRC)
 
 clean:
 	rm -r *~ steng.db db/
+

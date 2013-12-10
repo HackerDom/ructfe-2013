@@ -1,10 +1,11 @@
+#include "sng.h"
+#include "stego.h"
+
 #include <iostream>
 #include <sstream>
 #include <string>
 #include <vector>
 #include <iterator>
-#include "sng.h"
-#include "stego.h"
 
 std::istream & operator >> (std::istream & is, pixel & p) {
 	char c;
@@ -26,7 +27,12 @@ int main (int argc, char ** argv) {
 		s.push_back ('\n');
 	}
 
-	std::cout << stego::get (sng (s), v);
+	try {
+		std::cout << stego::get (sng (s), v);
+	}
+	catch (sng::parse_error &) { }
+	catch (...) { }
 
 	return 0;
 }
+

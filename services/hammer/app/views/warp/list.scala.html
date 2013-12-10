@@ -1,14 +1,21 @@
-@(messages: Seq[(Message, User)])(implicit request: Request[_], user: components.AuthorisedUser)
+@(messages: Seq[(Message, User)])(implicit request: Request[_], user: components.AuthorisedUser, session: scala.slick.session.Session)
 @import org.apache.commons.codec.binary.Hex
 
 @main("Warp beam") {
-
-    @messages.map { case (message, author) =>
-        <div class="">
-            <div class="msg-public">@message.message</div>
-            <div class="msg-mark">@{Hex.encodeHexString(message.mark)}</div>
-            <div class="msg-date">@message.created</div>
-            <div class="msg-author">@author.name</div>
-        </div>
-    }
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <td>#</td>
+                <td>Message</td>
+                <td>Chaos Mark</td>
+                <td>Author</td>
+                <td>Date</td>
+            </tr>
+        </thead>
+        <tbody>
+            @messages.map { case (message, author) =>
+                @warp.element(message, author)
+            }
+        </tbody>
+    </table>
 }

@@ -1,14 +1,15 @@
-@(message: Message)(implicit request: Request[_], user: components.AuthorisedUser, session: Session)
-@import org.apache.commons.codec.binary.Hex
+@(message: Message, author: User)(implicit request: Request[_], user: components.AuthorisedUser, session: scala.slick.session.Session)
 @import play.api.db.slick.Config.driver.simple._
 
 
-<div class="warp">
-    <div class="warp-author">@message.author_id</div>
-    <div class="warp-creation_time">@message.created</div>
-    <div class="warp-name">
-        <a href="@routes.Warp.show(message.id.get)">
-            @message.mark
-        </a>
-    </div>
-</div>
+<tr id="warp-row-@message.id.get" class="warp-td-row">
+    <td data-id="@message.id.get" id="warp-td-id-@message.id.get" class="warp-td-id">@message.id.get</td>
+    <td data-id="@message.id.get" id="warp-td-text-@message.id.get" class="warp-td-text">
+        @message.message.take(100)
+    </td>
+    <td data-id="@message.id.get" id="warp-td-mark-@message.id.get" class="warp-td-mark">
+        <a href="@routes.Warp.show(message.id.get)">@message.hexMark</a>
+    </td>
+    <td data-id="@message.id.get" id="warp-td-author-@message.id.get" class="warp-td-author">@author.name</td>
+    <td data-id="@message.id.get" id="warp-td-created-@message.id.get" class="warp-td-created">@message.created.get.format("hh:mm:ss dd/mm/YYYY ")</td>
+</tr>

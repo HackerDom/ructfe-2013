@@ -8,9 +8,18 @@
     <head>
         <title>@title</title>
         <link rel="shortcut icon" type="image/png" href="@routes.Assets.at("images/favicon.png")">
-        <link rel='stylesheet' href='@routes.WebJarAssets.at(WebJarAssets.locate("css/bootstrap.min.css"))'>
+        <link rel='stylesheet' href='@routes.Assets.at("stylesheets/bootstrap-wysihtml5-0.0.2.css")'>
+        <link rel='stylesheet' href='@routes.Assets.at("stylesheets/bootstrap.min.css")'>
+        <link rel='stylesheet' href='@routes.WebJarAssets.at(WebJarAssets.locate("select2.css"))'>
+        <link rel='stylesheet' href='@routes.WebJarAssets.at(WebJarAssets.locate("select2-bootstrap.css"))'>
+
         <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("jquery.min.js"))'></script>
         <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("bootstrap.min.js"))'></script>
+        <script type='text/javascript' src='@routes.WebJarAssets.at(WebJarAssets.locate("select2.min.js"))'></script>
+        <script type='text/javascript' src='@routes.Assets.at("javascripts/wysihtml5-0.3.0.min.js")'></script>
+        <script type='text/javascript' src='@routes.Assets.at("javascripts/bootstrap-wysihtml5-0.0.2.min.js")'></script>
+
+
 
         <link rel="stylesheet" media="screen" href="@routes.Assets.at("stylesheets/main.css")">
 
@@ -24,10 +33,21 @@
                         <a class="brand" href="#">Hammer</a>
                         <ul class="nav">
                             <li><a href="@routes.Application.index">Home</a></li>
+                            @if(user.isAuth) {<li><a href="@routes.Warp.create">Create warp</a></li>}
+                            <li><a href="@routes.Warp.all">Warp beam</a></li>
+                            @if(user.isAuth) {
 
-                            <li><a href="@routes.Warp.create">Create warp</a></li>
-                            <li><a href="@routes.Warp.all">Enter the Warp</a></li>
-                            <li><a href="@routes.Warp.own">Mutations</a></li>
+                                <li class="dropdown">
+                                    <a href="@routes.Warp.forme" class="dropdown-toggle" data-toggle="dropdown">Incoming</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="@routes.Warp.formeMode("all")"> All </a></li>
+                                        <li><a href="@routes.Warp.formeMode("read")"> Read </a></li>
+                                        <li><a href="@routes.Warp.formeMode("unread")"> Unread </a></li>
+                                    </ul>
+                                </li>
+                            }
+                            @if(user.isAuth) {<li><a href="@routes.Warp.own">Austopat</a></li>}
+                            <li><a href="@routes.Application.users()">Inquisitors</a></li>
                         </ul>
                         <ul class="nav pull-right">
                             @if(user.isAuth) {
