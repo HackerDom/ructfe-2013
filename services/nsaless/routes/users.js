@@ -2,6 +2,18 @@ var redis = require("redis"),
     client = redis.createClient();
 var bignum = require("bignum");
 
+exports.addPending = function(user_id, follower_id) {
+    client.hset('pending', follower_id, user_id);
+}
+
+exports.addFollower = function(user_id, follower_id) {
+    client.hget('pending', follower_id, function(err, reply) {
+        if (reply != null && user_id == reply) {
+            client.hset(user_id + '_followers', follower_id, follower_id);
+        }
+    });
+}
+
 exports.getUserFromId = function(id, callback) {
     var user = null
     client.hget('users', id, function(err, reply) {

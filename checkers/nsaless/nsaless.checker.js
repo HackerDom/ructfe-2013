@@ -1,141 +1,119 @@
 #!/usr/bin/node
 
 var http = require('http');
-var querystring = require('querystring');
-var EventEmitter = new require('events').EventEmitter
-var exit_event = new EventEmitter()
+var EventEmitter = new require('events').EventEmitter;
+var exit_event = new EventEmitter();
+var jsdom = require('jsdom');
+var async = require('async');
+var utils = require('./utils');
 
 exit_event.on('exit', function(code) {
-  process.exit(code);
+    process.exit(code);
 });
 
-codes = {
-  'SERVICE_OK' : 101,
-  'FLAG_GET_ERROR' : 102,
-  'SERVICE_CORRUPT' : 103,
-  'SERVICE_FAIL' : 104,
-  'INTERNAL_ERROR' : 110
-};
 
 var done = function(code) {
-  console.log('status: ' + code);
-  exit_event.emit('exit', code);
+    console.log('status: ' + code);
+    exit_event.emit('exit', code);
 };
 
-
 var put = function(ip, id, flag) {
-  console.log('put');
+    console.error('put');
 
-  console.log('ip: ' + ip);
-  console.log('id: ' + id);
-  console.log('flag: ' + flag);
+    console.error('ip: ' + ip);
+    console.error('id: ' + id);
+    console.error('flag: ' + flag);
 
-  var post_data = querystring.stringify({
-    'id' : id,
-    'message' : flag
-  });
+    var userId = null;
+    var userCookie = null;
 
-  var options = {
-    host: ip,
-    port: 3000,
-    path: '/create',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'Content-Length': post_data.length
-    }
-  };
-  
-  var post_req = http.request(options, function(res) {
-      res.setEncoding('utf8');
+    async.waterfall([
+        function(next) {
+            utils.createUser(ip, next);
+        },
 
-      var data = "";
-      res.on('data', function (chunk) {
-        data += chunk;
-      });
+        function(id, cookie, next) {
+            userId = id;
+            userCookie = cookie;
+            utils.tweetMessage(ip, cookie, flag, next);
+        },
 
-      res.on('end', function() {
-        console.log('response: ' + data);
-        var return_value;
-        if (data === id) {
-          return_value = codes['SERVICE_OK'];
-        } else {
-          return_value = codes['SERVICE_CORRUPT'];
+        function(next) {
+            async.map([0, 1, 2, 3, 4, 5, 6, 7],
+            function(number, callback) {
+                    utils.createUser(ip, function(err, id, cookie) {
+                        callback(err, {'id': id, 'cookie': cookie});
+                    });
+            },
+            function(err, results) {
+                next(err, results);
+            });
+        },
+
+        function(users, next) {
+            async.map(users,
+            function(user, callback) {
+                utils.tryFollow(ip, user.cookie, userId, function(data) {
+                    callback(null, user);
+                });
+            },
+            function(err, results) {
+                setInterval(function(){ next(err, results); }, 3000);
+            });
+        },
+
+        function(users, next) {
+            async.map(users,
+            function(user, callback) {
+                utils.acceptFollow(ip, userCookie, user.id, function(data) {
+                    callback(null, user);
+                });
+            },
+            function(err, results) {
+                next(err, utils.codes['SERVICE_OK']);
+            });
         }
-        done(return_value);
-      });
 
-  });
-
-  post_req.on('error', function(err) {
-    console.log(err);
-    done(codes['SERVICE_FAIL']);
-  });
-
-  post_req.write(post_data);
-  post_req.end();
+        ], function(err, code) {
+            done(code);
+        });
 };
 
 var get = function(ip, id, flag) {
-  console.log('get');
+    console.log('get');
 
-  console.log('ip: ' + ip);
-  console.log('id: ' + id);
-  console.log('flag: ' + flag);
+    console.log('ip: ' + ip);
+    console.log('id: ' + id);
+    console.log('flag: ' + flag);
 
-  var options = {
-    host: ip,
-    port: 3000,
-    path: '/get/' + id
-  };
+    var options = {
+        host: ip,
+        port: 48879,
+        path: '/get/' + id
+    };
 
-  var req = http.request(options, function(res) {
-      res.setEncoding('utf8');
-      
-      var data = "";
-      res.on('data', function (chunk) {
-        data += chunk;
-      });
+    httpClient.get(ip, '/signup', {}, function(data) {
 
-      res.on('end', function() {
-        console.log('response: ' + data);
-        var return_value;
-        if (data === flag) {
-          return_value = codes['SERVICE_OK'];
-        } else {
-          return_value = codes['FLAG_GET_ERROR'];
-        }
-        done(return_value);
-      });
-      
-      res.on('error', function() {
-        console.log("qwer");
-      });
-  }).on('error', function(err) {
-    console.log(err);
-    done(codes['SERVICE_FAIL']);
-  });
-
-  req.end();
+    }).end();
 };
 
 var check = function(ip, id, flag) {
-  console.log('check');
-  done(codes['SERVICE_OK']);
+    console.log('check');
+    done(codes['SERVICE_OK']);
 };
 
 var handlers = {
-  'put' : put,
-  'get' : get,
-  'check' : check
+    'put' : put,
+    'get' : get,
+    'check' : check
 }
 
 process.argv.splice(0, 2);
 var argv = process.argv;
 
 if (argv.length < 2) {
-  console.log('argv length missmatch');
-  process.exit(codes['INTERNAL_ERROR']);
+    console.log('argv length missmatch');
+    process.exit(codes['INTERNAL_ERROR']);
 }
 
 handlers[argv[0]](argv[1], argv[2], argv[3]);

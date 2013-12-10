@@ -116,8 +116,7 @@ exports.tryfollow = function(req, res) {
     if (res.user && userId) {
         users.getUserFromId(userId, function(user) {
             if (user) {
-                user.pending_followers[res.user.id] = userId;
-                users.saveUser(user);
+                users.addPending(userId, res.user.id);
                 res.redirect('/' + userId);
             } else {
                 res.redirect('/signin');
@@ -128,16 +127,9 @@ exports.tryfollow = function(req, res) {
 
 exports.follow = function(req, res) {
     var userId = req.params.id;
-    if (res.user &&
-        userId &&
-        userId in res.user.pending_followers) {
-            users.getUserFromId(userId, function(user) {
-                user.tweets = res.user.tweets.concat(user.tweets);
-                res.user.followers.unshift(user.id);
-                delete res.user.pending_followers[user.id];
-                users.saveUser(res.user);
-                res.redirect('/');
-            });
+    if (res.user && userId) {
+            users.addFollower(res.user.id, userId);
+            res.redirect('/');
     } else {
         res.redirect('/signin');
     }

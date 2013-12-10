@@ -6,26 +6,23 @@ var users = require('./users')
 
 exports.saveTweet = function(user, message) {
     if (user) {
-        var tweetId = crypto.random(64);
-        var tweet = {'id': tweetId, 'tweet': message};
-        client.hset('tweets', tweetId, JSON.stringify(tweet));
-        client.set(tweetId, JSON.stringify(tweet));
-        user.tweets.unshift(tweetId);
-        for (var i = 0; i < user.followers.length; ++i) {
-            users.getUserFromId(user.followers[i], function(another_user) {
-                if (another_user) {
-                    another_user.tweets.unshift(tweetId);
-                    users.saveUser(another_user);
+        client.hkeys(user.id + '_followers', function(err, reply) {
+            var tweetId = crypto.random(64);
+            var tweet = {'id': tweetId, 'tweet': message};
+            client.rpush(user.id + '_tweets', JSON.stringify(tweet));
+
+            if (reply) {
+                for (var i = 0; i < reply.length; ++i) {
+                    client.rpush(reply[i] + '_tweets', JSON.stringify(tweet));
                 }
-            });
-        }
-        users.saveUser(user);
+            }
+        });
     }
 }
 
 exports.getTweets = function(user, callback) {
     if (user) {
-        client.hmget('tweets', user.tweets, function(err, reply) {
+        client.lrange(user.id + '_tweets', 0, -1, function(err, reply) {
             if (reply) {
                 callback(reply.map(function(tweet) {
                     return JSON.parse(tweet); 
