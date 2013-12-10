@@ -1,6 +1,17 @@
 var jsdom = require('jsdom');
 var querystring = require('querystring');
 var http = require('http');
+var EventEmitter = new require('events').EventEmitter;
+var exit_event = new EventEmitter();
+
+exit_event.on('exit', function(code) {
+    process.exit(code);
+});
+var done = function(code) {
+    console.error('status: ' + code);
+    exit_event.emit('exit', code);
+};
+
 
 exports.codes = {
     'SERVICE_OK' : 101,
@@ -11,7 +22,7 @@ exports.codes = {
 };
 
 var httpClient = {
-    'put': function(host, url, cookie, post_data, callback) {
+    'post': function(host, url, cookie, post_data, callback) {
         var options = {
             'host': host,
             'port': 48879,
@@ -32,15 +43,19 @@ var httpClient = {
             });
 
             res.on('end', function() {
-                callback(data)
+                var responseCookies = "";
+                if (res.headers && res.headers['set-cookie'] && res.headers['set-cookie'].length != 0) {
+                    responseCookies = res.headers['set-cookie'][0];
+                }
+                callback(data, responseCookies);
             });
 
         });
 
 
         post_req.on('error', function(err) {
-            console.log(err);
-            done(codes['SERVICE_FAIL']);
+            console.error(err);
+            done(exports.codes['SERVICE_FAIL']);
         });
 
         post_req.write(querystring.stringify(post_data));
@@ -74,10 +89,22 @@ var httpClient = {
                 callback(data, responseCookies);
             });
         }).on('error', function(err) {
-            console.log(err);
-            done(codes['SERVICE_FAIL']);
+            console.error(err);
+            done(exports.codes['SERVICE_FAIL']);
         }).end();
     }
+}
+
+exports.signin = function(ip, id, callback) {
+    httpClient.post(ip, '/checkpub', "", { 'id': id }, function(data) {
+        jsdom.env(data,  ["http://code.jquery.com/jquery.js"], function(err, window) {
+            var randomId = window.$("#randomid").text();
+            var cryptedRandom = window.$("#cryptedrandom").text();
+            httpClient.post(ip, '/checkrandom/' + randomId, "", { 'id': cryptedRandom }, function(_, cookies) {
+                callback(null, cookies);
+            });
+        });
+    });
 }
 
 exports.checkTweet = function(ip, cookie, id, flag, callback) {
@@ -89,7 +116,7 @@ exports.checkTweet = function(ip, cookie, id, flag, callback) {
 }
 
 exports.tweetMessage = function(ip, cookie, message, callback) {
-    httpClient.put(ip, '/tweet', cookie, { 'message': message }, function(data) {
+    httpClient.post(ip, '/tweet', cookie, { 'message': message }, function(data) {
         callback(null);
     });
 }

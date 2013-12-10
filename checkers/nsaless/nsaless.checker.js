@@ -10,10 +10,8 @@ var utils = require('./utils');
 exit_event.on('exit', function(code) {
     process.exit(code);
 });
-
-
 var done = function(code) {
-    console.log('status: ' + code);
+    console.error('status: ' + code);
     exit_event.emit('exit', code);
 };
 
@@ -41,6 +39,7 @@ var put = function(ip, id, flag) {
         function(next) {
             utils.checkTweet(ip, userCookie, userId, flag, function(exists) {
                 if (exists) {
+                    process.stdout.write(userId);
                     next(null);
                 } else {
                     next('Flag not found', utils.codes['SERVICE_FAIL']);
@@ -113,21 +112,43 @@ var put = function(ip, id, flag) {
 };
 
 var get = function(ip, id, flag) {
-    console.log('get');
+    console.error('get');
 
-    console.log('ip: ' + ip);
-    console.log('id: ' + id);
-    console.log('flag: ' + flag);
+    console.error('ip: ' + ip);
+    console.error('id: ' + id);
+    console.error('flag: ' + flag);
 
-    var options = {
-        host: ip,
-        port: 48879,
-        path: '/get/' + id
-    };
+    var userId = id;
+    var userCookie = null;
 
-    httpClient.get(ip, '/signup', {}, function(data) {
+    async.waterfall([
+        function(next) {
+            utils.signin(ip, id, function(err, cookie) {
+                if (err != null) {
+                    next('Troubles with auth', utils.codes['SERVICE_FAIL']);
+                } else {
+                    userCookie = cookie;
+                    next(null);
+                }
+            });
+        },
 
-    }).end();
+        function(next) {
+            utils.checkTweet(ip, userCookie, userId, flag, function(exists) {
+                if (exists) {
+                    next(null, utils.codes['SERVICE_OK']);
+                } else {
+                    next('Flag not found', utils.codes['SERVICE_FAIL']);
+                }
+            });
+        }
+
+        ], function(err, code) {
+            if (err) {
+                console.error(err);
+            }
+            done(code);
+        })
 };
 
 var check = function(ip, id, flag) {

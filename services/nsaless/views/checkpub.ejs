@@ -5,7 +5,8 @@
         </title>
     </head>
     <body>
-        <%= cryptedrandom %>
+        <div id='cryptedrandom'><%= cryptedrandom %></div>
+        <div id='randomid'><%= randomid %></div>
         <form action='/checkrandom/<%= randomid %>' method='post'>
             <input type='text' name='id' size='64'>
             <input type='submit' value='Its me!'>
