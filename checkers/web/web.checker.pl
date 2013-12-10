@@ -514,12 +514,14 @@ $url->host($ip);
 $url->port(80);
 
 my $check_error = sub {
-        my $res = shift;
-        if ($res->error) {
-                warn $res->error;
-                print $res->error;
+        my $tx  = shift;
+	unless ($tx->success)  
+	{
+   		my ($err, $code) = $tx->error;
+    		warn $code ? "$code response: $err" : "Connection error: $err";
+    		print $code ? "$code" : "Connection error: $err";
                 exit $SERVICE_FAIL;
-        }
+	}
 };
 
 my $login = sub {
@@ -527,19 +529,21 @@ my $login = sub {
         $url->path('/index.php');
 	$url->query(action=>'login');
         warn "Try login '$utype' '$um' with password '$up'";    
-	my $res;
+	my $tx;
 	my $check_str;
 	if($utype eq 'company')
 	{
-		$res = $ua->post($url, form => {type => $utype, email => $um, passwd => $up})->res;
+		$tx = $ua->post($url, form => {type => $utype, email => $um, passwd => $up});
        		$check_str = '<legend>Welcome <a href="index.php?action=info_'.$utype.'">'.$um.'</a>!</legend>';
 	}
 	else
 	{
-		$res = $ua->post($url, form => {email => $um, passwd => $up})->res;
+		$tx = $ua->post($url, form => {email => $um, passwd => $up});
 		$check_str = '<legend>Welcome <a href="index.php?action=info_'.$utype.'">'.$um.'</a>!</legend>';
 	}
-	$check_error->($res);
+
+	$check_error->($tx);
+	my $res = $tx -> res;
         my $code = $res -> code;
 	unless($code == 200)
 	{
@@ -547,8 +551,9 @@ my $login = sub {
                 exit $SERVICE_CORRUPT;
 	} 
 	$url->query(Mojo::Parameters->new);
-	$res = $ua->get($url)->res;
-	$check_error -> ($res);
+	$tx = $ua->get($url);
+	$check_error -> ($tx);
+	$res = $tx -> res;
 	$code = $res -> code;
 	my $content = $res -> content;
         unless((defined $code) and ($code == 200) and ($content->body_contains($check_str)))
@@ -572,7 +577,7 @@ my $register = sub {
 	my $content = $res -> content;
 	unless ((defined $code) and ($code == 200) and $content->body_contains('<legend>Welcome <a href="index.php?action=info_'.$up{'type'}.'">'.$up{'mail'}.'</a>!</legend>')) 
 	{
-                print 'Registration first step fail';
+                print 'Registration fail';
                 warn 'Registration first step fail';
                 exit $SERVICE_CORRUPT;
         }
@@ -597,7 +602,7 @@ my $register = sub {
 	$content = $res -> content;
 	unless((defined $code) and ($code == 200) and ($content->body_contains($check_str)))
 	{
-		print 'Registration second step fail';
+		print 'Registration fail';
                 warn 'Registration second step fail';
 		warn $check_str;
                 exit $SERVICE_CORRUPT;
@@ -611,12 +616,13 @@ my $create_card = sub
         $url->path('/index.php');
         $url->query(action=>'addacct');
         warn "Try add card user '$um' with sum '$usum'";
-        my $res = $ua->post($url, form => {summ => $usum, type => $utype})->res;
-        $check_error->($res);
+        my $tx = $ua->post($url, form => {summ => $usum, type => $utype});
+        $check_error->($tx);
+	my $res = $tx;
         my $code = $res -> code;
         unless($code == 200)
         {
-                print 'Add cart fail';
+                print 'Add new card fail';
                 exit $SERVICE_CORRUPT;
         }
 	warn 'Add card successful';
@@ -627,14 +633,15 @@ my $check_doc_name = sub
 	my ($ua, $docname, $acc_type) = @_;
 	$url -> query(action => 'info_'.$acc_type);
 	warn "Check filename";
-	my $res = $ua -> get($url) -> res;
-	$check_error -> ($res);
+	my $tx = $ua -> get($url);
+	$check_error -> ($tx);
+	my $res = $tx -> res;
 	my $code = $res -> code;
 	my $content = $res -> content -> get_body_chunk(0);
 	$content =~ /<p>Doc:\s+(.*)<\/p>/;
 	unless($code == 200 and $docname eq $1)
 	{
-		print "Check filename doc fail. Expect: $docname, but received $1.";
+		warn "Check filename doc fail. Expect: $docname, but received $1.";
 		exit $SERVICE_CORRUPT;
 	} 
 	warn 'Check filename successful';
@@ -645,14 +652,15 @@ my $check_max_sum = sub
 	my ($ua, $max_sum, $acc_type) = @_;
 	$url -> query(action => 'acct_'.$acc_type);
 	warn "Check max_sum";
-	my $res = $ua -> get($url) -> res;
-	$check_error -> ($res);
+	my $tx = $ua -> get($url);
+	$check_error -> ($tx);
+	my $res = $tx -> res;
 	my $code = $res -> code;
 	my $content = $res -> content -> get_body_chunk(0);
 	$content =~ /<tbody>\s+<tr><td>\d+<\/td><td>100<\/td><td>(.+)<\/td><td>.<\/td><\/tr>/;
 	unless($code == 200 and $max_sum eq $1.'=')
 	{
-		print "Check max_sum fail. Expect: $max_sum, but received $1";
+		warn "Check max_sum fail. Expect: $max_sum, but received $1";
 		exit $SERVICE_CORRUPT;
 	}
 	warn 'Check max_sum successfull';
