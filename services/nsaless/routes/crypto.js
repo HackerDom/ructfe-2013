@@ -73,6 +73,12 @@ exports.getIdByRandom = function(id, random, callback) {
     });
 }
 
+exports.encryptTweet = function(user, tweet) {
+    var message = new Buffer(tweet.tweet);
+    tweet.tweet = exports.encryptWithUser(user, bignum.fromBuffer(message));
+    return tweet;
+}
+
 /*
 exports.prime = function(bits) {
     return bignum.prime(bits);

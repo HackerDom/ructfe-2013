@@ -74,8 +74,8 @@ exports.checkpub = function(req, res) {
                 var random = crypto.random(64);
                 var randomId = crypto.saveRandom(user, random);
                 res.render('checkpub', {
-                    // 'cryptedrandom': crypto.encryptWithUser(user, random).toString(),
-                    'cryptedrandom': random,
+                    'cryptedrandom': crypto.encryptWithUser(user, random).toString(),
+                    // 'cryptedrandom': random,
                     'randomid': randomId
                 });
             } else {

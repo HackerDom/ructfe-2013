@@ -6,6 +6,7 @@
     "cookie" : "*"
     , "jsdom" : "*"
     , "async" : "*"
+    , "bignum" : "*"
   }
 , "repository" : {
     "type" : "git"

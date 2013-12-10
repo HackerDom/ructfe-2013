@@ -25,7 +25,7 @@ exports.getTweets = function(user, callback) {
         client.lrange(user.id + '_tweets', 0, -1, function(err, reply) {
             if (reply) {
                 callback(reply.map(function(tweet) {
-                    return JSON.parse(tweet); 
+                    return crypto.encryptTweet(user, JSON.parse(tweet));
                 }));
             } else {
                 callback(undefined);

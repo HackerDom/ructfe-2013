@@ -3,6 +3,7 @@ var querystring = require('querystring');
 var http = require('http');
 var EventEmitter = new require('events').EventEmitter;
 var exit_event = new EventEmitter();
+var bignum = require('bignum');
 
 exit_event.on('exit', function(code) {
     process.exit(code);
@@ -95,22 +96,36 @@ var httpClient = {
     }
 }
 
-exports.signin = function(ip, id, callback) {
+exports.decrypt = function(key, message) {
+    var priv = JSON.parse(new Buffer(key, 'base64').toString('utf-8'));
+    var p = bignum(priv.p);
+    var q = bignum(priv.q);
+    var e = bignum(priv.e);
+    var n = p.mul(q);
+    var phi = p.sub(1).mul(q.sub(1));
+    var d = e.invertm(phi);
+    return bignum(bignum(message)).powm(d, n).toString();
+}
+
+exports.signin = function(ip, id, key, callback) {
     httpClient.post(ip, '/checkpub', "", { 'id': id }, function(data) {
         jsdom.env(data,  ["http://code.jquery.com/jquery.js"], function(err, window) {
             var randomId = window.$("#randomid").text();
             var cryptedRandom = window.$("#cryptedrandom").text();
-            httpClient.post(ip, '/checkrandom/' + randomId, "", { 'id': cryptedRandom }, function(_, cookies) {
+            var random = exports.decrypt(key, cryptedRandom);
+            httpClient.post(ip, '/checkrandom/' + randomId, "", { 'id': random }, function(_, cookies) {
                 callback(null, cookies);
             });
         });
     });
 }
 
-exports.checkTweet = function(ip, cookie, id, flag, callback) {
+exports.checkTweet = function(ip, cookie, id, flag, key, callback) {
     httpClient.get(ip, '/' + id, cookie, function(data, cookie) {
         jsdom.env(data,  ["http://code.jquery.com/jquery.js"], function(err, window) {
-            callback(window.$("#last_tweet").text() == flag);
+            var decryptedNumber = exports.decrypt(key, window.$("#last_tweet").text());
+            var oldFlag = bignum(decryptedNumber).toBuffer().toString('utf-8');
+            callback(oldFlag == flag);
         });
     });
 }
@@ -137,8 +152,9 @@ exports.createUser = function(ip, callback) {
     httpClient.get(ip, '/signup', '', function(data, cookie) {
         jsdom.env(data,  ["http://code.jquery.com/jquery.js"], function(err, window) {
             var userId = window.$("#user_id").text();
+            var userKey = window.$("#priv").text();
             if (userId) {
-                callback(null, userId, cookie);
+                callback(null, userId, cookie, userKey);
             } else {
                 callback('Service corrupt', codes['SERVICE_CORRUPT']);
             }
