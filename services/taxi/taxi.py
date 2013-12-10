@@ -1,12 +1,13 @@
 #!/usr/bin/python
 import urlparse
-import uuid
 import os
 import random
 import string
 import hmac
 import hashlib
 import os.path
+import json
+import re
 
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 from pymongo import collection
@@ -24,18 +25,19 @@ def connect_db(dbname):
     c = Connection()
     return c[dbname]
 
-
 def generate_id():
-    #todo: generate 32-c string
-    return uuid.uuid4()
+    abc = string.ascii_lowercase + string.digits
+    res = ''.join(random.choice(abc) for i in range(4))
+    res += "-"
+    res += ''.join(random.choice(abc) for i in range(4))
+    res += "-"
+    res += ''.join(random.choice(abc) for i in range(4))
+    return res
 
 
 def add(amount, admin, user, route, col):
     generated_id = generate_id()
-    rid = col.insert(
-        {"_id": generated_id, "date": datetime.now(), "amount": amount, "admin": admin, "user": user, "route": route})
-    print rid
-    return rid
+    return add_by_id(generated_id, amount, admin, user, route, col)
 
 
 def add_by_id(id, amount, admin, user, route, col):
@@ -46,14 +48,8 @@ def add_by_id(id, amount, admin, user, route, col):
 
 
 def get_by_id(id, col):
-    print "Get_by_id: id=" + id
-    found = list(col.find({"_id": id}))
-    print "found: " + str(found)
-    print type(found)
-    for f in found:
-        print "Record: " + str(f)
-        print dict_to_str(f)
-    return found[0]
+    found = col.find_one({"_id": id})
+    return dict(found)
 
 
 def get_map_func(admin_name):
@@ -68,31 +64,24 @@ def get_reduce_func():
 
 def mr_test(col, admin_name):
     res = col.map_reduce(get_map_func(admin_name), get_reduce_func(), "res")
-    results = []
-    for doc in res.find():
-        print doc
-        results.append(doc)
-    return results
+    return list(res.find())
 
 
 def view_all(col, admin_name):
     res = col.find({"admin": admin_name}).sort("date")
-    results = []
-    for doc in res:
-        print doc
-        results.append(doc)
-    return results
+    return list(res)
 
 
-def rreplace(s, old, new, occurrence):
+def r_replace(s, old, new, occurrence):
     li = s.rsplit(old, occurrence)
     return new.join(li)
 
 
-def dict_to_str(d):
-    res = "{%s}" % ''.join('\'{}\':\'{}\','.format(key, val) for key, val in d.items())
-    r = rreplace(res, ',', '', 1)
-    return r
+def dict_to_str(dic):
+    d = {}
+    for i in dic:
+        d[i] = str(dic[i])
+    return json.dumps(d)
 
 
 def try_create_user(query, db):
@@ -103,17 +92,17 @@ def try_create_user(query, db):
         col = collection.Collection(db, USERS)
         admin_exists = col.find_one({"admin": admin})
         if admin_exists is None:
-            return "Admin does not  exist"
+            return "Admin does not  exist", ""
         user_exists = col.find_one({"user": user})
         if user_exists is not None:
-            return "User already exists"
+            return "User already exists", ""
         id = col.insert({"admin": admin, "user": user})
         if id:
-            return "Success"
+            return "Success", user
         else:
-            return "Can't create new user"
+            return "Can't create new user", ""
     except KeyError:
-        return "You have to set [admin], [user] and [pswd] parameters in order to register new user"
+        return "You have to set [admin], [user] and [pswd] parameters in order to register new user", ""
 
 
 def try_create_admin(query, db):
@@ -134,13 +123,11 @@ def try_create_admin(query, db):
 
 
 def get_hmac(message):
-    if not os.path.isfile(KEY_FILE):
-        return False
-
-    f = file(KEY_FILE)
-    key = f.read()
-    print "read key: " + key
-    return hmac.new(key, message, digestmod=hashlib.sha1).hexdigest()
+    try:
+        key = file(KEY_FILE).read()
+        return hmac.new(key, message, digestmod=hashlib.sha1).hexdigest()
+    except:
+        return None
 
 
 class MonHTTPRequestHandler(BaseHTTPRequestHandler):
@@ -151,29 +138,31 @@ class MonHTTPRequestHandler(BaseHTTPRequestHandler):
             action = action.replace('/', '')
             print action
             p = urlparse.parse_qs(parsed.query)
-            admin = p['admin'][0]
+            user = p['user'][0]
 
             db = connect_db(DBNAME)
             col = collection.Collection(db, COLNAME)
 
-            if not 'cookie' in self.headers:
+            if 'cookie' not in self.headers:
                 print "no cookie sent"
                 self.send_error(401)
                 return
             print self.headers['cookie']
-            if not 'hm' in self.headers['cookie']:
+            c = self.headers['cookie']
+            r = re.search("hm=([^;]+)", c)
+            if not r:
                 print "no hmac sent"
                 self.send_error(401)
                 return
-            hm = self.headers['cookie']
-            h_mac = hm.split("=")
 
-            if h_mac[1] != get_hmac(admin):
+            h_mac = r.group(1)
+
+            if h_mac != get_hmac(user):
                 self.send_error(401)
                 return
 
             if action == 'route':
-                if 'id' in p.keys():
+                if 'id' in p:
                     r_id = p['id'][0]
                     res = get_by_id(r_id, col)
                     result_doc = dict_to_str(res)
@@ -186,9 +175,12 @@ class MonHTTPRequestHandler(BaseHTTPRequestHandler):
                     self.send_response(400)
                     return
             elif action == 'routes':
+                admin = p['admin'][0]
                 result_doc = view_all(col, admin)
             elif action == 'amount':
+                admin = p['admin'][0]
                 result_doc = mr_test(col, admin)
+                print result_doc
             else:
                 self.send_response(405)
                 return
@@ -197,11 +189,12 @@ class MonHTTPRequestHandler(BaseHTTPRequestHandler):
             self.send_header('Content-type', 'text-html')
             self.end_headers()
             for doc in result_doc:
-                self.wfile.write(doc)
+                self.wfile.write(json.dumps(doc))
                 self.wfile.write("\n")
             return
 
-        except IOError:
+        except Exception as e:
+            print str(e)
             self.send_error(404)
 
     def do_POST(self):
@@ -214,10 +207,11 @@ class MonHTTPRequestHandler(BaseHTTPRequestHandler):
             col = collection.Collection(db, COLNAME)
 
             if action == 'add_user':
-                res = try_create_user(parsed.query, db)
+                res, user = try_create_user(parsed.query, db)
                 if res == "Success":
-                    #todo: cookie
                     self.send_response(200)
+                    self.send_header('Set-Cookie', 'hm=' + get_hmac(user))
+                    self.end_headers()
                 else:
                     self.send_error(400)
                     self.wfile.write(res)
@@ -233,22 +227,35 @@ class MonHTTPRequestHandler(BaseHTTPRequestHandler):
                     self.wfile.write(res)
                 return
             elif action == 'add_route':
-                #todo: add verifying
+                if 'cookie' not in self.headers:
+                    print "no cookie sent"
+                    self.send_error(401)
+                    return
+                print self.headers['cookie']
+                c = self.headers['cookie']
+                r = re.search("hm=([^;]+)", c)
+                if not r:
+                    print "no hmac sent"
+                    self.send_error(401)
+                    return
+
+                h_mac = r.group(1)
                 p = urlparse.parse_qs(parsed.query)
-                if 'id' in p.keys():
-                    o_id = p['id'][0]
-                else:
-                    o_id = ""
+                user = p['user'][0]
+
+                if h_mac != get_hmac(user):
+                    self.send_error(401)
+                    return
 
                 try:
-                    amount = int(p['amount'][0])
+                    amount = float(p['amount'][0])
                 except ValueError:
                     self.send_response(400)
                     return
 
                 admin = p['admin'][0]
-                user = p['user'][0]
                 route = p['route'][0]
+                o_id = p.get('id', [""])[0]
                 print "params: " + o_id + "; " + str(amount)
                 if o_id == "":
                     result = add(amount, admin, user, route, col)
@@ -260,18 +267,15 @@ class MonHTTPRequestHandler(BaseHTTPRequestHandler):
                 if result is not None:
                     self.send_response(200)
                 else:
-                    self.send_response(501)
+                    self.send_error(501)
                 return
             else:
-                self.send_response(405) #501?
+                self.send_error(405)
                 return
 
-        except IOError:
-            print "IOError"
-            self.send_error(404)
-        except KeyError:
-            print "KeyError"
-            self.send_error(400)
+        except Exception as e:
+            print str(e)
+            self.send_error(500)
 
 
 def gen_key_if_not_exists():
@@ -281,8 +285,12 @@ def gen_key_if_not_exists():
     chars = string.ascii_letters + string.digits + '!@#$%^&*()'
     random.seed = (os.urandom(1024))
     key = ''.join(random.choice(chars) for i in range(length))
-    f = file(KEY_FILE, 'w')
-    f.write(key)
+    try:
+        open(KEY_FILE, 'w').write(key)
+    except:
+        print "Can't create key file"
+        return
+
 
 def run():
     print 'taxi service is starting...'
