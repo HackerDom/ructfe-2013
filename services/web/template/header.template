@@ -26,31 +26,20 @@
           <!--NAVBAR-->
         <div class="navbar navbar-static-top">
                 <nav class ="navbar-inner">
-                        <a class="brand">RuCTFe</a>
+                        <a class="brand">Online Banking</a>
                         <ul class="nav">
                                 <li class="divider-vertical"></li>
                                 <li><a href="index.php"><i class="icon-home"></i>Home</a></li>
                                    <li><a href="index.php?action=associates">Associates</a></li>
-                                <li class="dropdown">
-                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">Commercial<b class="caret"></a></b>
-                                        <ul class="dropdown-menu">
-                                                <li><a href="#">Products and Solutions</a></li>
-                                                <li><a href="#">Resources</a></li>
-                                                <li><a href="#">2013 Calendar</a></li>
-                                        </ul>
-                                </li>
-                                <li><a href="#">Customer Services</a></li>
-                                <li><a href="#">Open an Account</a></li>
-                        </ul>
-                        <form class="navbar-form pull-right">
-                                <input type="text" class="span2 search-query" placeholder="Input" />
+                               _links_
                                 
-                        </form>
+                        </ul>
+                    
                 </nav>
         </div>
         <div class="container row">
 
              
-  <div class="well carousel slide span7" id="myCarousel">
+  <div class="well carousel slide span10" id="myCarousel">
        
   
