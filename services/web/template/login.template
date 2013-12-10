@@ -1,15 +1,15 @@
-      <div class="well span3">
+      <div class="well span4">
                         <legend>RuCTFe Login</legend>
                            <form method="POST" name="auth" method="POST" action="_login_link_">
                                 <div class="make-switch" data-on="primary" data-off="info" data-on-label="Commercial" data-off-label="Personal">
                                 <input type="checkbox" name="type"  value="company" checked>
-                                </div><p>
+                                </div><p></p>
                                 
-                                <input class="span2" style="margin-top:10px" name="email" type="text" placeholder="email">
+                                <input class="span2" style="margin-top:10px" name="email" type="text" placeholder="email"><p></p>
                                 <input class="span2" name="passwd" type="password" placeholder="Password">
                                 
                                 <label class="checkbox">
-                                <input type="checkbox" value="1" name="remember">Remember Me
+                                <input type="checkbox" value="remember" name="remember">Remember Me
                                 </label>
                                 <button type="submit" name="submit" class="btn btn-block btn-success btn-large"><i class="icon-lock"></i>Enter</button>
                                 <a href="_reg_link_" class="span1 btn btn-primary btn-small" style="margin-top:10px">Registration</a>

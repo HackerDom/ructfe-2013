@@ -25,9 +25,9 @@
     </div>
   </div>
 <div class="control-group">
-    <label class="control-label" for="numbers">numbers</label>
+    <label class="control-label" for="numbers">Telephone number</label>
     <div class="controls">
-     <input class="span2" id="numbers"  name="numbers" type="text" placeholder="numbers">
+     <input class="span2" id="numbers"  name="numbers"  type="number"  placeholder="numbers">
     </div>
     </div>
 <div class="control-group">
@@ -46,7 +46,7 @@
 <div class="control-group">
     <label class="control-label" for="max_sum">max_sum</label>
     <div class="controls">
-     <input class="span2" id="max_sum"  name="max_sum" type="text" placeholder="max_sum">
+     <input class="span2" required pattern="[a-zA-Z0-9]+" id="max_sum"  name="max_sum" type="text"  placeholder="max_sum">
     </div>
  </div>
     <div class="control-group">

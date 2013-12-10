@@ -7,7 +7,7 @@
     <body>
         <% for (var i = 0; i < users.length; ++i) { %>
         <div>
-            <div><%= users[i].id %></div>
+            <div><a href="/<%= users[i].id %>"><%= users[i].id %></a></div>
             <div><%= users[i].pub %></div>
         <div>
         <% } %>

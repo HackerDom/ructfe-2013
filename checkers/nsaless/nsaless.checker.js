@@ -154,9 +154,28 @@ var get = function(ip, id_key, flag) {
         })
 };
 
-var check = function(ip, id, flag) {
-    console.log('check');
-    done(codes['SERVICE_OK']);
+var check = function(ip) {
+    console.error('check');
+
+    async.waterfall([
+
+        function(next) {
+            utils.createUser(ip, next);
+        },
+
+        function(id, cookie, key, next) {
+            userId = id;
+            userCookie = cookie;
+            userKey = key;
+            utils.checkUsers(ip, userId, userKey, next);
+        }
+
+        ], function(err, code) {
+            if (err) {
+                console.error(err);
+            }
+            done(code);
+        });
 };
 
 var handlers = {
@@ -170,7 +189,7 @@ var argv = process.argv;
 
 if (argv.length < 2) {
     console.log('argv length missmatch');
-    process.exit(codes['INTERNAL_ERROR']);
+    process.exit(utils.codes['INTERNAL_ERROR']);
 }
 
 handlers[argv[0]](argv[1], argv[2], argv[3]);

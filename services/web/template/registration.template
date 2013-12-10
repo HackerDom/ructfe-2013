@@ -2,11 +2,11 @@
   <legend>Registration</legend>
   <label class="radio">
   <input type="radio" name="type_table" value="user" id="type_table" checked>
-  Фз.л
+  Personal
    </label>
     <label class="radio">
   <input type="radio" name="type_table" value="company"  id="type_table" checked>
-Юр.л
+Commercial
 </label>
 <div class="control-group">
     <label class="control-label" for="email">email</label>
@@ -17,7 +17,7 @@
     <div class="control-group">
     <label class="control-label" for="passwd">password</label>
     <div class="controls">
-     <input class="span2" id="passwd"  name="passwd" type="password" placeholder="Create a password">
+     <input class="span2" id="passwd"  name="passwd"  type="password" placeholder="Create a password">
     </div>
   </div>
   <div class="control-group">

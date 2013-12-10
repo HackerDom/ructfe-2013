@@ -28,11 +28,14 @@ exports.home = function(req, res) {
     users.getUserFromId(id, function(user) {
         tweets.getTweets(user, function(tweets) {
             users.getFollowers(id, function(followers) {
-                res.render('home', {
-                    'cookie_user': res.user,
-                    'url_user': user,
-                    'tweets': tweets,
-                    'followers': followers
+                users.getPendings(id, function(pending) {
+                    res.render('home', {
+                        'cookie_user': res.user,
+                        'url_user': user,
+                        'tweets': tweets,
+                        'followers': followers,
+                        'pending': pending
+                    });
                 });
             });
         });
@@ -104,17 +107,6 @@ exports.tweet = function(req, res) {
         } else {
             res.redirect('/signin');
         }
-    } else {
-        res.redirect('/signin');
-    }
-}
-
-exports.retweet = function(req, res) {
-    var tweetId = req.params.id;
-    if (res.user) {
-        res.user.tweets.unshift(tweetId);
-        users.saveUser(res.user);
-        res.redirect('/');
     } else {
         res.redirect('/signin');
     }

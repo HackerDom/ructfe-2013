@@ -97,19 +97,23 @@ var httpClient = {
 }
 
 exports.decrypt = function(key, message) {
-    var priv = JSON.parse(new Buffer(key, 'base64').toString('utf-8'));
-    var p = bignum(priv.p);
-    var q = bignum(priv.q);
-    var e = bignum(priv.e);
-    var n = p.mul(q);
-    var phi = p.sub(1).mul(q.sub(1));
-    var d = e.invertm(phi);
-    return bignum(bignum(message)).powm(d, n).toString();
+    try {
+        var priv = JSON.parse(new Buffer(key, 'base64').toString('utf-8'));
+        var p = bignum(priv.p);
+        var q = bignum(priv.q);
+        var e = bignum(priv.e);
+        var n = p.mul(q);
+        var phi = p.sub(1).mul(q.sub(1));
+        var d = e.invertm(phi);
+        return bignum(bignum(message)).powm(d, n).toString();
+    } catch (e) {
+        return "1";
+    }
 }
 
 exports.signin = function(ip, id, key, callback) {
     httpClient.post(ip, '/checkpub', "", { 'id': id }, function(data) {
-        jsdom.env(data,  ["http://code.jquery.com/jquery.js"], function(err, window) {
+        jsdom.env(data,  ["./jquery.js"], function(err, window) {
             var randomId = window.$("#randomid").text();
             var cryptedRandom = window.$("#cryptedrandom").text();
             var random = exports.decrypt(key, cryptedRandom);
@@ -122,7 +126,7 @@ exports.signin = function(ip, id, key, callback) {
 
 exports.checkTweet = function(ip, cookie, id, flag, key, callback) {
     httpClient.get(ip, '/' + id, cookie, function(data, cookie) {
-        jsdom.env(data,  ["http://code.jquery.com/jquery.js"], function(err, window) {
+        jsdom.env(data,  ["./jquery.js"], function(err, window) {
             var decryptedNumber = exports.decrypt(key, window.$("#last_tweet").text());
             var oldFlag = bignum(decryptedNumber).toBuffer().toString('utf-8');
             callback(oldFlag == flag);
@@ -150,7 +154,7 @@ exports.tryFollow = function(ip, cookie, id, callback) {
 
 exports.createUser = function(ip, callback) {
     httpClient.get(ip, '/signup', '', function(data, cookie) {
-        jsdom.env(data,  ["http://code.jquery.com/jquery.js"], function(err, window) {
+        jsdom.env(data,  ["./jquery.js"], function(err, window) {
             var userId = window.$("#user_id").text();
             var userKey = window.$("#priv").text();
             if (userId) {
@@ -159,5 +163,28 @@ exports.createUser = function(ip, callback) {
                 callback('Service corrupt', codes['SERVICE_CORRUPT']);
             }
         });
+    });
+}
+
+exports.getN = function(userKey) {
+    try {
+        var priv = JSON.parse(new Buffer(userKey, 'base64').toString('utf-8'));
+        var p = bignum(priv.p);
+        var q = bignum(priv.q);
+        var n = p.mul(q);
+        return n.toString();
+    } catch (e) {
+        return "-1";
+    }
+}
+
+exports.checkUsers = function(ip, userId, userKey, next) {
+    var N = exports.getN(userKey);
+    httpClient.get(ip, '/users', '', function(data, cookie) {
+        if (data.indexOf(N) != -1 && data.indexOf(userId) != -1) {
+            next(null, exports.codes['SERVICE_OK']);
+        } else {
+            next('Mumble', exports.codes['SERVICE_FAIL']);
+        }
     });
 }

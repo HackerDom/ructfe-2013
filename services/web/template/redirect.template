@@ -1,1 +1,7 @@
-﻿<center>_msg_<br>Вы будите перенаправлены через _time_ сек..<br></center><script>window.setTimeout('location.replace("_location_")', _seconds_);</script>
+﻿<center>
+_msg_<br>
+You will be redirected in _time_ seconds..<br>
+</center>
+<script>
+window.setTimeout('location.replace("_location_")', _seconds_);
+</script>

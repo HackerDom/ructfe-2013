@@ -2,9 +2,9 @@
 <thead>
 <tr>
 <th>ACCT</th>
-<th>Type</th>
 <th>Balance</th>
 <th>Max sum</th>
+<th>Currency</th>
 </tr>
 </thead>
 <tbody>
