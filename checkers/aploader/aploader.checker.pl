@@ -1,4 +1,4 @@
-#!/usr/bin/perl -wl
+#!/usr/bin/perl -w
 
 use feature ':5.10';
 use IO::Socket::INET;
