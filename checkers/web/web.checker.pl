@@ -491,6 +491,7 @@ my @animals = ("aardvark","addax","alligator","alpaca","anteater","antelope","ao
 
 my @countries = ("Afghanistan", "Albania", "Algeria", "American Samoa", "Andorra", "Angola", "Anguilla", "Antigua and Barbuda", "Argentina", "Armenia", "Aruba", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bermuda", "Bhutan", "Bolivia", "Bosnia-Herzegovina", "Botswana", "Bouvet Island", "Brazil", "Brunei", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", "Cameroon", "Canada", "Cape Verde", "Cayman Islands", "Central African Republic", "Chad", "Chile", "China", "Christmas Island", "Cocos  Islands", "Colombia", "Comoros", "Congo, Democratic Republic of the", "Congo, Republic of", "Cook Islands", "Costa Rica", "Croatia", "Cuba", "Cyprus", "Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Ethiopia", "Falkland Islands", "Faroe Islands", "Fiji", "Finland", "France", "French Guiana", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Gibraltar", "Greece", "Greenland", "Grenada", "Guadeloupe", "Guam", "Guatemala", "Guinea", "Guinea Bissau", "Guyana", "Haiti", "Holy See", "Honduras", "Hong Kong", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Israel", "Italy", "Ivory Coast", "Jamaica", "Japan", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Kuwait", "Kyrgyzstan", "Laos", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Macau", "Macedonia", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Martinique", "Mauritania", "Mauritius", "Mayotte", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Montserrat", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "Netherlands Antilles", "New Caledonia", "New Zealand", "Nicaragua", "Niger", "Nigeria", "Niue", "Norfolk Island", "North Korea", "Northern Mariana Islands", "Norway", "Oman", "Pakistan", "Palau", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Pitcairn Island", "Poland", "Polynesia", "Portugal", "Puerto Rico", "Qatar", "Reunion", "Romania", "Russia", "Rwanda", "Saint Helena", "Saint Kitts and Nevis", "Saint Lucia", "Saint Pierre and Miquelon", "Saint Vincent and Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Georgia and South Sandwich Islands", "South Korea", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Svalbard and Jan Mayen Islands", "Swaziland", "Sweden", "Switzerland", "Syria", "Taiwan", "Tajikistan", "Tanzania", "Thailand", "Timor-Leste", "Togo", "Tokelau", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Turks and Caicos Islands", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", "Venezuela", "Vietnam", "Virgin Islands", "Wallis and Futuna Islands", "Yemen", "Zambia", "Zimbabwe");
 
+my @quote = ("You\'ve gotta dance like there\'s nobody watching, Love like you\'ll never be hurt, Sing like there\'s nobody listening, And live like it\'s heaven on earth.", "Be the change that you wish to see in the world.", "Imperfection is beauty, madness is genius and it\'s better to be absolutely ridiculous than absolutely boring.", "Listen to the mustn\'ts, child. Listen to the don\'ts. Listen to the shouldn\'ts, the impossibles, the won\'ts. Listen to the never haves, then listen close to me… Anything can happen, child. Anything can be.", "I believe in pink. I believe that laughing is the best calorie burner. I believe in kissing, kissing a lot. I believe in being strong when everything seems to be going wrong. I believe that happy girls are the prettiest girls. I believe that tomorrow is another day and I believe in miracles.", "Our deepest fear is not that we are inadequate. Our deepest fear is that we are powerful beyond measure. It is our light, not our darkness that most frightens us. We ask ourselves, ‘Who am I to be brilliant, gorgeous, talented, fabulous?\' Actually, who are you not to be?", "And, when you want something, all the universe conspires in helping you to achieve it.", "the only people for me are the mad ones, the ones who are mad to live, mad to talk, mad to be saved, desirous of everything at the same time, the ones who never yawn or say a commonplace thing, but burn, burn, burn like fabulous yellow roman candles exploding like spiders across the stars.", "Hope is the thing with feathers That perches in the soul And sings the tune without the words And never stops at all.", "Do not go where the path may lead, go instead where there is no path and leave a trail.", "None but ourselves can free our minds.", "So we beat on, boats against the current, borne back ceaselessly into the past.", "Simplicity, patience, compassion. These three are your greatest treasures. Simple in actions and thoughts, you return to the source of being. Patient with both friends and enemies, you accord with the way things are. Compassionate toward yourself, you reconcile all beings in the world.", "A ship is safe in harbor, but that\'s not what ships are for.", "Meditate. Live purely. Be quiet. Do your work with mastery. Like the moon, come out from behind the clouds! Shine.", "Is it so bad, then, to be misunderstood? Pythagoras was misunderstood, and Socrates, and Jesus, and Luther, and Copernicus, and Galileo, and Newton, and every pure and wise spirit that ever took flesh. To be great is to be misunderstood.", "Be patient toward all that is unsolved in your heart and to try to love the questions themselves like locked rooms and like books that are written in a very foreign tongue. Do not now seek the answers, which cannot be given you because you would not be able to live them. And the point is,to live everything. Live the questions now. Perhaps you win then gradually, without noticing it, live along some distant day into the answer.", "I don\'t think I could love you so much if you had nothing to complain of and nothing to regret. I don\'t like people who have never fallen or stumbled. Their virtue is lifeless and of little value. Life hasn\'t revealed it\'s beauty to them.", "Tell me, what is it you plan to do with your one wild and precious life?", "Only those who will risk going too far can possibly find out how far one can go.", "It\'s not the load that breaks you down, it\'s the way you carry it.", "Hold fast to dreams, For if dreams die Life is a broken-winged bird, That cannot fly.", "Understanding is the first step to acceptance, and only with acceptance can there be recovery.", "Your life is an occasion. Rise to it.", "It is not revolutions and upheavals That clear the road to new and better days, But revelations, lavishness and torments Of someone\'s soul, inspired and ablaze.", "It\'s so hard to forget pain, but it\'s even harder to remember sweetness. We have no scar to show for happiness. We learn so little from peace.", "Count your age by friends, not years. Count your life by smiles, not tears.", "With all its sham, drudgery, and broken dreams, it is still a beautiful world. Be cheerful. Strive to be happy.", "Believe in yourself and all that you are. Know that there is something inside you that is greater than any obstacle.", "All the world is made of faith, and trust, and pixie dust.", "And those who were seen dancing were thought to be insane by those who could not hear the music.", "I do not believe this darkness will endure.", "Rather than love, than money, than fame, give me truth.", "You must have chaos within you to give birth to a dancing star.", "Do not feel lonely, the entire universe is within you.", "All we have is all we need. All we need is the awareness of how blessed we really are.", "The bad news is you\'re falling through the air, nothing to hang on to, no parachute. The good news is, there\'s no ground.", "In the midst of winter, I found there was within me an invincible summer.", "be gentle with yourself. You are a child of the universe, no less than the trees and the stars; you have a right to be here.", "There are far, far better things ahead than any we leave behind.", "All that is gold does not glitter, not all those who wander are lost", "The most beautiful people we have known are those who have known defeat, known suffering, known struggle, known loss, and have found their way out of the depths. These persons have an appreciation, a sensitivity, and an understanding of life that fills them with compassion, gentleness, and a deep loving concern. Beautiful people do not just happen.", "Whatever you are, be a good one", "Promise me you\'ll always remember: You\'re braver than you believe, and stronger than you seem, and smarter than you think.", "Out of suffering have emerged the strongest souls; the most massive characters are seared with scars.", "Ever tried. Ever failed. No matter. Try Again. Fail again. Fail better.", "Live, travel, adventure, bless, and don\'t be sorry.", "We work in the dark – we do what we can – we give what we have. Our doubt is our passion, and our passion is our task. The rest is the madness of art.", "If you have built castles in the air, your work need not be lost; that is where they should be. Now put foundations under them.", "Don\'t tell me the moon is shining; show me the glint of light on broken glass.", "When it\'s over, I want to say: all my life I was a bride married to amazement. I was the bridegroom, taking the world into my arms. When it is over, I don\'t want to wonder if I have made of my life something particular, and real. I don\'t want to find myself sighing and frightened, or full of argument. I don\'t want to end up simply having visited this world.", "Don\'t step into lives that aren\'t yours, make choices that aren\'t nourishing, or dance stiffly for years with the wrong partner, or parts of yourself.", "Emotional discomfort, when accepted, rises, crests and falls in a series of waves. Each wave washes a part of us away and deposits treasures we never imagined. Out goes naivete, in comes wisdom; out goes anger, in comes discernment; out goes despair, in comes kindness. No one would call it easy, but the rhythm of emotional pain that we learn to tolerate is natural, constructive and expansive… The pain leaves you healthier than it found you.", "There shall be an eternal summer in the grateful heart.", "Never stop dreaming of moonbeams and fairy dust, shiny stars and the wonder of the heavens, a happier life and a better world.", "Here\'s to the crazy ones, the misfits, the rebels, the troublemakers, the round pegs in the square holes… the ones who see things differently — they\'re not fond of rules… You can quote them, disagree with them, glorify or vilify them, but the only thing you can\'t do is ignore them because they change things… they push the human race forward, and while some may see them as the crazy ones, we see genius, because the ones who are crazy enough to think that they can change the world, are the ones who do.", "We are repeatedly what we do. Excellence, then, is not an act, but a habit.", "Stop wearing your wishbone where your backbone ought to be.", "Anything or anyone that does not bring you alive is too small for you.", "There will always be suffering. But we must not suffer over the suffering.", "I can give you my loneliness, my darkness, the hunger of my heart, I am trying to bribe you with uncertainty, with danger, with defeat.", "You must learn one thing. The world was made to be free in. Give up all the other worlds Except the one in which you belong.", "If anything is worth doing, it is worth doing it badly.", "Owning our story can be hard but not nearly as difficult as spending our lives running from it. Embracing our vulnerabilities is risky but not nearly as dangerous as giving up on love and belonging and joy—the experiences that make us the most vulnerable. Only when we are brave enough to explore the darkness will we discover the infinite power of our light.", "Your life is not a problem to be solved but a gift to be opened.", "Forget safety. Live where you fear to live. Destroy your reputation. Be notorious.", "Think you\'re escaping and run into yourself. Longest way round is the shortest way home.", "No need to hurry. No need to sparkle. No need to be anybody but oneself.", "The world needs dreamers and the world needs doers But above all the world needs dreamers who do.", "Nothing, Everything, Anything, Something: If you have nothing, then you have everything, because you have the freedom to do anything, without the fear of losing something.", "The world breaks everyone and afterward many are strong at the broken places.", "The man who moves a mountain begins by carrying away small stones.", "The one who asks questions doesn\'t lose his way.", "Love everyone. Trust few. Paddle your own canoe.", "There\'s always a little truth behind every \"just kidding\". A little knowledge behind every \"I don\'t know\". A little emotion behind every \"I don\'t care\". And a little pain behind every \"it\'s okay\".", "Ready, aim, fire? Fire. Fire. Fire.", "If consensus is overrated, I think balance is, too. I have no interest in living a balanced life. I want a life of adventure.", "Enough of these phrases, conceit and metaphors, I want burning, burning, burning.", "I thank god for this most amazing day: for leaping greenly spirits of tress and a blue true dream of sky; for everything which is natural which is infinite which is yes.", "If you want to reach the sky, you better learn how to kneel.", "Remarkable is a choice.", "To be great, be whole; Exclude nothing, exaggerate nothing that is not you. Be whole in everything. Put all you are Into the smallest thing you do. The whole moon gleams in every pool.", "Loneliness is the human condition. Cultivate it. The way it tunnels into you allows your soul room to grow. Never expect to outgrow loneliness. Never hope to find people who will understand you, someone to fill that space. And intelligent, sensitive person is the exception, the very great exception. If you expect to find people who will understand you, you will grow murderous with disappointment. The best you\'ll ever do is to understand yourself, know what it is that you want, and not let the cattle stand in your way.", "Some feelings sink so deep into the heart that only loneliness can help you find them again. Some truths are so painful that only shame can help you live with them. Some things are so sad that only your soul can do the crying for them.", "Holy is the supernatural extra brilliant intelligent kindness of the soul.", "If I can stop one heart from breaking, I shall not live in vain.", "To see a World in a Grain of Sand And a Heaven in a Wild Flower, Hold Infinity in the palm of your hand And Eternity in an hour.", "If your daily life seems poor, do not blame it; blame yourself, tell yourself that you are not poet enough to call it forth its riches.", "I turned silences and nights into words. What was unutterable, I wrote down. I made the whirling world stand still.", "Our ability to grow is directly proportional to an ability to entertain the uncomfortable.", "I believe that everything happens for a reason. People change so that you can learn to let go, things go wrong so that you appreciate them when they\'re right, you believe lies so you eventually learn to trust no one but yourself, and sometimes good things fall apart so better things can fall together.", "The only way to stay sane is to go a little crazy.", "I went to the woods because I wished to live deliberately, to front only the essential facts of life, and see if I could not learn what it had to teach, and not, when I came to die, discover that I had not lived.", "Sometimes it\'s a little better to travel than to arrive.", "You may not be her first, her last, or her only. She loved before she may love again. But if she loves you now, what else matters? She\'s not perfect – you aren\'t either, and the two of you may never be perfect together but if she can make you laugh, cause you to think twice, and admit to being human and making mistakes, hold onto her and give her the most you can. She may not be thinking about you every second of the day, but she will give you a part of her that she knows you can break – her heart. So don\'t hurt her, don\'t change her, don\'t analyze and don\'t expect more than she can give. Smile when she makes you happy, let her know when she makes you mad, and miss her when she\'s not there.", "To love at all is to be vulnerable. Love anything and your heart will be wrung and possibly broken. If you want to make sure of keeping it intact you must give it to no one, not even an animal. Wrap it carefully round with hobbies and little luxuries; avoid all entanglements. Lock it up safe in the casket or coffin of your selfishness. But in that casket, safe, dark, motionless, airless, it will change. It will not be broken; it will become unbreakable, impenetrable, irredeemable. To love is to be vulnerable.", "Do not let your fire go out, spark by irreplaceable spark in the hopeless swamps of the not-quite, the not-yet, and the not-at-all. Do not let the hero in your soul perish in lonely frustration for the life you deserved and have never been able to reach. The world you desire can be won. It exists.. it is real.. it is possible.. it\'s yours.", "Peace comes from within.  Do not seek it without.", "Love is what we are born with. Fear is what we learn. The spiritual journey is the unlearning of fear and prejudices and the acceptance of love back in our hearts. Love is the essential reality and our purpose on earth. To be consciously aware of it, to experience love in ourselves and others, is the meaning of life. Meaning does not lie in things. Meaning lies in us.", "Another year is fast approaching. Go be that starving artist you\'re afraid to be. Open up that journal and get poetic finally. Volunteer. Suck it up and travel. You were not born here to work and pay taxes. You were put here to be part of a vast organism to explore and create. Stop putting it off. The world has much more to offer than what\'s on 15 televisions at TGI Fridays. Take pictures. Scare people. Shake up the scene. Be the change you want to see in the world.", "The really important kind of freedom involves attention, and awareness, and discipline, and effort, and being able truly to care about other people and to sacrifice for them, over and over, in myriad petty little unsexy ways, every day.", "Rock bottom became the solid foundation on which I rebuilt my life.");
 my ($SERVICE_OK, $FLAG_GET_ERROR, $SERVICE_CORRUPT,
         $SERVICE_FAIL, $INTERNAL_ERROR) = (101, 102, 103, 104, 110);
 
@@ -576,14 +577,15 @@ my $register = sub {
 	my $res = $tx -> res;
 	my $code = $res-> code;
 	my $content = $res -> content;
-	unless ((defined $code) and ($code == 200) and $content->body_contains('<legend>Welcome <a href="index.php?action=info_'.$up{'type'}.'">'.$up{'mail'}.'</a>!</legend>')) 
+	my $check_str_0 = '<legend>Welcome <a href="index.php?action=info_'.$up{'type'}.'">'.$up{'mail'}.'</a>!</legend>';
+	unless ((defined $code) and ($code == 200) and $content->body_contains($check_str_0)) 
 	{
                 print 'Registration fail';
                 warn 'Registration first step fail';
                 exit $SERVICE_CORRUPT;
         }
 
-	my $check_str;	
+	my $check_str = '<div class="well carousel slide span10" id="myCarousel">';	
 	
 	if($up{'type'} eq 'user')
 	{    	
@@ -591,19 +593,17 @@ my $register = sub {
         	warn "Continue register '$up{'type'}' '$up{'mail'}' with password '$up{'pass'}' and flag '$up{'max_sum'}'";
 		$tx = $uagent -> post($url, form => {name => $up{'name'}, surname => $up{'surname'}, country => $up{'country'}, birthday => $up{'birthday'}, numbers => $up{'phone'}, max_sum => $up{'max_sum'}, currency => $up{'currency'}, doc => { filename => $up{'filename'}, content => 'SimpleText' } });
 		$res = $tx -> res;
-		$check_str = '<legend>Welcome <a href="index.php?action=info_'.$up{'type'}.'">'.$up{'mail'}.'</a>!</legend>';
 	}
 	if($up{'type'} eq 'company')
 	{
 		$url->query(action=>'reg_company');
 	        warn "Continue register '$up{'type'}' '$up{'name'}' with password '$up{'pass'}' and flag '$up{'max_sum'}'";
 		$tx = $uagent -> post($url, form => {name_company => $up{'name'}, country => $up{'country'}, address => $up{'addr'}, created => $up{'date'}, numbers => $up{'phone'}, owner => $up{'owner'}, max_sum => $up{'max_sum'}, currency => $up{'currency'}, doc => {filename => $up{'filename'}, content => 'SimpleText'}});
-		$check_str = '<legend>Welcome <a href="index.php?action=info_'.$up{'type'}.'">'.$up{'mail'}.'</a>!</legend>';
 	}
 	$res = $tx -> res;
         $code = $res -> code;
 	$content = $res -> content;
-	unless((defined $code) and ($code == 200) and ($content->body_contains($check_str)))
+	unless((defined $code) and ($code == 200) and ($content->body_contains($check_str))  and ($content->body_contains($check_str_0)))
 	{
 		print 'Registration fail';
                 warn 'Registration second step fail';
@@ -618,10 +618,10 @@ my $create_card = sub
 	my ($ua, $um, $usum,$utype) = @_;
         $url->path('/index.php');
         $url->query(action=>'addacct');
-        warn "Try add card user '$um' with sum '$usum'";
+        warn "Try add card for '$utype' '$um' with sum '$usum'";
         my $tx = $ua->post($url, form => {summ => $usum, type => $utype});
         $check_error->($tx);
-	my $res = $tx;
+	my $res = $tx -> res;
         my $code = $res -> code;
         unless($code == 200)
         {
@@ -629,6 +629,40 @@ my $create_card = sub
                 exit $SERVICE_CORRUPT;
         }
 	warn 'Add card successful';
+};
+
+my $add_comment = sub
+{
+	my ($ua, $um, $utext) = @_;
+	$url->query(action=>'add_review');
+	warn "Try add comment for user '$um' with text: '$utext'";
+	my $tx = $ua->post($url, form => {comment => $utext, submit => ''});
+	$check_error->($tx);
+	my $res = $tx -> res;
+	my $code = $res -> code;
+	unless($code == 200)
+        {
+                print 'Add comment fail';
+                exit $SERVICE_CORRUPT;
+        }
+        warn 'Add comment successful';
+};
+
+my $transfer = sub
+{
+	my ($ua, $from, $to) = @_;
+	$url->query(action=>'transfer');
+	warn "Try transfer from '$from' to '$to'";
+	my $tx = $ua -> post($url, from => {acct_out => $from, acct_in => $to, sum => '10'});
+	$check_error -> ($tx);
+	my $res = $tx -> res;
+	my $code = $res -> code;
+	unless($code == 200)
+	{
+                print 'Transfer fail';
+                exit $SERVICE_CORRUPT;
+	}
+	warn 'Transfer successful';
 };
 
 my $check_doc_name = sub
@@ -674,11 +708,50 @@ exit $SERVICE_OK;
 
 sub check 
 {	
-	warn "check $ip";
-	my $uagent = Mojo::UserAgent->new();
-        $url->path('/');
-	$register->($uagent, name => rname(), surname =>  rname(), pass => rname(), type => 'user', mail => rname().'@'.rname(), country => rname(), phone => '1111',birthday =>  '11.11.1111', max_sum => rname(), currency => '$', filename => 'doc.jpeg');
-	exit $SERVICE_OK;  
+my ($id, $flag) = @_;
+	warn "put $ip $id $flag";
+        my $ua = Mojo::UserAgent->new();
+	my $type_flag = int(rand(3));
+	my $uphone = ''; for(0..9){$uphone .= int(rand(9)+1);}
+	my ($upass, $ucountry, $ufilename) = (rname(30), $countries[int(rand(@countries+0))], rname().'.jpeg');
+	my $ucurrency;
+        if(int(rand(2)) == 0) {$ucurrency = '$'} else {$ucurrency = '€'}
+
+
+	if($type_flag == 0) #user
+	{
+		chop $flag;
+		my ($uname, $usurname, $ubirthday) = ($names[int(rand(@names+0))].'.'.$uphone, $surnames[int(rand(@surnames+0))], int(rand(40)+1950).'-'.int(rand(12)+1).'-'.int(rand(28)+1));
+		my $umail = $usurname.$uname.'@'.rname().'.com';
+		$register->($ua, name => $uname, surname => $usurname, pass => $upass, type => 'user', mail => $umail, country => $ucountry, phone => $uphone, birthday => $ubirthday, max_sum => $flag, currency => '=', filename => $ufilename);
+		$add_comment -> ($ua, $umail, $quote[int(rand(@quote))]);
+		warn "0:$umail:$upass";
+	}
+	if($type_flag == 1)#company
+	{
+		chop $flag;
+		my ($uname, $uaddr, $udate, $uowner) = ($companies[int(rand(@companies+0))].'.'.$uphone.'.'.$animals[int(rand(@animals+0))], rname(), int(rand(40)+1950).'-'.int(rand(12)+1).'-'.int(rand(28)+1), $names[int(rand(@names+0))].' '.$surnames[int(rand(@surnames+0))]);
+		my $umail = $uname.'@'.rname().'.com';
+		$register->($ua, name => $uname, pass => $upass, mail => $umail, country => $ucountry, addr => $uaddr, date => $udate, owner => $uowner, phone => $uphone, type => 'company', max_sum => $flag, filename => $ufilename, currency => '=');
+		warn "1:$umail:$upass";
+	}	
+	if($type_flag == 2)
+	{
+		if(int(rand(2)) == 0) #company
+		{
+		 	my ($uname, $uaddr, $udate, $uowner) = ($companies[int(rand(@companies+0))].'.'.$uphone.'.'.$animals[int(rand(@animals+0))], rname(), int(rand(40)+1950).'-'.int(rand(12)+1).'-'.int(rand(28)+1), $names[int(rand(@names+0))].' '.$surnames[int(rand(@surnames+0))]);
+                	my $umail =  $uname.'@'.rname().'.com';
+			$register->($ua, name => $uname, pass => $upass, mail => $umail, country => $ucountry, addr => $uaddr, date => $udate, owner => $uowner, phone => $uphone, type => 'company', max_sum => rname(), filename => $flag, currency => $ucurrency);
+                	warn "21:$umail:$upass";
+		}
+		else #user
+		{
+			my ($uname, $usurname, $ubirthday, $ufilename) = ($names[int(rand(@names+0))].'.'.$uphone, $surnames[int(rand(@surnames+0))], int(rand(40)+1950).'-'.int(rand(12)+1).'-'.int(rand(28)+1));
+        	         my $umail = $usurname.$uname.'@'.rname().'.com';
+			$register->($ua, name => $uname, surname => $usurname, pass => $upass, type => 'user', mail => $umail, country => $ucountry, phone => $uphone, birthday => $ubirthday, max_sum => rname(), currency => $ucurrency, filename => $flag);
+		       	warn "22:$umail:$upass";
+		}
+	}
 }
 
 sub put 
@@ -688,20 +761,21 @@ sub put
         my $ua = Mojo::UserAgent->new();
 	my $type_flag = int(rand(3));
 	my $uphone = ''; for(0..9){$uphone .= int(rand(9)+1);}
-	my ($upass, $ucountry, $ufilename) = (rname(), $countries[int(rand(@countries+0))], rname().'.jpeg');
+	my ($upass, $ucountry, $ufilename) = (rname(30), $countries[int(rand(@countries+0))], rname().'.jpeg');
 	my $ucurrency;
         if(int(rand(2)) == 0) {$ucurrency = '$'} else {$ucurrency = '€'}
 
 
-	if($type_flag == 0)
+	if($type_flag == 0) #user
 	{
 		chop $flag;
 		my ($uname, $usurname, $ubirthday) = ($names[int(rand(@names+0))].'.'.$uphone, $surnames[int(rand(@surnames+0))], int(rand(40)+1950).'-'.int(rand(12)+1).'-'.int(rand(28)+1));
 		my $umail = $usurname.$uname.'@'.rname().'.com';
 		$register->($ua, name => $uname, surname => $usurname, pass => $upass, type => 'user', mail => $umail, country => $ucountry, phone => $uphone, birthday => $ubirthday, max_sum => $flag, currency => '=', filename => $ufilename);
+		$add_comment -> ($ua, $umail, $quote[int(rand(@quote))]);
 		print "0:$umail:$upass";
 	}
-	if($type_flag == 1)
+	if($type_flag == 1)#company
 	{
 		chop $flag;
 		my ($uname, $uaddr, $udate, $uowner) = ($companies[int(rand(@companies+0))].'.'.$uphone.'.'.$animals[int(rand(@animals+0))], rname(), int(rand(40)+1950).'-'.int(rand(12)+1).'-'.int(rand(28)+1), $names[int(rand(@names+0))].' '.$surnames[int(rand(@surnames+0))]);
@@ -711,14 +785,14 @@ sub put
 	}	
 	if($type_flag == 2)
 	{
-		if(int(rand(2)) == 0)
+		if(int(rand(2)) == 0) #company
 		{
 		 	my ($uname, $uaddr, $udate, $uowner) = ($companies[int(rand(@companies+0))].'.'.$uphone.'.'.$animals[int(rand(@animals+0))], rname(), int(rand(40)+1950).'-'.int(rand(12)+1).'-'.int(rand(28)+1), $names[int(rand(@names+0))].' '.$surnames[int(rand(@surnames+0))]);
                 	my $umail =  $uname.'@'.rname().'.com';
 			$register->($ua, name => $uname, pass => $upass, mail => $umail, country => $ucountry, addr => $uaddr, date => $udate, owner => $uowner, phone => $uphone, type => 'company', max_sum => rname(), filename => $flag, currency => $ucurrency);
                 	print "21:$umail:$upass";
 		}
-		else
+		else #user
 		{
 			my ($uname, $usurname, $ubirthday, $ufilename) = ($names[int(rand(@names+0))].'.'.$uphone, $surnames[int(rand(@surnames+0))], int(rand(40)+1950).'-'.int(rand(12)+1).'-'.int(rand(28)+1));
         	         my $umail = $usurname.$uname.'@'.rname().'.com';

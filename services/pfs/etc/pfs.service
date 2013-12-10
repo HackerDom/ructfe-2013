@@ -7,4 +7,5 @@ Type=simple
 User=pfs
 Group=pfs
 
+ExecStartPre=/usr/bin/psql -f /home/pfs/init.sql
 ExecStart=/home/pfs/pfs.rb /home/pfs/t
