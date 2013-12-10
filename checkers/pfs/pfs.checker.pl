@@ -29,8 +29,9 @@ sub get {
 
   my $ua = HTTP::Tiny->new(timeout => 10);
   my $response = $ua->get("http://$ip:3000/$id");
+  return $SERVICE_FAIL unless $response->{success};
   return $FLAG_GET_ERROR unless $response->{status} == 200;
-  return $response->{content} eq $flag ? $SERVICE_OK : $FLAG_GET_ERROR;
+  return $response->{content} eq $flag ? $SERVICE_OK : $SERVICE_CORRUPT;
 }
 
 sub put {
@@ -38,6 +39,7 @@ sub put {
 
   my $ua = HTTP::Tiny->new(timeout => 10);
   my $response = $ua->put("http://$ip:3000/$id", {content => $flag});
-  return $SERVICE_FAIL unless $response->{status} == 200;
+  return $SERVICE_FAIL unless $response->{success};
+  return $SERVICE_CORRUPT unless $response->{status} == 200;
   return $SERVICE_OK;
 }
