@@ -39,6 +39,16 @@ var put = function(ip, id, flag) {
         },
 
         function(next) {
+            utils.checkTweet(ip, userCookie, userId, flag, function(exists) {
+                if (exists) {
+                    next(null);
+                } else {
+                    next('Flag not found', utils.codes['SERVICE_FAIL']);
+                }
+            });
+        },
+
+        function(next) {
             async.map([0, 1, 2, 3, 4, 5, 6, 7],
             function(number, callback) {
                     utils.createUser(ip, function(err, id, cookie) {
@@ -58,7 +68,7 @@ var put = function(ip, id, flag) {
                 });
             },
             function(err, results) {
-                setInterval(function(){ next(err, results); }, 3000);
+                next(err, results);
             });
         },
 
@@ -70,11 +80,34 @@ var put = function(ip, id, flag) {
                 });
             },
             function(err, results) {
-                next(err, utils.codes['SERVICE_OK']);
+                next(err, results);
+            });
+        },
+
+        function(users, next) {
+            async.map(users,
+            function(user, callback) {
+                utils.checkTweet(ip, user.cookie, user.id, flag, function(exists) {
+                    if (exists) {
+                        callback(null, user);
+                    } else {
+                        next('Flag not found', utils.codes['SERVICE_FAIL']);
+                    }
+                });
+            },
+            function(err, results) {
+                if (err == null) {
+                    next(null, utils.codes['SERVICE_OK']);
+                } else {
+                    next(err, resulsts);
+                }
             });
         }
 
         ], function(err, code) {
+            if (err) {
+                console.error(err);
+            }
             done(code);
         });
 };

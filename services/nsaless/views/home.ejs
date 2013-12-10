@@ -35,8 +35,11 @@
         <% if (tweets) { %>
            <% for (var i = 0; i < tweets.length; ++i) { %>
             <hr/>
-                <%= tweets[i].tweet %>
-                <br/>
+                <% if (i == 0) { %>
+                   <div id='last_tweet'><%= tweets[i].tweet %></div>
+                <% } else { %>
+                    <div><%= tweets[i].tweet %></div>
+                <% } %>
                 <a href="/retweet/<%= tweets[i].id %>">Retweet</a>
             <hr/>
             <% } %>

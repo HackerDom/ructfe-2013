@@ -80,6 +80,14 @@ var httpClient = {
     }
 }
 
+exports.checkTweet = function(ip, cookie, id, flag, callback) {
+    httpClient.get(ip, '/' + id, cookie, function(data, cookie) {
+        jsdom.env(data,  ["http://code.jquery.com/jquery.js"], function(err, window) {
+            callback(window.$("#last_tweet").text() == flag);
+        });
+    });
+}
+
 exports.tweetMessage = function(ip, cookie, message, callback) {
     httpClient.put(ip, '/tweet', cookie, { 'message': message }, function(data) {
         callback(null);
