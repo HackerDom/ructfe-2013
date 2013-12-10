@@ -71,7 +71,7 @@ sub passw_gen {
 
 	my $k = @p / 5;
 	splice @p, int rand @p, 1 for 1 .. $k;
-	$k = int rand @k;
+	$k = int rand $k;
 	splice @p, int rand @p, 1, &ch for 1 .. $k;
 	my $P = join '', @p;
 
