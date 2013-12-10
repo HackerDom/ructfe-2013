@@ -571,8 +571,9 @@ my $register = sub {
 	$url->query(action=>'registration');
         warn "Try register user '$up{'mail'}' with password '$up{'pass'}'";
        
-	my $res = $uagent->post($url, form => { passwd => $up{'pass'}, repassword => $up{'pass'}, email => $up{'mail'}, type_table => $up{'type'}})->res;
-        
+	my $tx = $uagent->post($url, form => { passwd => $up{'pass'}, repassword => $up{'pass'}, email => $up{'mail'}, type_table => $up{'type'}});
+        $check_error -> ($tx);
+	my $res = $tx -> res;
 	my $code = $res-> code;
 	my $content = $res -> content;
 	unless ((defined $code) and ($code == 200) and $content->body_contains('<legend>Welcome <a href="index.php?action=info_'.$up{'type'}.'">'.$up{'mail'}.'</a>!</legend>')) 
@@ -588,16 +589,18 @@ my $register = sub {
 	{    	
 		$url->query(action=>'reg_user');
         	warn "Continue register '$up{'type'}' '$up{'mail'}' with password '$up{'pass'}' and flag '$up{'max_sum'}'";
-		$res = $uagent -> post($url, form => {name => $up{'name'}, surname => $up{'surname'}, country => $up{'country'}, birthday => $up{'birthday'}, numbers => $up{'phone'}, max_sum => $up{'max_sum'}, currency => $up{'currency'}, doc => { filename => $up{'filename'}, content => 'SimpleText' } })->res;
+		$tx = $uagent -> post($url, form => {name => $up{'name'}, surname => $up{'surname'}, country => $up{'country'}, birthday => $up{'birthday'}, numbers => $up{'phone'}, max_sum => $up{'max_sum'}, currency => $up{'currency'}, doc => { filename => $up{'filename'}, content => 'SimpleText' } });
+		$res = $tx -> res;
 		$check_str = '<legend>Welcome <a href="index.php?action=info_'.$up{'type'}.'">'.$up{'mail'}.'</a>!</legend>';
 	}
 	if($up{'type'} eq 'company')
 	{
 		$url->query(action=>'reg_company');
 	        warn "Continue register '$up{'type'}' '$up{'name'}' with password '$up{'pass'}' and flag '$up{'max_sum'}'";
-		$res = $uagent -> post($url, form => {name_company => $up{'name'}, country => $up{'country'}, address => $up{'addr'}, created => $up{'date'}, numbers => $up{'phone'}, owner => $up{'owner'}, max_sum => $up{'max_sum'}, currency => $up{'currency'}, doc => {filename => $up{'filename'}, content => 'SimpleText'}}) -> res;
+		$tx = $uagent -> post($url, form => {name_company => $up{'name'}, country => $up{'country'}, address => $up{'addr'}, created => $up{'date'}, numbers => $up{'phone'}, owner => $up{'owner'}, max_sum => $up{'max_sum'}, currency => $up{'currency'}, doc => {filename => $up{'filename'}, content => 'SimpleText'}});
 		$check_str = '<legend>Welcome <a href="index.php?action=info_'.$up{'type'}.'">'.$up{'mail'}.'</a>!</legend>';
 	}
+	$res = $tx -> res;
         $code = $res -> code;
 	$content = $res -> content;
 	unless((defined $code) and ($code == 200) and ($content->body_contains($check_str)))
