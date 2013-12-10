@@ -1,0 +1,14 @@
+{ "name" : "nsaless_checker"
+, "version" : "0.0.1"
+, "description" : "NSAless checker on ructfe-2013"
+, "main" : "nsaless.checker.js"
+, "dependencies" : {
+    "cookie" : "*"
+    , "jsdom" : "*"
+    , "async" : "*"
+  }
+, "repository" : {
+    "type" : "git"
+    , "url" : "https://github.com/HackerDom/ructfe-2013.git"
+  }
+}
