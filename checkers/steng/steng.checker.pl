@@ -63,12 +63,16 @@ sub check {
 	do_exit (CHECKER_OK);
 }
 
+sub ch { return chr (ord ('a') + int rand 26); }
+
 sub passw_gen {
-	my @p = map { chr (ord ('a') + int rand 26) } 1 .. (80 + int rand 20);
+	my @p = map { &ch } 1 .. (80 + int rand 20);
 	my $p = join '', @p;
 
 	my $k = @p / 5;
 	splice @p, int rand @p, 1 for 1 .. $k;
+	$k = int rand @k;
+	splice @p, int rand @p, 1, &ch for 1 .. $k;
 	my $P = join '', @p;
 
 	($p, $P);
@@ -104,7 +108,7 @@ sub expand_psw {
 	my $l = length $p[0];
 	my $n = int rand 8;
 
-	push @p, (join '', map { chr (ord ('a') + int rand 26) } 1 .. $l) for 1 .. $n;
+	push @p, (join '', map { &ch } 1 .. $l) for 1 .. $n;
 	"@p";
 }
 
