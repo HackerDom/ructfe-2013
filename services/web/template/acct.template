@@ -11,4 +11,4 @@
 _tbody_
 </tbody>
 </table>
-<a href="index.php?action=addacct" class="btn btn-large btn-primary">Добывить карту</a>
+<a href="index.php?action=addacct" class="btn btn-large btn-primary">Add acct</a>
