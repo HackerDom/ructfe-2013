@@ -62,7 +62,7 @@ exports.signup = function(req, res) {
     var user = users.createUser();
     var keys = crypto.buildKeys();
     user.pub = keys.pub;
-    users.createSession(req, res, user);
+    users.createSession(res, user);
     users.saveUser(user);
     res.render('signup', {
         'user': user,
@@ -78,7 +78,7 @@ exports.checkrandom = function(req, res) {
         crypto.getIdByRandom(id, random, function(id) {
             if (id) {
                 users.getUserFromId(id, function(user) {
-                    users.createSession(req, res, user);
+                    users.createSession(res, user);
                     res.redirect('/');
                 });
             } else {

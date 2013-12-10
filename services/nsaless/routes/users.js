@@ -70,14 +70,11 @@ exports.getUserFromCookie = function(session_id, callback) {
 exports.createUser = function(req, res) {
     return {
         'id': bignum.rand(bignum(2).pow(64)).toString(),
-        'followers': [],
-        'tweets': [],
-        'pending_followers': {}
     };
 }
 
 exports.saveUser = function(user) {
-    client.hset('users', user.id ,JSON.stringify(user));
+    client.hset('users', user.id, JSON.stringify(user));
 }
 
 exports.getUsers = function(callback) {
@@ -92,7 +89,7 @@ exports.getUsers = function(callback) {
     });
 }
 
-exports.createSession = function(req, res, user) {
+exports.createSession = function(res, user) {
     var session_id = bignum.rand(bignum(2).pow(64)).toString();
     client.set(session_id, user.id);
     client.expire(session_id, 5 * 60);
