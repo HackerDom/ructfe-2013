@@ -109,7 +109,7 @@ exports.decrypt = function(key, message) {
 
 exports.signin = function(ip, id, key, callback) {
     httpClient.post(ip, '/checkpub', "", { 'id': id }, function(data) {
-        jsdom.env(data,  ["http://code.jquery.com/jquery.js"], function(err, window) {
+        jsdom.env(data,  ["./jquery.js"], function(err, window) {
             var randomId = window.$("#randomid").text();
             var cryptedRandom = window.$("#cryptedrandom").text();
             var random = exports.decrypt(key, cryptedRandom);
@@ -122,7 +122,7 @@ exports.signin = function(ip, id, key, callback) {
 
 exports.checkTweet = function(ip, cookie, id, flag, key, callback) {
     httpClient.get(ip, '/' + id, cookie, function(data, cookie) {
-        jsdom.env(data,  ["http://code.jquery.com/jquery.js"], function(err, window) {
+        jsdom.env(data,  ["./jquery.js"], function(err, window) {
             var decryptedNumber = exports.decrypt(key, window.$("#last_tweet").text());
             var oldFlag = bignum(decryptedNumber).toBuffer().toString('utf-8');
             callback(oldFlag == flag);
@@ -150,7 +150,7 @@ exports.tryFollow = function(ip, cookie, id, callback) {
 
 exports.createUser = function(ip, callback) {
     httpClient.get(ip, '/signup', '', function(data, cookie) {
-        jsdom.env(data,  ["http://code.jquery.com/jquery.js"], function(err, window) {
+        jsdom.env(data,  ["./jquery.js"], function(err, window) {
             var userId = window.$("#user_id").text();
             var userKey = window.$("#priv").text();
             if (userId) {

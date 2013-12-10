@@ -10,6 +10,7 @@ exports.addFollower = function(user_id, follower_id) {
     client.hget('pending', follower_id, function(err, reply) {
         if (reply != null && user_id == reply) {
             client.hset(user_id + '_followers', follower_id, follower_id);
+            client.hdel('pending', follower_id);
             client.lrange(user_id + '_tweets', 0, -1, function(err, reply) {
                 if (reply) {
                     for (var i = 0; i < reply.length; ++i) {
@@ -27,6 +28,16 @@ exports.getFollowers = function(user_id, callback) {
             callback(reply);
         } else {
             callback([]);
+        }
+    });
+}
+
+exports.getPendings = function(user_id, callback) {
+    client.hgetall('pending', function(err, reply) {
+        if (reply) {
+            callback(reply);
+        } else {
+            callback({});
         }
     });
 }
