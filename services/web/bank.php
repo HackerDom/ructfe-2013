@@ -68,8 +68,7 @@ $this->content.= preg_replace($search, $replace, file_get_contents('template/hea
             $this->AddAcct();
         } else if ($_GET['action'] == "associates") {
             $this->associates();
-        } else if ($_GET['action'] == "addcomment") {
-            $this->AddComment();
+        
         } else if ($_GET['action'] == "info") {
             $this->info_user();
         } else {
@@ -108,7 +107,7 @@ $this->content.= preg_replace($search, $replace, file_get_contents('template/hea
             $sql="SELECT  email FROM company WHERE id='".$rows['company_id']."' ";
             $email = mysql_fetch_array(mysql_query($sql));
             $this->mysqlClose();
-            $data.="<tr><td>".$rows['id']."</td><td>".$rows['name_company']."</td><td>".$email['email']."</td></tr>";
+            $data.="<tr><td>".htmlspecialchars($rows['id'])."</td><td>".htmlspecialchars($rows['name_company'])."</td><td>".htmlspecialchars($email['email'])."</td></tr>";
         }
         $search = array("/_tbody_/");
         $replace = array($data );
@@ -283,7 +282,7 @@ VALUES (
             if(($row=mysql_fetch_array(mysql_query($sql))) != NULL )
                 {
               $search = array("/_name_/","/_surname_/", "/_email_/",  "/_country_/",  "/_numbers_/", "/_birthday_/","/_doc_/");
-                $replace = array($row['name'],$row['surname'],$row['email'],$row['country'],$row['numbers'],$row['birthday'],$row['doc']);
+                $replace = array(htmlspecialchars($row['name']),htmlspecialchars($row['surname']),htmlspecialchars($row['email']),htmlspecialchars($row['country']),htmlspecialchars($row['numbers']),htmlspecialchars($row['birthday']),htmlspecialchars($row['doc']));
                 $this->content.= preg_replace($search, $replace, file_get_contents('template/info_user.template'));
                 }}
                 
@@ -297,7 +296,7 @@ VALUES (
             if(($row=mysql_fetch_array(mysql_query($sql))) != NULL )
                 {
               $search = array("/_name_company_/","/_email_/","/_country_/", "/_address_/",  "/_created_/",  "/_numbers_/", "/_owner_/","/_doc_/");
-                $replace = array($row['name_company'],$row['email'],$row['country'],$row['address'],$row['created'],$row['numbers'],$row['owner'],$row['doc']);
+                $replace = array(htmlspecialchars($row['name_company']),htmlspecialchars($row['email']),htmlspecialchars($row['country']),htmlspecialchars($row['address']),htmlspecialchars($row['created']),htmlspecialchars($row['numbers']),htmlspecialchars($row['owner']),htmlspecialchars($row['doc']));
                 $this->content.= preg_replace($search, $replace, file_get_contents('template/info_company.template'));
                 }}
                 
@@ -333,34 +332,13 @@ VALUES (
        $this->mysqlClose();
        while ($row = mysql_fetch_array($result))
                 {
-           $new=$row["comment"];
-           $email=$row["email"];
-           $data.= " <div class=\"hero-unit\"><h2>$email:</h2><p> $new</p></div> ";
+           $comment=htmlspecialchars($row["comment"]);
+           $email=htmlspecialchars($row["email"]);
+           $data.= " <div class=\"hero-unit\"><h2>$email:</h2><p>  $comment</p></div> ";
            }
            $this->content.= preg_replace("/_reviews_/", $data, file_get_contents('template/reviews.template'));
         }
-private function AddComment()
-    {
-       $this->mysqlInit();
-        if(isset($_SESSION['email']))
-        {
-       
-        if(isset($_POST['comment']) && isset($_POST['id_comment']))
-        {
-            $comment = mysql_real_escape_string($_POST['comment']);
-            $id_comment = mysql_real_escape_string($_POST['id_comment']);
-            $sql="SELECT * FROM user INNER JOIN user_info on user.id = user_info.user_id WHERE pass='".$_SESSION['UID']."'";
-            if(($row=mysql_fetch_array(mysql_query($sql))) != NULL )
-                {
-                $id_user=$row['id'];
-                $sql="INSERT INTO `comments_news`( `id_news`, `id_user`, `comment`) VALUES ('$id_comment','$id_user',' $comment')";
-                $result = mysql_query($sql);
-                }
-            
-            
-        }}
-       $this->mysqlClose();
-    }
+
     public function acct_user()
     {
          if(isset($_SESSION['email'])&&($_SESSION['type'])=="user")
@@ -377,7 +355,7 @@ private function AddComment()
         $this->mysqlClose();
                   while ($rows = mysql_fetch_array($result))
                     {
-                        $data.="<tr><td>".$rows['acct']."</td><td>".$rows['balance']."</td><td>".$rows['max_sum']."</td><td>".$rows['currency']."</td></tr>";
+                        $data.="<tr><td>".htmlspecialchars($rows['acct'])."</td><td>".htmlspecialchars($rows['balance'])."</td><td>".htmlspecialchars($rows['max_sum'])."</td><td>".htmlspecialchars($rows['currency'])."</td></tr>";
                         $i++;
                     }
                     $search = array("/_tbody_/");
@@ -401,7 +379,7 @@ private function AddComment()
                  $result=mysql_query($sql);
                  $rows=mysql_fetch_array($result);
                  $this->mysqlClose();
-                 $data.="<tr><td>".$rows['acct']."</td><td>".$rows['balance']."</td><td>".$rows['max_sum']."</td><td>".$rows['currency']."</td></tr>";
+                 $data.="<tr><td>".htmlspecialchars($rows['acct'])."</td><td>".htmlspecialchars($rows['balance'])."</td><td>".htmlspecialchars($rows['max_sum'])."</td><td>".htmlspecialchars($rows['currency'])."</td></tr>";
                  $search = array("/_tbody_/");
                  $replace = array($data );
                  $this->content.= preg_replace($search, $replace, file_get_contents('template/accts_company.template'));
@@ -433,7 +411,7 @@ private function AddComment()
            
           
          
-            $data.="<option value=".$rows['acct'].">".$rows['acct']."</option>";
+            $data.="<option value=".$rows['acct'].">".htmlspecialchars($rows['acct'])."</option>";
         }
             $search = array("/_select_/");
                  $replace = array($data );
