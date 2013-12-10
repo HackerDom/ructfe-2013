@@ -13,7 +13,7 @@ exports.addFollower = function(user_id, follower_id) {
             client.lrange(user_id + '_tweets', 0, -1, function(err, reply) {
                 if (reply) {
                     for (var i = 0; i < reply.length; ++i) {
-                        client.rpush(follower_id + '_tweets', reply[i]);
+                        client.lpush(follower_id + '_tweets', reply[i]);
                     }
                 }
             });

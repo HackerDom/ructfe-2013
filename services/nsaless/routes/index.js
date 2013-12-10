@@ -27,7 +27,7 @@ exports.home = function(req, res) {
     var id = req.params.id;
     users.getUserFromId(id, function(user) {
         tweets.getTweets(user, function(tweets) {
-            users.getFollowers(user.id, function(followers) {
+            users.getFollowers(id, function(followers) {
                 res.render('home', {
                     'cookie_user': res.user,
                     'url_user': user,

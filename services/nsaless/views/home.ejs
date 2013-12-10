@@ -10,7 +10,7 @@
         <% if (followers.length) { %>
             Followers:
             <% for (var i = 0; i < followers.length; ++i) { %>
-                <div><%= followers[i] %></div>
+                <div><a href="/<%= followers[i] %>"><%= followers[i] %></a></div>
             <% } %>
         <% } %>
         <% if (cookie_user && url_user) { %>
@@ -24,8 +24,6 @@
                     <input type='submit' value='Tweet!'>
                 </form>
             <% } else { %>
-                <%= JSON.stringify(url_user) %>
-                <%= JSON.stringify(cookie_user) %>
                 <% if (url_user.pending_followers[cookie_user.id]) { %>
                     <p>Pending</p>
                 <% } else { %>

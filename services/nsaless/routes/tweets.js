@@ -9,11 +9,11 @@ exports.saveTweet = function(user, message) {
         client.hkeys(user.id + '_followers', function(err, reply) {
             var tweetId = crypto.random(64);
             var tweet = {'id': tweetId, 'tweet': message};
-            client.rpush(user.id + '_tweets', JSON.stringify(tweet));
+            client.lpush(user.id + '_tweets', JSON.stringify(tweet));
 
             if (reply) {
                 for (var i = 0; i < reply.length; ++i) {
-                    client.rpush(reply[i] + '_tweets', JSON.stringify(tweet));
+                    client.lpush(reply[i] + '_tweets', JSON.stringify(tweet));
                 }
             }
         });
