@@ -38,7 +38,7 @@ object Checker {
   }
 
 	def main(args: Array[String]): Unit = {
-    println("Running with: " + args.mkString(","))
+    //println("Running with: " + args.mkString(","))
     try {
       do_check(args)
       System.exit(OK)
@@ -232,9 +232,6 @@ class Checker (host:String, port:Int) extends FlatSpec with Firefox with Matcher
     click on partialLinkText("All")
 
     val messagesFrom = findAll(cssSelector(".warp-td-author")).toArray.filter(_.text === name)
-
-
-    println(messagesFrom.map(_.text).mkString(" "))
 
     messagesFrom.length should be > (0)
 
