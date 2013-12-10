@@ -155,7 +155,7 @@ def put(hostname, id, flag):
                 break
 
         new_id = pack_id(id_sent, admin, h_mac)
-        print >> sys.stdout, "New id: " + new_id
+        print >> sys.stdout, new_id
         return status_codes['OK']
     elif r.status_code in [404, 500]:
         return status_codes['CORRUPT']
