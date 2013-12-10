@@ -8,6 +8,7 @@
     , "redis" : "*"
     , "bignum" : "*"
     , "jsdom" : "*"
+    , "async" : "*"
   }
 , "repository" : {
     "type" : "git"

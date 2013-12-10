@@ -1,6 +1,7 @@
 var crypto = require("./crypto");
-var tweets = require("./tweets")
-var users = require("./users")
+var tweets = require("./tweets");
+var users = require("./users");
+var async = require("async");
 
 exports.getUser = function(req, res, next) {
     users.getUserFromCookie(req.cookies.id, function(user) {
@@ -14,27 +15,42 @@ exports.index = function(req, res) {
 }
 
 exports.users = function(req, res) {
-    users.getUsers(function(usrs) {
-        res.render('users', {'users': usrs});
+    users.getUsers(function(u) {
+        res.render('users', {'users': u});
     });
 }
 
 exports.home = function(req, res) {
     var id = req.params.id;
+
     users.getUserFromId(id, function(user) {
-        tweets.getTweets(user, function(tweets) {
-            users.getFollowers(id, function(followers) {
-                users.getPendings(id, function(pending) {
+        async.parallel([
+                function(callback) {
+                    tweets.getTweets(user, function(tweets) {
+                        callback(null, tweets);
+                    });
+                },
+                function(callback) {
+                    users.getFollowers(id, function(followers) {
+                        callback(null, followers);
+                    });
+                },
+                function(callback) {
+                    users.getPendings(id, function(pending) {
+                        callback(null, pending);
+                    });
+                }
+                ],
+
+                function(err, results) {
                     res.render('home', {
                         'cookie_user': res.user,
                         'url_user': user,
-                        'tweets': tweets,
-                        'followers': followers,
-                        'pending': pending
+                        'tweets': results[0],
+                        'followers': results[1],
+                        'pending': results[2]
                     });
                 });
-            });
-        });
     });
 }
 
