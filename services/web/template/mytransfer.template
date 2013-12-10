@@ -1,7 +1,7 @@
 <form class="form-horizontal" name="auth" method="POST" action="/index.php?action=mytransfer">
  
     <div class="control-group">
-    <label class="control-label" for="acct_out">acct_out</label>
+    <label class="control-label" for="acct_out">acct from</label>
     <div class="controls">
         <select name="acct_out">
            _select_
@@ -9,7 +9,7 @@
      </div>
 </div>
     <div class="control-group">
-    <label class="control-label" for="acct_in">acct_in</label>
+    <label class="control-label" for="acct_in">acct to</label >
     <div class="controls">
         <select name="acct_in">
           _select_
@@ -19,7 +19,7 @@
  <div class="control-group">
     <label class="control-label" for="sum">Sum</label>
     <div class="controls">
-      <input class="span2" id="sum"  name="sum" type="text" placeholder="sum">
+      <input class="span2" id="sum"  name="sum" type="text" placeholder="sum" required>
 
     </div>
   </div>

@@ -1,22 +1,22 @@
 <form class="form-horizontal" name="auth" method="POST" action="/index.php?action=transfer">
  
  <div class="control-group">
-    <label class="control-label" for="acct_out">acct_out</label>
+    <label class="control-label" for="acct_out">acct from</label>
    <div class="controls">
-      <input class="span2" id="acct_out"  name="acct_out" type="text" placeholder="acct_out">
+      <input class="span2" id="acct_out"  name="acct_out" type="text" placeholder="acct from" required>
   </div>
 </div>
         <div class="control-group">
-    <label class="control-label" for="acct_in">acct_in</label>
+    <label class="control-label" for="acct_in">acct to</label>
    <div class="controls">
-      <input class="span2" id="acct_in"  name="acct_in" type="text" placeholder="acct_in">
+      <input class="span2" id="acct_in"  name="acct_in" type="text"  placeholder=">acct to" required>
   </div>
      
 </div>
  <div class="control-group">
     <label class="control-label" for="sum">Sum</label>
     <div class="controls">
-      <input class="span2" id="sum"  name="sum" type="text" placeholder="sum">
+      <input class="span2" id="sum"  name="sum" type="text" placeholder="sum" required>
 
     </div>
   </div>
