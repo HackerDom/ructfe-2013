@@ -154,9 +154,28 @@ var get = function(ip, id_key, flag) {
         })
 };
 
-var check = function(ip, id, flag) {
+var check = function(ip) {
     console.error('check');
-    done(utils.codes['SERVICE_OK']);
+
+    async.waterfall([
+
+        function(next) {
+            utils.createUser(ip, next);
+        },
+
+        function(id, cookie, key, next) {
+            userId = id;
+            userCookie = cookie;
+            userKey = key;
+            utils.checkUsers(ip, userId, userKey, next);
+        }
+
+        ], function(err, code) {
+            if (err) {
+                console.error(err);
+            }
+            done(code);
+        });
 };
 
 var handlers = {

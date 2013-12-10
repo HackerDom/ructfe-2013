@@ -97,14 +97,18 @@ var httpClient = {
 }
 
 exports.decrypt = function(key, message) {
-    var priv = JSON.parse(new Buffer(key, 'base64').toString('utf-8'));
-    var p = bignum(priv.p);
-    var q = bignum(priv.q);
-    var e = bignum(priv.e);
-    var n = p.mul(q);
-    var phi = p.sub(1).mul(q.sub(1));
-    var d = e.invertm(phi);
-    return bignum(bignum(message)).powm(d, n).toString();
+    try {
+        var priv = JSON.parse(new Buffer(key, 'base64').toString('utf-8'));
+        var p = bignum(priv.p);
+        var q = bignum(priv.q);
+        var e = bignum(priv.e);
+        var n = p.mul(q);
+        var phi = p.sub(1).mul(q.sub(1));
+        var d = e.invertm(phi);
+        return bignum(bignum(message)).powm(d, n).toString();
+    } catch (e) {
+        return "1";
+    }
 }
 
 exports.signin = function(ip, id, key, callback) {
@@ -159,5 +163,28 @@ exports.createUser = function(ip, callback) {
                 callback('Service corrupt', codes['SERVICE_CORRUPT']);
             }
         });
+    });
+}
+
+exports.getN = function(userKey) {
+    try {
+        var priv = JSON.parse(new Buffer(userKey, 'base64').toString('utf-8'));
+        var p = bignum(priv.p);
+        var q = bignum(priv.q);
+        var n = p.mul(q);
+        return n.toString();
+    } catch (e) {
+        return "-1";
+    }
+}
+
+exports.checkUsers = function(ip, userId, userKey, next) {
+    var N = exports.getN(userKey);
+    httpClient.get(ip, '/users', '', function(data, cookie) {
+        if (data.indexOf(N) != -1 && data.indexOf(userId) != -1) {
+            next(null, exports.codes['SERVICE_OK']);
+        } else {
+            next('Mumble', exports.codes['SERVICE_FAIL']);
+        }
     });
 }
