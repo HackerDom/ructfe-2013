@@ -3,7 +3,7 @@ var tweets = require("./tweets")
 var users = require("./users")
 
 exports.getUser = function(req, res, next) {
-    users.getUserFromCookie(req, res, function(user) {
+    users.getUserFromCookie(req.cookies.id, function(user) {
         res.user = user;
         next();
     });

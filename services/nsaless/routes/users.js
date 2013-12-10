@@ -52,9 +52,8 @@ exports.getUserFromId = function(id, callback) {
     });
 }
 
-exports.getUserFromCookie = function(req, res, callback) {
+exports.getUserFromCookie = function(session_id, callback) {
     var user = null
-    var session_id = req.cookies.id;
     if (session_id) {
         client.get(session_id, function(err, reply) {
             if (reply) {
