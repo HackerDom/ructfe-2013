@@ -7,22 +7,35 @@ from Crypto.Cipher import AES
 HOST_NAME = '0.0.0.0'
 PORT_NUMBER = 4369
 
+messages = None
+keys = None
+
 class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def do_GET(self):
+        global messages, snapshotMessages, keys, snapshotKeys
+
         try:
-            try:
-                self.messages
-            except AttributeError as e:
-                self.messages = {}
+            if messages is None:
+                messages = {}
                 try:
                     with open("messages", "r") as fm:
                         for line in fm.readlines():
-                            (id, enc_mes) = line.rstrip().split("\t")
-                            self.messages[id] = enc_mes
+                            (id, enc_mes) = line.rstrip().split(" ")
+                            messages[id] = enc_mes
                 except IOError:
                     pass
-                self.snapshot = open("messages", "a")
+                snapshotMessages = open("messages", "a")
+            if keys is None:
+                keys = {}
+                try:
+                    with open("keys", "r") as fk:
+                        for line in fk.readlines():
+                            (id, key) = line.rstrip().split(" ")
+                            keys[id] = key
+                except IOError:
+                    pass
+                snapshotKeys = open("keys", "a")
 
 
             parsed_path = urlparse.urlparse(self.path)
@@ -32,8 +45,8 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 result = self.list()
             elif parsed_path.path == "/get":
                 id = parsed_qs["id"][0]
-                key = parsed_qs["key"][0]
-                result = self.get(id, key)
+                enc = parsed_qs["enc"][0]
+                result = self.get(id, enc)
             elif parsed_path.path == "/put":
                 mes = parsed_qs["mes"][0]
                 result = self.put(mes)
@@ -56,29 +69,34 @@ class MyHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
             self.wfile.write("Exception!\n")
             self.wfile.write(e) 
-            return 
+            return
 
 
 
     def list(self):
-        return "\n".join(["\t".join([key,value]) for (key,value) in self.messages.items()])
+        return "\n".join(value for value in messages.values())
 
-    def get(self, id, key_hex):
-        enc_hex = self.messages[id]
+    def get(self, id_hex, enc_hex):
+        key_hex = keys[id_hex]
         mes = CryptoHelper.decrypt(enc_hex.decode("HEX"), key_hex.decode("HEX"))
         return mes
 
     def put(self, mes):
         with open("/dev/random", "rb") as f:
             key = f.read(32)
-            id = f.read(8).encode("HEX")
+            id_hex = f.read(8).encode("HEX")
 
-        enc = CryptoHelper.encrypt(mes, key).encode("HEX")
-        self.messages[id] = enc
-        self.snapshot.write("\t".join([id, enc]) + "\n")
-        self.snapshot.flush()
+        enc_hex = CryptoHelper.encrypt(mes, key).encode("HEX")
+        messages[id_hex] = enc_hex
+        snapshotMessages.write(" ".join([id_hex, enc_hex]) + "\n")
+        snapshotMessages.flush()
 
-        return "\t".join([id, key.encode("HEX")])
+        key_hex = key.encode("HEX")
+        keys[id_hex] = key_hex
+        snapshotKeys.write(" ".join([id_hex, key_hex]) + "\n")
+        snapshotKeys.flush()
+
+        return " ".join([id_hex, enc_hex])
 
 class CryptoHelper:
 
