@@ -99,7 +99,6 @@ exports.checkpub = function(req, res) {
                 var randomId = crypto.saveRandom(user, random);
                 res.render('checkpub', {
                     'cryptedrandom': crypto.encryptWithUser(user, random).toString(),
-                    // 'cryptedrandom': random,
                     'randomid': randomId
                 });
             } else {
