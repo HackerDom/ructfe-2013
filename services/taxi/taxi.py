@@ -1,3 +1,4 @@
+#!/usr/bin/python
 import urlparse
 import uuid
 import os
@@ -45,10 +46,14 @@ def add_by_id(id, amount, admin, user, route, col):
 
 
 def get_by_id(id, col):
-    found = col.find_one({"_id": id})
+    print "Get_by_id: id=" + id
+    found = list(col.find({"_id": id}))
     print "found: " + str(found)
     print type(found)
-    return found
+    for f in found:
+        print "Record: " + str(f)
+        print dict_to_str(f)
+    return found[0]
 
 
 def get_map_func(admin_name):
@@ -281,7 +286,7 @@ def gen_key_if_not_exists():
 
 def run():
     print 'taxi service is starting...'
-    server_address = ('127.0.0.1', 8081)
+    server_address = ('0.0.0.0', 8081)
     httpd = HTTPServer(server_address, MonHTTPRequestHandler)
     print 'Welcome to our taxi service!'
     print 'You can order trips, view your users\' routes and monitor your riding costs'
