@@ -748,7 +748,7 @@ sub check
 	my $uphone = ''; for(0..9){$uphone .= int(rand(9)+1);}
 	my ($upass, $ucountry, $ufilename) = (rname(30), $countries[int(rand(@countries+0))], rname().'.jpeg');
 	my $type = int(rand(2)) ? 'user' : 'company';  
-	my $ucurrency = int(rand(2)) == 0 ? '$' : '€';
+	my $ucurrency = '$';
 	my $umail;
 	if($type eq 'user')
 	{
@@ -782,7 +782,7 @@ sub put
 	my $uphone = ''; for(0..9){$uphone .= int(rand(9)+1);}
 	my ($upass, $ucountry, $ufilename) = (rname(30), $countries[int(rand(@countries+0))], rname().'.jpeg');
 	my $ucurrency;
-        if(int(rand(2)) == 0) {$ucurrency = '$'} else {$ucurrency = '€'}
+        $ucurrency = '$';
 
 
 	if($type_flag == 0) #user
