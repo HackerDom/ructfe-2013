@@ -29,7 +29,7 @@ sub generate_simple_sng {
 	my $pat = ($d == 8 ? "%02x" : "%04x") x (3 + $a);
 	$r .= "  " . (join ' ', map { sprintf $pat, int rand (1 << $d), int rand (1 << $d), int rand (1 << $d), int rand (1 << $d) } (1 .. $w)) . "\n" for 1 .. $h;
 
-	"$r}";
+	"$r}\n";
 }
 
 sub uniq {

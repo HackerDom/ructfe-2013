@@ -3,7 +3,7 @@
 use constant {
 	DEBUG => 0,
 	PORT => 18360,
-	TIMEOUT => 4,
+	TIMEOUT => 3,
 
 	CHECKER_OK => 101,
 	CHECKER_NOFLAG => 102,
@@ -51,7 +51,7 @@ sub do_exit {
 sub check {
 	send $S, "list\n", 0;
 
-	my @list = split /\s+/, &get_string; #&get_all;
+	my @list = split /\s+/, &get_all;
 	do_exit (CHECKER_OK) unless @list;
 
 	my $pic = $list[int rand @list];
@@ -72,10 +72,25 @@ sub passw_gen {
 	my $k = @p / 5;
 	splice @p, int rand @p, 1 for 1 .. $k;
 	$k = int rand $k;
-	splice @p, int rand @p, 1, &ch for 1 .. $k;
+	splice @p, int rand @p, 0, &ch for 1 .. $k;
 	my $P = join '', @p;
 
 	($p, $P);
+}
+
+sub send_lines {
+	my $s = shift;
+	my $n = ($s =~ tr/\n/\n/);
+
+	$s = "$n\n$s";
+	$l = length $s;
+	$n = 0;
+
+	while ($n < $l) {
+		my $x = send $S, $s, 0;
+		$n += $x;
+		$s = substr $s, $x;
+	}
 }
 
 sub put {
@@ -83,7 +98,8 @@ sub put {
 	my $pic = ($type < $perc[0] + $perc[1]) ? &SNG::generate_simple_sng : &SNG::generate_palette_sng;
 
 	if ($type < $perc[0] || $type >= $perc[0] + $perc[1]) {
-		send $S, "putpic $flag\n$pic\n", 0;
+		send $S, "putpic $flag\n", 0;
+		send_lines ($pic);
 		my $data = &get_string;
 
 		do_exit (CHECKER_MUMBLE, CANNOT_PUT_PICTURE) if $data =~ /^ERROR/;
@@ -92,7 +108,8 @@ sub put {
 	}
 	else {
 		my ($psw1, $psw2) = &passw_gen;
-		send $S, "putpic $flag $psw1\n$pic\n", 0;
+		send $S, "putpic $flag $psw1\n", 0;
+		send_lines ($pic);
 		my $data = &get_string;
 
 		do_exit (CHECKER_MUMBLE, CANNOT_PUT_PICTURE) if $data =~ /^ERROR/;
@@ -154,16 +171,7 @@ sub get_string {
 }
 
 sub get_all {
-	my $x = '';
-	for (1 .. (TIMEOUT * 100)) {
-		next unless select '' . $v, undef, undef, 0.01;
-		while (select '' . $v, undef, undef, 0) {
-			recv $S, ($_ = ''), 1024, 0;
-			return unless length;
-
-			$x .= $_;
-		}
-	}
-	$x;
+	my $len = &get_string;
+	join '', map { &get_string . "\n" } 1 .. $len;
 }
 
