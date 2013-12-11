@@ -21,9 +21,21 @@ std::ostream & operator << (std::ostream & os, const pixel & p) {
 	return os;
 }
 
-void send_list (std::shared_ptr <client> & c) {
-	const std::list <std::string> & items = sng_storage::instance ()->get_all_items ();
+std::string int_to_string (int v) {
+	std::ostringstream os;
+	os << v;
 
+	return os.str ();
+}
+
+int string_to_int (const std::string & s) {
+	return std::atoi (s.c_str ());
+}
+
+void send_list (std::shared_ptr <client> & c) {
+	auto items = sng_storage::instance ()->get_all_items ();
+
+	c->sendStringEndl (int_to_string (items.size ()));
 	for (const auto & it : items)
 		c->sendStringEndl (it);
 }
@@ -93,7 +105,9 @@ void get_picture (std::shared_ptr <client> & c, const std::vector <std::string> 
 			}
 		}
 
-		c->sendString (pic.to_raw_string ());
+		auto p = pic.to_raw_string ();
+		c->sendStringEndl (int_to_string (count_lines (p)));
+		c->sendString (p);
 	}
 	catch (sng_storage::not_found_error &) {
 		c->sendStringEndl ("ERROR(NOTFOUND)");
@@ -115,7 +129,8 @@ void init_time (sng & pic) {
 
 void put_picture (std::shared_ptr <client> & c, const std::vector <std::string> & op) {
 	try {
-		sng pic (c->receiveAll ());
+		auto s = string_to_int (c->receiveString ());
+		sng pic (c->receiveAll (s));
 
 		switch (op.size ()) {
 		case 2: {

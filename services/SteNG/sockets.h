@@ -1,3 +1,5 @@
+#ifndef _SOCKETS_H_
+#define _SOCKETS_H_
 #include <iostream>
 #include <cstdlib>
 #include <sys/types.h>
@@ -27,7 +29,7 @@ public:
 	
 	bool canRead(int timeout = 10);
 	std::string receiveString();
-	std::string receiveAll();
+	std::string receiveAll(int n);
 	void sendStringEndl(const std::string& data);
 	void sendString(const std::string& data);
 	
@@ -45,3 +47,6 @@ public:
 private:
 	sockaddr_in addr;
 };
+
+#endif
+

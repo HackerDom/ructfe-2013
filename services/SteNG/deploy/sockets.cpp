@@ -64,7 +64,7 @@ std::string client::receiveString()
 	{
 		if ((letter == '\n') || (received == 0))
 		{
-			if ((received == 0) && (canRead()))
+			if ((received == 0) && (canRead(0)))
 				closed = true;
 			return data;
 		}
@@ -75,41 +75,27 @@ std::string client::receiveString()
 	throw excHandler("recv");
 }
 
-std::string client::receiveAll()
+std::string client::receiveAll(int n)
 {
-	char buffer[1025];
-	int received;
 	std::string data;
 
-	if (!canRead())
+	for (int i = 0; i < n; ++ i)
 	{
-		closed = true;
-		return data;
+		std::string s = receiveString();
+
+		data += s + '\n';
 	}
 
-	do
-	{
-		if ((received = recv(sock, buffer, 1024, 0)) == -1)
-			throw excHandler("recv");
-		
-		if (received == 0)
-		{
-			if (data.length() == 0)
-				closed = true;
-
-			return data;
-		}
-		
-		buffer[received] = '\0';
-		data += buffer;
-	} while (canRead(3));
-		
 	return data;
 }
 
 bool client::canRead(int timeout)
 {
 	timeout *= 10;
+	if (timeout == 0)
+	{
+		timeout = 1;
+	}
 	
 	for (int i = 0; i < timeout; i++)
 	{

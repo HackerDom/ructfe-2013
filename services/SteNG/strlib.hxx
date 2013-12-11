@@ -28,4 +28,6 @@ std::string join (const T & cont, const std::string & delim) {
 
 std::string replace (const std::string & s, const char * chars, char symbol);
 
+int count_lines (const std::string & s);
+
 #endif

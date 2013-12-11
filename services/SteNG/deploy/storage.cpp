@@ -74,7 +74,7 @@ sng_storage * sng_storage::instance () {
 
 std::mutex mtx;
 
-const std::list <std::string> & sng_storage::get_all_items () const throw () {
+const std::vector <std::string> & sng_storage::get_all_items () const throw () {
 	std::lock_guard <std::mutex> lock (mtx);
 
 	return items;

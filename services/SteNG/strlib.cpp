@@ -25,3 +25,7 @@ std::string replace (const std::string & s, const char * chars, char symbol) {
 	return r;
 }
 
+int count_lines (const std::string & s) {
+	return std::count (std::begin (s), std::end (s), '\n');
+}
+
