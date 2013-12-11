@@ -31,10 +31,10 @@ sub check {
 sub get {
   my ($complex_id, $flag) = @_;
   
-  my ($id, $enc) = split /\s+/, $complex_id;
+  my ($id, $sign, $enc) = split /\s+/, $complex_id;
 
   my $ua = HTTP::Tiny->new(timeout => 5);
-  my $response = $ua->get("http://$ip:4369/get?id=$id&enc=$enc");
+  my $response = $ua->get("http://$ip:4369/get?id=$id&sign=$sign&enc=$enc");
   return $SERVICE_FAIL unless $response->{success};
   return $SERVICE_MUMBLE unless $response->{status} == 200;
   return $response->{content} eq $flag ? $SERVICE_OK : $SERVICE_CORRUPT;
@@ -48,7 +48,7 @@ sub put {
   $new_id = $response->{content};
 
   @tokens = split /\s/, $new_id;
-  exit $SERVICE_CORRUPT if $#tokens != 1;
+  exit $SERVICE_CORRUPT if $#tokens != 2;
   return $SERVICE_FAIL unless $response->{success};
   return $SERVICE_MUMBLE unless $response->{status} == 200;
 
