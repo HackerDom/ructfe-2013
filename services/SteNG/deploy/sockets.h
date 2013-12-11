@@ -27,7 +27,7 @@ class client : public socket_t
 public:
 	client(int sockNumber, sockaddr clientSock);
 	
-	bool canRead(int timeout = 10);
+	bool canRead();
 	std::string receiveString();
 	std::string receiveAll(int n);
 	void sendStringEndl(const std::string& data);
@@ -40,7 +40,7 @@ private:
 class server : public socket_t
 {
 public:
-	server(int port = 18360,  int numberOfClients = 5);
+	server(int port,  int numberOfClients);
 
 	std::shared_ptr<client> acceptConnection();
 

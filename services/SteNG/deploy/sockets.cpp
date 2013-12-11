@@ -64,7 +64,7 @@ std::string client::receiveString()
 	{
 		if ((letter == '\n') || (received == 0))
 		{
-			if ((received == 0) && (canRead(0)))
+			if ((received == 0) && (canRead()))
 				closed = true;
 			return data;
 		}
@@ -83,35 +83,27 @@ std::string client::receiveAll(int n)
 	{
 		std::string s = receiveString();
 
-		data += s + '\n';
+		data += s;
+		data += '\n';
 	}
 
 	return data;
 }
 
-bool client::canRead(int timeout)
+bool client::canRead()
 {
-	timeout *= 10;
-	if (timeout == 0)
-	{
-		timeout = 1;
-	}
-	
-	for (int i = 0; i < timeout; i++)
-	{
-		fd_set readset;
-        	FD_ZERO(&readset);
-        	FD_SET(sock, &readset);
-        	timeval  stimeout;
-       		stimeout.tv_sec = 0;
-	        stimeout.tv_usec = 100000;
+	fd_set readset;
+	FD_ZERO(&readset);
+	FD_SET(sock, &readset);
+	timeval  stimeout;
+	stimeout.tv_sec = 0;
+	stimeout.tv_usec = 100000;
 
-		if (select(1+sock, &readset, NULL, NULL, &stimeout) == -1)
-			throw excHandler("select");
+	if (select(1+sock, &readset, NULL, NULL, &stimeout) == -1)
+		throw excHandler("select");
 
-		if (FD_ISSET(sock, &readset))
-			return true;
-	}
+	if (FD_ISSET(sock, &readset))
+		return true;
 
 	return false;
 }
