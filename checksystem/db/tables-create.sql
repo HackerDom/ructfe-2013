@@ -120,6 +120,13 @@ CREATE TABLE access_checks (
 	task_id		UUID DEFAULT NULL
 );
 
+CREATE TABLE sla (
+	team_id		INTEGER,
+	successed	INTEGER,
+	failed		INTEGER,
+	time		TIMESTAMP		NOT NULL
+);
+
 CREATE TABLE news (
     time TIMESTAMP,
     text TEXT,
