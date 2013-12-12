@@ -57,6 +57,9 @@ public class SLAworker extends Thread{
 		{
 			Hashtable<Integer,SLA> stateFromDb = GetStateFromDb();
 			Timestamp lastKnownTime = GetLastKnownTime(stateFromDb);
+			if (lastKnownTime == null)
+				lastKnownTime = new Timestamp(0);
+
 			logger.info(String.format("LastKnownTime: %s", lastKnownTime.toString()));			
 			DoJobLoop(stateFromDb, lastKnownTime);
 		}
@@ -67,12 +70,8 @@ public class SLAworker extends Thread{
 		}		
 	}
 	
-	private void DoJobLoop(Hashtable<Integer, SLA> state, Timestamp lastKnownTime) throws SQLException, InterruptedException {
-		if (lastKnownTime == null)
-			lastKnownTime = new Timestamp(0);
-		
-		conn.setAutoCommit(false);
-		
+	private void DoJobLoop(Hashtable<Integer, SLA> state, Timestamp lastKnownTime) throws SQLException, InterruptedException {		
+		conn.setAutoCommit(false);		
 		
 		while (true) {
 			stGetLastAccessChecks.setTimestamp(1, lastKnownTime);
