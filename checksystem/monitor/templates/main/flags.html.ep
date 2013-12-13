@@ -1,0 +1,23 @@
+% layout 'default';
+% title 'RuCTFE Monitor > Flags';
+
+<div class="content" style="width: 830px">
+  <table border="1">
+    <tr>
+      <th>Logo</th>
+      <th>Team</th>
+      % for my $service (@$services) {
+      <th><%= $service %></th>
+      % }
+    </tr>
+    % for my $tid (keys %$teams) {
+      <tr>
+        <td>X</td>
+        <td><%= $teams->{$tid}{name} %></td>
+        % for my $service (@$services) {
+        <td><%= $flags->{$teams->{$tid}{name}}{$service} // 0 %></td>
+        % }
+      </tr>
+    % }
+  </table>
+</div>

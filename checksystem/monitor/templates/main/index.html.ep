@@ -1,0 +1,32 @@
+% layout 'default';
+% title 'RuCTFE Monitor > Scoreboard';
+
+<div class="content" style="width: 830px">
+  <table border="1">
+    <tr>
+      <th>#</th>
+      <th>Logo</th>
+      <th>Team</th>
+      <th>Flag Points</th>
+      <th>SLA</th>
+      <th>SCORE</th>
+      % for my $service (keys %$services) {
+      <th><%= $service %></th>
+      % }
+    </tr>
+    % my $pos = 0;
+    % for my $team (@$teams) {
+      <tr>
+        <td><%= ++$pos %></td>
+        <td>X</td>
+        <td><%= $team->{name} %></td>
+        <td><%= sprintf '%.2f', $team->{fp} %></td>
+        <td><%= sprintf '%.2f', $team->{sla} %></td>
+        <td><%= sprintf '%.2f', $team->{score} %></td>
+        % for my $service (keys %$services) {
+        <td><%= $services->{$service}{$team->{tid}}{status} %></td>
+        % }
+      </tr>
+    % }
+  </table>
+</div>
