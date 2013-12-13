@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title><%= title %></title>
+    <link rel="stylesheet" href="<%= url_for('/css/index.css') %>"/>
+    <link href="<%= url_for('/img/favicon.ico') %>" rel="shortcut icon" type="image/x-icon" />
+  </head>
+
+  <body class="page">
+    <div class="page__frame">
+      <div class="header">
+        <div class="logo">
+          <a class="logo__link" href="<%= url_for('index') %>">
+            <img class="logo__img" src="<%= url_for('/img/logo/logo.png') %>" alt=""/>
+          </a>
+          <div class="logo__right">
+            <span class="logo__right__backslash">\</span>
+              <span class="logo__right__text">
+                Online international challenge <br/>
+                of information security
+              </span>
+          </div>
+        </div>
+      </div>
+        <%= content %>
+      <table class="footer">
+        <tr>
+          <td class="footer__left">
+            <div class="contact">
+              Feel free to contact us by email <a class="link" href="mailto:info@ructf.org">info@ructf.org</a><br/>
+              Official mailing list: <a class="link" href="https://groups.google.com/group/ructfe/">groups.google.com/group/ructfe/</a><br/>
+              IRC: <a class="link" href="irc://irc.hackerdom.ru/ructfe">#ructfe@irc.hackerdom.ru</a>
+            </div>
+          </td>
+          <td class="footer__right">
+            <div class="social">
+              <a class="social__link" href="https://www.facebook.com/groups/132264436820977/">
+                <img class="social__link__image" src="<%= url_for('/img/social/facebook.png') %>" alt=""/>
+              </a>
+              <a class="social__link" href="https://twitter.com/ructfe">
+                <img class="social__link__image" src="<%= url_for('/img/social/twitter.png') %>" alt=""/>
+              </a>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    % if ($self->app->mode eq 'production') {
+      <!-- Yandex.Metrika counter -->
+      <script type="text/javascript">
+      (function (d, w, c) {
+        (w[c] = w[c] || []).push(function() {
+          try {
+            w.yaCounter4085251 = new Ya.Metrika({id:4085251, enableAll: true, webvisor:true});
+          } catch(e) { }
+        });
+        var n = d.getElementsByTagName("script")[0],
+            s = d.createElement("script"),
+            f = function () { n.parentNode.insertBefore(s, n); };
+        s.type = "text/javascript";
+        s.async = true;
+        s.src = (d.location.protocol == "https:" ? "https:" : "http:") + "//mc.yandex.ru/metrika/watch.js";
+
+        if (w.opera == "[object Opera]") {
+          d.addEventListener("DOMContentLoaded", f);
+        } else { f(); }
+      })(document, window, "yandex_metrika_callbacks");
+      </script>
+      <noscript><div><img src="//mc.yandex.ru/watch/4085251" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+      <!-- /Yandex.Metrika counter -->
+    % }
+  </body>
+</html>
