@@ -1,6 +1,6 @@
 name := "Hammer-checker"
 
-version := "0.8"
+version := "0.9"
 
 libraryDependencies ++= Seq(
 	"org.scalatest" %% "scalatest" % "2.+",

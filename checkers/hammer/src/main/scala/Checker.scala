@@ -24,7 +24,9 @@ object Checker {
       throw CheckUsage
     }
     val Array(mode, host) = args.slice(0,2)
-    val checker = new SeleniumChecker(host, port)
+    val checkerClass = Class.forName(conf.getString("hammer.checker.type"))
+    
+    val checker:Checker = checkerClass.getDeclaredConstructor(classOf[String], classOf[Int]).newInstance(host, port.asInstanceOf[Object]).asInstanceOf[Checker]
 
     checker.doAction(mode, args.slice(2,4))
   }
