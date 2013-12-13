@@ -10,7 +10,6 @@ public class DaemonSettings {
 	
 	public static int maxThreads;
 	public static String taskManagerUrl;
-	public static String xmlServicesUrl;	// TODO: Как это выпилить ???
 	
 	public static void Initialize(String filePath) throws Exception{		
 		HashMap<String, String> settings = new HashMap<String, String>();
@@ -49,10 +48,7 @@ public class DaemonSettings {
 		if (!settings.containsKey("taskManagerUrl"))
 			throw new Exception("Obligatory param 'taskManagerUrl' not specified in settings file");		
 		taskManagerUrl = settings.get("taskManagerUrl");
-		
-		if (!settings.containsKey("xmlServicesUrl"))
-			throw new Exception("Obligatory param 'xmlServicesUrl' not specified in settings file");
-		xmlServicesUrl = settings.get("xmlServicesUrl");		
+
 	}
 	
 	private static Logger logger = Logger.getLogger("ructf.daemon");
