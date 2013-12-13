@@ -7,14 +7,20 @@ import org.openqa.selenium.htmlunit.HtmlUnitDriver
 class RequestFilter(client:WebClient) extends WebConnectionWrapper(client) {
 
   def filterUrl(url: String): Boolean = {
-    url.endsWith(".css") || url.contains("wysihtml5") || url.contains("googleusercontent") || url.contains("googleapis")
+    url.endsWith(".css") ||
+      url.contains("wysihtml5") ||
+      url.contains("googleusercontent") ||
+      url.contains("googleapis") ||
+      url.endsWith("woff") ||
+      url.endsWith("png")  ||
+      url.endsWith("jpg")
   }
 
   override def getResponse(request: WebRequest) = {
 
     if(filterUrl(request.getUrl.toExternalForm)) {
       val data = new WebResponseData("".getBytes(), 200, "OK", Collections.emptyList[NameValuePair]);
-      new WebResponse(data, request, scala.util.Random.nextLong() % 10000)
+      new WebResponse(data, request, (scala.util.Random.nextLong() % 1000) + 100)
       
     }
     else {
