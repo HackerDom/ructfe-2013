@@ -1,6 +1,8 @@
+import org.apache.commons.logging.LogFactory
 import org.scalatest._
 import org.apache.commons.codec.digest.DigestUtils
 import com.typesafe.config.ConfigFactory
+import java.util.logging.Level
 
 object CheckUsage extends Exception
 
@@ -24,13 +26,31 @@ object Checker {
       throw CheckUsage
     }
     val Array(mode, host) = args.slice(0,2)
-    val checker = new SeleniumChecker(host, port)
+    val checkerClass = Class.forName(conf.getString("hammer.checker.type"))
+    
+    val checker:Checker = checkerClass.getDeclaredConstructor(classOf[String], classOf[Int]).newInstance(host, port.asInstanceOf[Object]).asInstanceOf[Checker]
 
     checker.doAction(mode, args.slice(2,4))
   }
 
+  def prepend = {
+    LogFactory.getFactory().setAttribute("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog");
+
+    java.util.logging.Logger.getLogger("com.gargoylesoftware.htmlunit").setLevel(Level.OFF);
+    java.util.logging.Logger.getLogger("org.apache.commons.httpclient").setLevel(Level.OFF);
+    java.util.logging.Logger.getLogger("org").setLevel(Level.OFF);
+    java.util.logging.Logger.getLogger("com").setLevel(Level.OFF);
+    java.util.logging.Logger.getLogger("sun").setLevel(Level.OFF);
+    java.util.logging.Logger.getLogger("net").setLevel(Level.OFF)
+
+
+  }
+
 	def main(args: Array[String]): Unit = {
     //println("Running with: " + args.mkString(","))
+
+    prepend
+
     try {
       do_check(args)
       System.exit(OK)

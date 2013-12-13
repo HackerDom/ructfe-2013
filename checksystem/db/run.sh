@@ -1,18 +1,9 @@
 #!/bin/bash
 
-if [[ -z $1 ]]; then
-	echo usage: run.sh script.sql [db-config]
+if [[ -z $3 ]]; then
+	echo usage: run.sh USER DATABASE SQLSCRIPT
 	exit 1
 fi
 
-if [[ -z $2 ]]; then
-	DB_CONFIG=db.config
-else
-	DB_CONFIG=$2
-fi
-
-echo run.sh: run with config: $DB_CONFIG
-. $DB_CONFIG
-psql --quiet -h $DB_HOST -U $DB_USER -d $DB_BASE -f $1
+psql --quiet -U $1 -d $2 -f $3 
 echo run.sh: finished.
-

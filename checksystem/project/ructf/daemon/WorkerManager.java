@@ -60,7 +60,7 @@ public class WorkerManager extends Thread{
 		}
 	}	 
 	
-	private static final int fatalErrorTimeout = 30000; 
+	private static final int fatalErrorTimeout = 5000; 
 	private static final int nextPollTimeout = 1000;
 	private static Logger logger = Logger.getLogger("ructf.daemon");
 }

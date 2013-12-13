@@ -5,17 +5,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Hashtable;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
-
 import ructf.main.CheckerExitCode;
-import ructf.main.Constants;
 import ructf.main.DatabaseManager;
 
 public class SLAworker extends Thread{
@@ -113,7 +105,9 @@ public class SLAworker extends Thread{
 			}
 			
 			try {
-				for (SLA sla : state.values()) {
+				for (int team : stateDelta.keySet()) {
+					SLA sla = state.get(team);
+					
 					stInsertSla.setInt(1, sla.team);
 					stInsertSla.setInt(2, sla.successed);
 					stInsertSla.setInt(3, sla.failed);

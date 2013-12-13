@@ -1,15 +1,20 @@
+import java.util.logging.Level
 import org.apache.commons.codec.digest.DigestUtils
 import org.openqa.selenium.htmlunit.HtmlUnitDriver
+import org.openqa.selenium.WebDriver
 import org.scalatest.concurrent.AbstractPatienceConfiguration
 import org.scalatest.OptionValues._
 import org.scalatest.concurrent.Eventually._
 import org.scalatest.selenium.{HtmlUnit, WebBrowser, Firefox}
-import org.scalatest.{Matchers, FlatSpec, exceptions}
+import org.scalatest.{ScreenshotCapturer, Matchers, FlatSpec, exceptions}
 import org.scalatest.time.{Seconds, Span}
 import scala.collection.convert.DecorateAsScala
 import scala.Some
+import scala.util.Random
 
-class SeleniumChecker(host: String,port:Int) extends Checker(host, port) with HtmlUnit with Matchers with DecorateAsScala{
+abstract class SeleniumChecker(host: String,port:Int) extends Checker(host, port)  with WebBrowser with Matchers with DecorateAsScala{
+
+  implicit val webDriver:WebDriver
 
   def generateReference(id: String) = "<a href=\"http://google.com/?q=" +id+ "\">report</a>"
 
@@ -75,7 +80,6 @@ class SeleniumChecker(host: String,port:Int) extends Checker(host, port) with Ht
     submit()
 
     eventually {
-      Thread.sleep(100)
       currentUrl shouldNot be(registrationUrl)
       currentUrl shouldNot include("register")
     }
@@ -90,7 +94,6 @@ class SeleniumChecker(host: String,port:Int) extends Checker(host, port) with Ht
     submit()
 
     eventually {
-      Thread.sleep(500)
       currentUrl shouldNot include("register")
       find(partialLinkText("Logout")) shouldNot be(None)
     }
@@ -110,15 +113,17 @@ class SeleniumChecker(host: String,port:Int) extends Checker(host, port) with Ht
     }
   }
 
+  def getInnerHtml(id: String) = {
+    val script = s"x=document.getElementById('${id}'); return x ? x.innerHTML : '';"
+    System.err.println(script)
+    executeScript(script).asInstanceOf[String]
+  }
+
   def doCreate(pub:String, priv:Option[String]) = {
     goSite
     click on partialLinkText("Create")
 
-    // Cheat
-    eventually {
-      //      Thread.sleep(100)
-      click on(cssSelector("a[data-wysihtml5-action=change_view]"))
-    }(PatienceConfig(timeout = Span(10, Seconds)))
+    doCreateCheat
     click on("public")
     enter(pub)
 
@@ -130,18 +135,26 @@ class SeleniumChecker(host: String,port:Int) extends Checker(host, port) with Ht
     }
     submit()
 
-
     eventually {
-      Thread.sleep(100)
+      pageTitle should startWith("Message")
       if(priv.nonEmpty) {
         find("warp-decrypt").value.text should be(pub)
         find("warp-secret").value.text should be(priv.get)
       } else {
-        find("warp-public").value.text should be(pub)
+        getInnerHtml("warp-public") should startWith(pub.takeWhile(_ === '<'))
       }
     }
 
     Integer.parseInt(find("warp-id").get.text)
+  }
+
+
+  def doCreateCheat {
+    // Cheat
+    eventually {
+      //      Thread.sleep(100)
+      click on (cssSelector("a[data-wysihtml5-action=change_view]"))
+    }(PatienceConfig(timeout = Span(10, Seconds)))
   }
 
   def doSend(msg: Int, name: String) = {
@@ -226,7 +239,7 @@ class SeleniumChecker(host: String,port:Int) extends Checker(host, port) with Ht
     doLogin(login, password)
 
     doCheckMessageFrom(adminName, flag)
-    doCreate("We've got your message, check out " + generateReference(id), None)
+    doCreate("We've got your message, check out " + generateReference(id) + System.currentTimeMillis, None)
   }
 
   def check() = {
@@ -239,7 +252,7 @@ class SeleniumChecker(host: String,port:Int) extends Checker(host, port) with Ht
       val extLinks = findAll(cssSelector(s"#warp-public a")).toArray.map({_.attribute("href")}).flatten
       System.err.println(extLinks.mkString(" "))
       walkAllLinks(extLinks) {
-        Thread.sleep(100)
+        Thread.sleep(10)
       }
     }
   }
@@ -255,7 +268,6 @@ class SeleniumChecker(host: String,port:Int) extends Checker(host, port) with Ht
 
 
       eventually {
-        Thread.sleep(1000);
         println(s"Hello, ${pageTitle}!")
       }
       val links =  findAll( cssSelector(".r  a")).flatMap( _.attribute("href")).toList
@@ -271,4 +283,10 @@ class SeleniumChecker(host: String,port:Int) extends Checker(host, port) with Ht
       close()
     }
   }
+}
+
+class FirefoxChecker(host: String,port:Int) extends SeleniumChecker(host, port) with Firefox
+class HtmlUnitChecker(host: String,port:Int) extends SeleniumChecker(host, port) {
+  override implicit val webDriver = new HtmlDriver()
+  override def doCreateCheat = {}
 }
