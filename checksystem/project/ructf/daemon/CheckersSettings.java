@@ -34,7 +34,7 @@ public class CheckersSettings {
 			String name = tokens[1];
 			int timeout = Integer.parseInt(tokens[2]);
 			
-			logger.info(String.format("Adding checker: id=%d, name=%s, timeout=%d ms", serviceId));
+			logger.info(String.format("Adding checker: id=%d, name=%s, timeout=%d ms", serviceId, name, timeout));
 			checkers.put(serviceId, new Checker(name, timeout));			
 		}		
 	}
