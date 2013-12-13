@@ -71,6 +71,13 @@ CREATE TABLE stolen_flags (
 	score_attack	INTEGER		CHECK (score_attack BETWEEN 1 AND 2)
 );
 
+CREATE TABLE score (
+    round   int NOT NULL,
+    "time"	timestamp without time zone NOT NULL,
+    team	integer NOT NULL,
+    score	double precision NOT NULL
+);
+
 CREATE SEQUENCE adv_seq INCREMENT 1 START 1;
 CREATE TABLE advisories
 (
@@ -118,6 +125,13 @@ CREATE TABLE access_checks (
 	fail_comment	TEXT,
 	score_access	INTEGER			CHECK (score_access BETWEEN 0 AND 1),
 	task_id		UUID DEFAULT NULL
+);
+
+CREATE TABLE sla (
+	team_id		INTEGER,
+	successed	INTEGER,
+	failed		INTEGER,
+	time		TIMESTAMP		NOT NULL
 );
 
 CREATE TABLE news (
@@ -261,26 +275,13 @@ CREATE INDEX idx_stolen_flags_2	ON stolen_flags(team_id, time);
 CREATE INDEX idx_advisories	ON advisories(team_id, check_time);
 CREATE INDEX idx_solved_tasks	ON solved_tasks(team_id, status, check_time);
 
+CREATE INDEX idx_sla_time ON sla(time);
+CREATE INDEX idx_sla_teamid ON sla(team_id);
 
+CREATE INDEX idx_score_time ON score(time);
+CREATE INDEX idx_score_team ON score(team);
 
 -- Views
-
-CREATE VIEW score AS 
-	SELECT 
-		teams.id,
-		teams.name,
-		(SELECT sum(score_secret)	FROM secret_flags	WHERE team_id=teams.id) AS "privacy",
-		(SELECT sum(score_access)	FROM access_checks	WHERE team_id=teams.id) AS "availability",
-		(SELECT sum(score_attack)	FROM stolen_flags	WHERE team_id=teams.id) AS "attack",
-		(SELECT sum(score_advisory)	FROM advisories		WHERE team_id=teams.id) AS "advisories",
-		(SELECT sum(tasks.score)	
-			FROM  solved_tasks INNER JOIN tasks
-			ON    solved_tasks.task_id=tasks.id
-			WHERE solved_tasks.team_id=teams.id AND solved_tasks.status=true) AS "tasks"
-	FROM  teams
-	WHERE enabled=true;
-
-	
 
 CREATE VIEW service_status AS
 	SELECT 
@@ -325,7 +326,7 @@ CREATE VIEW xmlCachedScoreboard AS
 								(SELECT		
 									xmlelement(
 										name scores,
-										xmlattributes(ISNULL(privacy,0) + ISNULL(availability,0) as defence, attack, advisories)
+										xmlattributes(ISNULL(cached_score.privacy,0) + ISNULL(cached_score.availability,0) as defence, attack, advisories)
 									)
 								FROM
 									cached_score
@@ -359,75 +360,6 @@ CREATE VIEW xmlCachedScoreboard AS
 	standalone yes
 	) as scoreboard;
 	
-
-CREATE VIEW xmlScoreboard AS	
-	SELECT xmlroot(
-	(SELECT xmlconcat(
-		(SELECT xmlpi(name "xml-stylesheet", 'type="text/xsl" href="scoreboard.en.xsl"')),	
-		(SELECT
-			xmlelement(
-				name scoreboard,
-				xmlattributes((SELECT to_char(NOW() AT TIME ZONE 'UTC', 'YYYY.MM.DD HH24:MI:SS')) as "genTimeUTC", (SELECT max(n) FROM rounds) as "round", (SELECT to_char(time AT TIME ZONE 'UTC', 'HH24:MI:SS') FROM rounds WHERE n = (SELECT max(n) from rounds)) as "roundStartTimeUTC"),
-				(SELECT
-					xmlagg(team)
-				FROM
-					(SELECT
-						xmlconcat(
-							xmlelement(
-								name team, xmlattributes(teams.name as name, teams.vuln_box as "vulnBox"),
-								(SELECT		
-									xmlelement(
-										name scores,
-										xmlattributes(ISNULL(privacy,0) + ISNULL(availability,0) as defence, attack, advisories)
-									)
-								FROM
-									score
-								WHERE
-									name=teams.name
-								),
-								xmlelement(
-									name services,
-									(SELECT
-										xmlagg(service)
-									FROM
-										(SELECT
-											xmlelement(name service, xmlattributes(service as name, status, fail_comment)) as service
-										FROM
-											service_status
-										WHERE
-											team=teams.name) as services
-									)
-								)
-							
-							)
-						) as team
-					FROM teams
-					WHERE enabled=true
-					) as body
-				)
-			)
-		))
-	),
-	version '1.0',
-	standalone yes
-	) as scoreboard;
-
-
-/*
-CREATE OR REPLACE VIEW xmlcachedscoreboard_last AS 
-SELECT XMLROOT(( SELECT XMLCONCAT(
-  (SELECT XMLPI(NAME "xml-stylesheet", 'type="text/xsl" href="scoreboard.xsl"'::text) AS "xmlpi"), 
-    (SELECT XMLELEMENT(NAME scoreboard, ( SELECT xmlagg(body.team) AS xmlagg
-        FROM ( SELECT XMLCONCAT(XMLELEMENT(NAME team, XMLATTRIBUTES(teams.name AS name, teams.vuln_box AS "vulnBox"),
-     XMLELEMENT(NAME services, ( SELECT xmlagg(services.service) AS xmlagg
-        FROM ( SELECT XMLELEMENT(NAME service, XMLATTRIBUTES(service_status.service AS name, service_status.status AS status, service_status.fail_comment AS fail_comment)) AS service
-           FROM service_status WHERE service_status.team::text = teams.name::text) services)))) AS team
-    FROM teams WHERE teams.enabled = true) body)) AS "xmlelement")) AS "xmlconcat"), VERSION '1.0'::text, STANDALONE YES) AS scoreboard;
-
-ALTER TABLE xmlcachedscoreboard_last OWNER TO ructf;
-*/
-
-
 CREATE VIEW services_flags_stolen AS
 	SELECT
 		t.name as team, s.name as service, count(s.name) as flags
@@ -497,4 +429,3 @@ CREATE VIEW xmlFlags AS
 	version '1.0',
 	standalone yes
 	);
-

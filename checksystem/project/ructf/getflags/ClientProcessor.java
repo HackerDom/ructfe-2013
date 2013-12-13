@@ -91,11 +91,11 @@ public class ClientProcessor extends Thread
 			
 			while (true)
 			{
-/*				if (totalFlags - goodFlags >= Constants.getFlagsDisconnectThreshold) {
-					out.println("Too many bad flags!");
-					break;
-				}*/
-				out.print("> ");
+//				if (totalFlags - goodFlags >= Constants.getFlagsDisconnectThreshold) {
+//					out.println("Too many bad flags!");
+//					break;
+//				}
+//				out.print("> ");
 				
 				String flagStr = in.readLine();
 				timeoutCloser.resetTimer();
@@ -152,7 +152,7 @@ public class ClientProcessor extends Thread
 					out.println("Accepted");
 				else {
 					logger.error("InsertStolenFlag failed");
-					out.println("Unexpected error. Please tell jury");
+					out.println("Please try again later");
 				}
 			}
 		}
@@ -166,7 +166,7 @@ public class ClientProcessor extends Thread
 		catch(Exception e) {
 			logger.error("Unexpected exception: " + e.getMessage());
 			Main.logException(e);
-			out.println("Unexpected exception. Please tell jury!");
+			out.println("Please try again later");
 		}
 		finally {
 			FreeResources();

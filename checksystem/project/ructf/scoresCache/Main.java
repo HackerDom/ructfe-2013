@@ -24,7 +24,7 @@ public class Main {
 	private static Logger logger = Logger.getLogger("ructf.scoresCache");
 	
 	private static String sqlGetLastScores = "SELECT score.team, score.score, score.time FROM (SELECT team,MAX(time) AS time FROM score GROUP BY team) qqq INNER JOIN score ON qqq.time=score.time AND qqq.team=score.team";
-	private static String sqlCreateInitState = "INSERT INTO score SELECT 0, '2009-01-01', teams.id, 1000 FROM teams";
+	private static String sqlCreateInitState = "INSERT INTO score SELECT 0, '2009-01-01', teams.id, (select 100 * count(*) FROM teams) FROM teams";
 	private static String sqlGetStealsOfRottenFlags = "SELECT flags.flag_data,flags.time,stolen_flags.victim_team_id,stolen_flags.team_id FROM flags INNER JOIN stolen_flags ON flags.flag_data=stolen_flags.flag_data WHERE flags.time>?";
 	private static String sqlInsertScore = "INSERT INTO score (round, time, team, score) VALUES (?,?,?,?)";
 		
@@ -42,7 +42,10 @@ public class Main {
 				Constants.Initialize(args[0]);
 			
 			DatabaseManager.Initialize();
-						
+			
+			SLAworker slaWorker = new SLAworker();
+			slaWorker.start();
+			
 			Connection conn = DatabaseManager.CreateConnection();
 			PrepareStatements(conn);
 			
@@ -59,13 +62,13 @@ public class Main {
 			DoJobLoop(conn, stateFromDb, lastKnownTime);
 						
 		} catch (Exception e) {
-			logger.fatal("General error", e);
+			logger.fatal("General error in main thread", e);
 			e.printStackTrace();
+			System.exit(1);
 		}
 	}
 	
-	private static List<RottenStolenFlag> GetRottenStolenFlags(Timestamp ts) throws SQLException
-	{
+	private static List<RottenStolenFlag> GetRottenStolenFlags(Timestamp ts) throws SQLException {
 		List<RottenStolenFlag> result = new LinkedList<RottenStolenFlag>();
 		
 		stGetStealsOfRottenFlags.setTimestamp(1, ts);
@@ -145,13 +148,13 @@ public class Main {
 						conn.rollback();
 						throw exception;
 					} catch (SQLException rollbackException) {
-						logger.error("Failed to rollback transaction", rollbackException);
+						logger.error("Failed to rollback score transaction", rollbackException);
 					}
 					logger.error("Failed to insert score data in database", exception);
 				}
 			}
 			
-			logger.info("Sleeping ... ");
+			logger.info("Sleeping Score ... ");
 			Thread.sleep(10000);
 		}
 	}

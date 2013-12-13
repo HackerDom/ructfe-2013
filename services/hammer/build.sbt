@@ -2,7 +2,7 @@ com.github.play2war.plugin.Play2WarPlugin.play2WarSettings
 
 name := "Hammer"
 
-version := "0.7"
+version := "0.8"
 
 libraryDependencies ++= Seq(
   jdbc,
