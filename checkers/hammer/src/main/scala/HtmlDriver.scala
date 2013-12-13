@@ -2,7 +2,6 @@ import com.gargoylesoftware.htmlunit.util.{NameValuePair, WebConnectionWrapper}
 import com.gargoylesoftware.htmlunit.{WebResponse, WebResponseData, WebRequest, WebClient}
 import java.util.Collections
 import org.openqa.selenium.htmlunit.HtmlUnitDriver
-import org.scalatest.selenium.HtmlUnit
 
 
 class RequestFilter(client:WebClient) extends WebConnectionWrapper(client) {
@@ -30,6 +29,7 @@ class HtmlDriver extends HtmlUnitDriver(true) {
     client.getOptions.setCssEnabled(false)
     client.getOptions.setJavaScriptEnabled(true)
     client.getOptions.setThrowExceptionOnScriptError(false)
+    client.setJavaScriptTimeout( 1000 );
     new RequestFilter(client)
     client
 
