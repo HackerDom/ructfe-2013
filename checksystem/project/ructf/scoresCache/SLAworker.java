@@ -49,12 +49,16 @@ public class SLAworker extends Thread{
 	public void run() {
 		try
 		{
+			logger.info("Getting SLA state from db");
 			Hashtable<Integer,SLA> stateFromDb = GetStateFromDb();
 			Timestamp lastKnownTime = GetLastKnownTime(stateFromDb);
 			if (lastKnownTime == null)
+			{
+				logger.info("Empty SLA state in db. Considering timestamp to start as 0");
 				lastKnownTime = new Timestamp(0);
+			}
 
-			logger.info(String.format("LastKnownTime: %s", lastKnownTime.toString()));			
+			logger.info(String.format("SLA LastKnownTime: %s", lastKnownTime.toString()));			
 			DoJobLoop(stateFromDb, lastKnownTime);
 		}
 		catch(Exception e){
@@ -68,7 +72,7 @@ public class SLAworker extends Thread{
 		conn.setAutoCommit(false);		
 		
 		while (true) {
-			logger.info(String.format("Getting new sla data from time %s", lastKnownTime.toString()));
+			logger.info(String.format("Getting new SLA data from time %s", lastKnownTime.toString()));
 			stGetLastAccessChecks.setTimestamp(1, lastKnownTime);
 			ResultSet res = stGetLastAccessChecks.executeQuery();
 			
@@ -142,7 +146,9 @@ public class SLAworker extends Thread{
 	}
 	
 	private static Timestamp Max(Timestamp t1, Timestamp t2){
-		return new Timestamp(Math.max(t1.getTime(),t2.getTime()));
+		if (t1.before(t2))
+			return t2;
+		return t1;
 	}
 
 	private static Timestamp GetLastKnownTime(Hashtable<Integer, SLA> stateFromDb) {

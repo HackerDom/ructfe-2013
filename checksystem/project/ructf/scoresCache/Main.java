@@ -49,15 +49,17 @@ public class Main {
 			Connection conn = DatabaseManager.CreateConnection();
 			PrepareStatements(conn);
 			
+			logger.info("Getting score state from db");
 			Hashtable<Integer,TeamScore> stateFromDb = GetStateFromDb();
 			if (stateFromDb.isEmpty()) {
+				logger.info("Creating score InitStateInDb");
 				CreateInitStateInDb();
-				logger.info("CreateInitStateInDb completed");
+				logger.info("Score CreateInitStateInDb completed");
 				stateFromDb = GetStateFromDb();
 			}
 								
 			Timestamp lastKnownTime = GetLastKnownTime(stateFromDb);
-			logger.info(String.format("LastKnownTime: %s", lastKnownTime.toString()));
+			logger.info(String.format("Score LastKnownTime: %s", lastKnownTime.toString()));
 			
 			DoJobLoop(conn, stateFromDb, lastKnownTime);
 						
@@ -88,7 +90,9 @@ public class Main {
 	}
 	
 	private static void DoJobLoop(Connection conn, Hashtable<Integer,TeamScore> state, Timestamp lastKnownTime) throws SQLException, InterruptedException {
-		Timestamp lastCreationTime = new Timestamp(lastKnownTime.getTime() - Constants.flagExpireInterval*1000);		
+		Timestamp lastCreationTime = new Timestamp(lastKnownTime.getTime() - Constants.flagExpireInterval*1000);
+		lastCreationTime.setNanos(lastKnownTime.getNanos());
+		
 		int totalTeamsCount = DatabaseManager.getTeams().size();
 		
 		conn.setAutoCommit(false);
@@ -125,6 +129,7 @@ public class Main {
 				double scoreToEachAttacker = scoreFromOwner / attackersCount;
 				
 				Timestamp rottenTime = new Timestamp(flag.time.getTime() + Constants.flagExpireInterval*1000);
+				rottenTime.setNanos(flag.time.getNanos());				
 				
 				try {
 					for (RottenStolenFlag attackerFlag : list) {
