@@ -80,7 +80,6 @@ abstract class SeleniumChecker(host: String,port:Int) extends Checker(host, port
     submit()
 
     eventually {
-      Thread.sleep(100)
       currentUrl shouldNot be(registrationUrl)
       currentUrl shouldNot include("register")
     }
@@ -95,7 +94,6 @@ abstract class SeleniumChecker(host: String,port:Int) extends Checker(host, port
     submit()
 
     eventually {
-      Thread.sleep(500)
       currentUrl shouldNot include("register")
       find(partialLinkText("Logout")) shouldNot be(None)
     }
@@ -138,7 +136,6 @@ abstract class SeleniumChecker(host: String,port:Int) extends Checker(host, port
     submit()
 
     eventually {
-      Thread.sleep(100)
       pageTitle should startWith("Message")
       if(priv.nonEmpty) {
         find("warp-decrypt").value.text should be(pub)
@@ -255,7 +252,7 @@ abstract class SeleniumChecker(host: String,port:Int) extends Checker(host, port
       val extLinks = findAll(cssSelector(s"#warp-public a")).toArray.map({_.attribute("href")}).flatten
       System.err.println(extLinks.mkString(" "))
       walkAllLinks(extLinks) {
-        Thread.sleep(100)
+        Thread.sleep(10)
       }
     }
   }
@@ -271,7 +268,6 @@ abstract class SeleniumChecker(host: String,port:Int) extends Checker(host, port
 
 
       eventually {
-        Thread.sleep(1000);
         println(s"Hello, ${pageTitle}!")
       }
       val links =  findAll( cssSelector(".r  a")).flatMap( _.attribute("href")).toList
