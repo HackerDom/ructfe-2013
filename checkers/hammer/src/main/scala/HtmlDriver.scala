@@ -29,6 +29,7 @@ class HtmlDriver extends HtmlUnitDriver(true) {
   override def modifyWebClient(client: WebClient) = {
     client.getOptions.setCssEnabled(false)
     client.getOptions.setJavaScriptEnabled(true)
+    client.getOptions.setThrowExceptionOnScriptError(false)
     new RequestFilter(client)
     client
 
