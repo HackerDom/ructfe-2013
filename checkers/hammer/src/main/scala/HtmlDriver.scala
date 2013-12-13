@@ -1,5 +1,5 @@
 import com.gargoylesoftware.htmlunit.util.{NameValuePair, WebConnectionWrapper}
-import com.gargoylesoftware.htmlunit.{WebResponse, WebResponseData, WebRequest, WebClient}
+import com.gargoylesoftware.htmlunit._
 import java.util.Collections
 import org.openqa.selenium.htmlunit.HtmlUnitDriver
 
@@ -23,7 +23,7 @@ class RequestFilter(client:WebClient) extends WebConnectionWrapper(client) {
   }
 }
 
-class HtmlDriver extends HtmlUnitDriver(true) {
+class HtmlDriver extends HtmlUnitDriver(BrowserVersion.FIREFOX_17) {
 
   override def modifyWebClient(client: WebClient) = {
     client.getOptions.setCssEnabled(false)
