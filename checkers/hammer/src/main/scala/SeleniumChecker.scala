@@ -16,9 +16,6 @@ abstract class SeleniumChecker(host: String,port:Int) extends Checker(host, port
 
   implicit val webDriver:WebDriver
 
-  // Disabling logging for Selenium based things
-  java.util.logging.Logger.getLogger("com.gargoylesoftware").setLevel(Level.OFF);
-
   def generateReference(id: String) = "<a href=\"http://google.com/?q=" +id+ "\">report</a>"
 
   def goBase = if (currentUrl != baseUrl) go to baseUrl
