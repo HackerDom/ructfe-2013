@@ -6,7 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Hashtable;
+
 import org.apache.log4j.Logger;
+
 import ructf.main.CheckerExitCode;
 import ructf.main.DatabaseManager;
 
@@ -66,6 +68,7 @@ public class SLAworker extends Thread{
 		conn.setAutoCommit(false);		
 		
 		while (true) {
+			logger.info(String.format("Getting new sla data from time %s", lastKnownTime.toString()));
 			stGetLastAccessChecks.setTimestamp(1, lastKnownTime);
 			ResultSet res = stGetLastAccessChecks.executeQuery();
 			

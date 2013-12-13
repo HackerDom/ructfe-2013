@@ -71,6 +71,7 @@ public class Main {
 	private static List<RottenStolenFlag> GetRottenStolenFlags(Timestamp ts) throws SQLException {
 		List<RottenStolenFlag> result = new LinkedList<RottenStolenFlag>();
 		
+		logger.info(String.format("Getting new score data from time %s", ts.toString()));
 		stGetStealsOfRottenFlags.setTimestamp(1, ts);
 		ResultSet res = stGetStealsOfRottenFlags.executeQuery();
 		
@@ -87,7 +88,7 @@ public class Main {
 	}
 	
 	private static void DoJobLoop(Connection conn, Hashtable<Integer,TeamScore> state, Timestamp lastKnownTime) throws SQLException, InterruptedException {
-		Timestamp lastCreationTime = new Timestamp(lastKnownTime.getTime() - Constants.flagExpireInterval*1000);
+		Timestamp lastCreationTime = new Timestamp(lastKnownTime.getTime() - Constants.flagExpireInterval*1000);		
 		int totalTeamsCount = DatabaseManager.getTeams().size();
 		
 		conn.setAutoCommit(false);
