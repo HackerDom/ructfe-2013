@@ -1,6 +1,6 @@
 ///////////  Configuration ///////////////
 
-var ajaxURL            = 'http://10.23.201.2/taskmon/mon/';
+var ajaxURL            = 'http://10.20.0.2/taskmon/mon/';
 var autoUpdateInterval = 10000;		// milliseconds
 var ajaxTimeout        =  5000;         // milliseconds
 

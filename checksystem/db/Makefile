@@ -1,32 +1,19 @@
 help:
-	echo Targets: create-test drop-test create-game drop-game
+	echo Targets: main-db test-db clean
 
-create-game:
-	psql -af databases-create.sql postgres
-	psql -f tables-create.sql ructfe11
-	psql -f tables-create.sql ructfe12
-	psql -f tables-create.sql ructfe13
-	psql -f tables-create.sql ructfe21
-	psql -f tables-create.sql ructfe22
-	psql -f data.services.sql ructfe11
-	psql -f data.services.sql ructfe12
-	psql -f data.services.sql ructfe13
-	psql -f data.services.sql ructfe21
-	psql -f data.services.sql ructfe22
-	./change-owner.sh ructfe11 ructfe
-	./change-owner.sh ructfe12 ructfe
-	./change-owner.sh ructfe13 ructfe
-	./change-owner.sh ructfe21 ructfe
-	./change-owner.sh ructfe22 ructfe
+main-db:
+	./run.sh ructfe ructfe game-databases-create.sql
+	./run.sh ructfe ructfe tables-create.sql
+	./run.sh ructfe ructfe ructfe2013-services.sql
+	./run.sh ructfe ructfe game-teams-add.sql
+	./change-owner.sh ructfe ructfe
 
-drop-game:
-	psql -af game-databases-drop.sql postgres
-
-create-test:
-	psql -af test-databases-create.sql postgres
-	psql -f tables-create.sql ructfetest
+test-db:
+	./run.sh testuser ructfetest test-databases-create.sql
+	./run.sh testuser ructfetest tables-create.sql
+	./run.sh testuser ructfetest ructfe2013-services.sql
+	./run.sh testuser ructfetest test-teams-add.sql
 	./change-owner.sh ructfetest testuser
-	psql -f test-data-add.sql ructfetest
 
-drop-test:
-	psql -af test-databases-drop.sql postgres
+clean:
+	./run.sh tables-clear.sql

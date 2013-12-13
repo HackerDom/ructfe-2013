@@ -1,7 +1,6 @@
 package ructf.daemon;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.Scanner;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -11,7 +10,7 @@ public class CheckersSettings {
 	
 	public static ConcurrentHashMap<Integer, Checker> checkers = new ConcurrentHashMap<Integer, Checker>();
 
-	public static void Initialize(String filePath, HashMap<String,Integer> namesIdMap) throws Exception{
+	public static void Initialize(String filePath) throws Exception{
 		filePath = filePath.trim();
 		
 		Scanner scanner = new Scanner(new File(filePath));
@@ -31,13 +30,12 @@ public class CheckersSettings {
 			if (checkers.containsKey(tokens[0]))
 				logger.warn("Duplicate parameter  " + tokens[0] + " in config, using last one");					
 			
-			if (!namesIdMap.containsKey(tokens[0]))
-			{
-				logger.warn("Unknown service name " + tokens[0] + " in config, skipping it");
-				continue;
-			}
+			int serviceId = Integer.parseInt(tokens[0]);
+			String name = tokens[1];
+			int timeout = Integer.parseInt(tokens[2]);
 			
-			checkers.put(namesIdMap.get(tokens[0]), new Checker(tokens[1], Integer.parseInt(tokens[2])));			
+			logger.info(String.format("Adding checker: id=%d, name=%s, timeout=%d ms", serviceId));
+			checkers.put(serviceId, new Checker(name, timeout));			
 		}		
 	}
 

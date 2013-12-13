@@ -1,3 +1,5 @@
+DELETE FROM sla;
+DELETE FROM score;
 DELETE FROM news;
 DELETE FROM rounds;
 DELETE FROM checker_run_log;
@@ -9,10 +11,8 @@ ALTER SEQUENCE stask_seq RESTART 1;
 DELETE FROM stolen_flags;
 DELETE FROM secret_flags;
 DELETE FROM flags;
-DELETE FROM cache;
 DELETE FROM tasks;
 DELETE FROM services;
 DELETE FROM teams;
 
 INSERT INTO rounds(n) VALUES(0);
-
