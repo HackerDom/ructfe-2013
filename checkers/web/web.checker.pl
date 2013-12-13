@@ -520,7 +520,7 @@ my $check_error = sub {
 	{
    		my ($err, $code) = $tx->error;
     		warn $code ? "$code response: $err" : "Connection error: $err";
-    		print $code ? "$code" : "Connection error: $err";
+    		print $code ? "$code" : "$err";
                 exit $SERVICE_FAIL;
 	}
 };
@@ -570,7 +570,7 @@ my $register = sub {
 	
 	$url->path('/index.php');
 	$url->query(action=>'registration');
-        warn "Try register user '$up{'mail'}' with password '$up{'pass'}'";
+        warn "Try register '$up{'type'}' '$up{'mail'}' with password '$up{'pass'}'";
        
 	my $tx = $uagent->post($url, form => { passwd => $up{'pass'}, repassword => $up{'pass'}, email => $up{'mail'}, type_table => $up{'type'}});
         $check_error -> ($tx);
@@ -615,11 +615,11 @@ my $register = sub {
 
 my $create_card = sub
 {
-	my ($ua, $um, $usum,$utype) = @_;
+	my ($ua, $um, $usum, $utype) = @_;
         $url->path('/index.php');
         $url->query(action=>'addacct');
-        warn "Try add card for '$utype' '$um' with sum '$usum'";
-        my $tx = $ua->post($url, form => {summ => $usum, type => $utype});
+        warn "Try add card for '$um' with sum '$usum'";
+	my $tx = $ua->post($url, form => {summ => $usum, currency => $utype});
         $check_error->($tx);
 	my $res = $tx -> res;
         my $code = $res -> code;
@@ -650,14 +650,30 @@ my $add_comment = sub
 
 my $transfer = sub
 {
-	my ($ua, $from, $to) = @_;
-	$url->query(action=>'transfer');
+	my $ua = shift;
+	$url->query(action=>'acct_user');
+	my $tx = $ua -> get($url);
+	$check_error -> ($tx);
+	my $content = $tx -> res -> content -> get_body_chunk(0);
+	$content =~ /<tbody>\s+<tr><td>(\d+)<\/td><td>.+<\/td><td>.+<\/td><td>.+<\/td><\/tr><tr><td>(\d+)<\/td><td>.+<\/td><td>.+<\/td>/;
+	my $from = $1;
+	my $to = $2;
+	warn "Find cards: $1 and $2";
+
+	$url->query(action=>'mytransfer');
 	warn "Try transfer from '$from' to '$to'";
-	my $tx = $ua -> post($url, from => {acct_out => $from, acct_in => $to, sum => '10'});
+	$tx = $ua -> post($url, form => {acct_out => $from, acct_in => $to, sum => '10'});
 	$check_error -> ($tx);
 	my $res = $tx -> res;
 	my $code = $res -> code;
-	unless($code == 200)
+	$content = $tx -> res -> content -> get_body_chunk(0);
+	$content =~ /location\.replace\("index\.php\?(.+)=(.+)"\)/;
+	warn "Get with $1=$2";
+	$url->query($1 => $2);
+	$tx = $ua -> get($url);
+	$check_error -> ($tx);
+	$content = $tx -> res -> content;
+	unless($code == 200 and ($content->body_contains("Transfer done!")))
 	{
                 print 'Transfer fail';
                 exit $SERVICE_CORRUPT;
@@ -702,56 +718,59 @@ my $check_max_sum = sub
 	}
 	warn 'Check max_sum successfull';
 };
+my $check_company_list = sub
+{
+	my $ua = shift;
+	$url -> query(action => 'associates');
+	warn "Check show company list";
+	my $tx = $ua -> get($url);
+	$check_error -> ($tx);
+	my $res = $tx -> res;
+	my $code = $res -> code;
+        my $content = $res -> content -> get_body_chunk(0);
+
+	unless($code == 200 and  $content =~ /<tbody>\s+<tr><td>1<\/td><td>.*<\/td><td>.*@.*<\/td><\/tr>/)
+        {
+                warn "Check show company list fail.";
+                exit $SERVICE_CORRUPT;
+        }
+        warn 'Check show company list successfull';
+};
 
 $MODES{$mode}->(@ARGV);
 exit $SERVICE_OK;
 
 sub check 
 {	
-my ($id, $flag) = @_;
-	warn "put $ip $id $flag";
-        my $ua = Mojo::UserAgent->new();
-	my $type_flag = int(rand(3));
+	warn "Check $ip";
+	my $ua = Mojo::UserAgent->new();
+        $url->path('/');
 	my $uphone = ''; for(0..9){$uphone .= int(rand(9)+1);}
 	my ($upass, $ucountry, $ufilename) = (rname(30), $countries[int(rand(@countries+0))], rname().'.jpeg');
-	my $ucurrency;
-        if(int(rand(2)) == 0) {$ucurrency = '$'} else {$ucurrency = '€'}
-
-
-	if($type_flag == 0) #user
+	my $type = int(rand(2)) ? 'user' : 'company';  
+	my $ucurrency = '$';
+	my $umail;
+	if($type eq 'user')
 	{
-		chop $flag;
-		my ($uname, $usurname, $ubirthday) = ($names[int(rand(@names+0))].'.'.$uphone, $surnames[int(rand(@surnames+0))], int(rand(40)+1950).'-'.int(rand(12)+1).'-'.int(rand(28)+1));
-		my $umail = $usurname.$uname.'@'.rname().'.com';
-		$register->($ua, name => $uname, surname => $usurname, pass => $upass, type => 'user', mail => $umail, country => $ucountry, phone => $uphone, birthday => $ubirthday, max_sum => $flag, currency => '=', filename => $ufilename);
-		$add_comment -> ($ua, $umail, $quote[int(rand(@quote))]);
-		warn "0:$umail:$upass";
+		warn "Check user";
+	       	my ($uname, $usurname, $ubirthday) = ($names[int(rand(@names+0))].'.'.$uphone, $surnames[int(rand(@surnames+0))], int(rand(40)+1950).'-'.int(rand(12)+1).'-'.int(rand(28)+1));	
+		$umail = $usurname.$uname.'@'.rname().'.com';
+		$register->($ua, name => $uname, surname => $usurname, pass => $upass, type => 'user', mail => $umail, country => $ucountry, phone => $uphone, birthday => $ubirthday, max_sum => rname(), currency => $ucurrency, filename => $ufilename);
+		$create_card -> ($ua, $umail, rname(), $ucurrency);
+		$transfer -> ($ua);
 	}
-	if($type_flag == 1)#company
+	else
 	{
-		chop $flag;
+		warn "Check company";		
 		my ($uname, $uaddr, $udate, $uowner) = ($companies[int(rand(@companies+0))].'.'.$uphone.'.'.$animals[int(rand(@animals+0))], rname(), int(rand(40)+1950).'-'.int(rand(12)+1).'-'.int(rand(28)+1), $names[int(rand(@names+0))].' '.$surnames[int(rand(@surnames+0))]);
-		my $umail = $uname.'@'.rname().'.com';
-		$register->($ua, name => $uname, pass => $upass, mail => $umail, country => $ucountry, addr => $uaddr, date => $udate, owner => $uowner, phone => $uphone, type => 'company', max_sum => $flag, filename => $ufilename, currency => '=');
-		warn "1:$umail:$upass";
-	}	
-	if($type_flag == 2)
-	{
-		if(int(rand(2)) == 0) #company
-		{
-		 	my ($uname, $uaddr, $udate, $uowner) = ($companies[int(rand(@companies+0))].'.'.$uphone.'.'.$animals[int(rand(@animals+0))], rname(), int(rand(40)+1950).'-'.int(rand(12)+1).'-'.int(rand(28)+1), $names[int(rand(@names+0))].' '.$surnames[int(rand(@surnames+0))]);
-                	my $umail =  $uname.'@'.rname().'.com';
-			$register->($ua, name => $uname, pass => $upass, mail => $umail, country => $ucountry, addr => $uaddr, date => $udate, owner => $uowner, phone => $uphone, type => 'company', max_sum => rname(), filename => $flag, currency => $ucurrency);
-                	warn "21:$umail:$upass";
-		}
-		else #user
-		{
-			my ($uname, $usurname, $ubirthday, $ufilename) = ($names[int(rand(@names+0))].'.'.$uphone, $surnames[int(rand(@surnames+0))], int(rand(40)+1950).'-'.int(rand(12)+1).'-'.int(rand(28)+1));
-        	         my $umail = $usurname.$uname.'@'.rname().'.com';
-			$register->($ua, name => $uname, surname => $usurname, pass => $upass, type => 'user', mail => $umail, country => $ucountry, phone => $uphone, birthday => $ubirthday, max_sum => rname(), currency => $ucurrency, filename => $flag);
-		       	warn "22:$umail:$upass";
-		}
+        	$umail = $uname.'@'.rname().'.com';
+        	$register->($ua, name => $uname, pass => $upass, mail => $umail, country => $ucountry, addr => $uaddr, date => $udate, owner => $uowner, phone => $uphone, type => 'company', max_sum => rname(), filename => $ufilename, currency => $ucurrency);
+		$check_company_list -> ($ua);
 	}
+	warn "$umail:$upass";
+	
+	exit $SERVICE_OK;  
+
 }
 
 sub put 
@@ -763,7 +782,7 @@ sub put
 	my $uphone = ''; for(0..9){$uphone .= int(rand(9)+1);}
 	my ($upass, $ucountry, $ufilename) = (rname(30), $countries[int(rand(@countries+0))], rname().'.jpeg');
 	my $ucurrency;
-        if(int(rand(2)) == 0) {$ucurrency = '$'} else {$ucurrency = '€'}
+        $ucurrency = '$';
 
 
 	if($type_flag == 0) #user

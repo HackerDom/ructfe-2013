@@ -11,5 +11,5 @@ public class TeamScore {
 		this.team = team;
 		this.score = score;
 		this.time = time;
-	}		
+	}
 }
