@@ -61,11 +61,13 @@ object Warp extends Controller with Secured {
     DBAction { implicit request =>
       Query(Messages).filter(_.id === messageId).innerJoin(Users).on(_.author_id === _.id).firstOption.map { case (msg:Message, author:User) =>
 
-        val query = Query(SentMessages).filter(_.user_id === user.id.get).filter(_.message_id === msg.id.get)
-        if(query.exists.run) {
-          query.map(_.read).update(true)
-        } else {
-          SentMessages.insert(SentMessage.create(user, msg, true))
+        if(msg.canRead.run) {
+          val query = Query(SentMessages).filter(_.user_id === user.id.get).filter(_.message_id === msg.id.get)
+          if(query.exists.run) {
+            query.map(_.read).update(true)
+          } else {
+            SentMessages.insert(SentMessage.create(user, msg, true))
+          }
         }
         Ok(views.html.warp.show(msg, author))
       }.getOrElse(NotFound("No such message"))
