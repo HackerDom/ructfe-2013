@@ -245,7 +245,8 @@ abstract class SeleniumChecker(host: String,port:Int) extends Checker(host, port
     doLogin(login, password)
 
     doCheckMessageFrom(adminName, flag)
-    doCreate("We've got your message, check out " + generateReference(id) + System.currentTimeMillis, None)
+    val msgId = doCreate("We've got your message, check out " + generateReference(id) + System.currentTimeMillis, None)
+    doSend(msgId, adminName)
   }
 
   def check() = {
