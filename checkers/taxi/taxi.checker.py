@@ -164,7 +164,7 @@ def put(hostname, id, flag):
         return status_codes['MUMBLE']
     
 def main():
-    #try:
+    try:
         if args.mode == 'get':
             return get(args.hostname, args.id, args.flag)
         elif args.mode == 'put':
@@ -173,9 +173,9 @@ def main():
             return check(args.hostname)
         else:
             return status_codes['CHECKER_ERROR']
-    #except Exception as e:
-    #    print >> sys.stderr, str(e)
-    #    return status_codes["DOWN"]
+    except Exception as e:
+        print >> sys.stderr, str(e)
+        return status_codes["DOWN"]
         
 parser = argparse.ArgumentParser(description='taxi srv checker')
 parser.add_argument(dest='mode', action='store')
