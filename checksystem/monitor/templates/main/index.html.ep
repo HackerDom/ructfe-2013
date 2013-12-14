@@ -2,6 +2,7 @@
 % title 'RuCTFE Monitor > Scoreboard';
 
 <div class="content" style="width: 830px">
+  Round #<%= $round->{n} %> started at <%= $round->{time} %>
   <table border="1">
     <tr>
       <th>#</th>

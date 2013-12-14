@@ -30,6 +30,7 @@ sub index {
 
   $self->stash(teams    => \@teams);
   $self->stash(services => $self->_service_status);
+  $self->stash(round    => $self->_round);
   $self->render;
 }
 
@@ -39,6 +40,7 @@ sub flags {
   $self->stash(flags    => $self->_flags);
   $self->stash(services => $self->_services);
   $self->stash(teams    => $self->_teams);
+  $self->stash(round    => $self->_round);
   $self->render;
 }
 
@@ -190,6 +192,28 @@ sub _services {
   }
 
   return $services;
+}
+
+sub _round {
+  my $self = shift;
+  my $round;
+  my $db = $self->db;
+
+  my $r = $self->app->cache->{r};
+  if ($r && $r->{expires} > time) {
+    $round = $r->{data};
+  } else {
+    my $stm = $db->prepare('SELECT n, EXTRACT(EPOCH FROM time) AS time FROM rounds ORDER BY n DESC LIMIT 1');
+    $stm->execute() or $self->app->log->warn("SQL error [$DBI::err]: $DBI::errstr");
+    my $row = $stm->fetchrow_hashref();
+    $round = {n => $row->{n}, time => scalar gmtime int $row->{time}};
+
+    my $cache = $self->app->cache;
+    $cache->{r} = {expires => 20 + time, data => $round};
+    $self->app->cache($cache);
+  }
+
+  return $round;
 }
 
 1;
