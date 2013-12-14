@@ -5,6 +5,9 @@
     <title><%= title %></title>
     <link rel="stylesheet" href="<%= url_for('/css/index.css') %>"/>
     <link href="<%= url_for('/img/favicon.ico') %>" rel="shortcut icon" type="image/x-icon" />
+
+    <script type="text/javascript" src="/js/jquery-latest.js"></script>
+    <script type="text/javascript" src="/js/jquery.tablesorter.js"></script>
   </head>
 
   <body class="page">

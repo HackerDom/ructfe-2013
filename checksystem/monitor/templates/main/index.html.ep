@@ -1,11 +1,13 @@
 % layout 'default';
 % title 'RuCTFE Monitor > Scoreboard';
 
+% use Mojo::Util 'url_escape';
+
 <div class="content" style="width: 1230px">
   <table class="top">
     <tr>
       <td><p id="links"><span class="nonactive">Scoreboard</span> | <a href="/flags">Flags statistic</a></p></td>
-      <td><p id="round">Round <span id="round_number"><%= $round->{n} %></span> (started at <%= $round->{time} %>)</p></td>
+      <td><p id="round">Round <span id="round_number"><%= $round->{n} %></span> (started at <%= $round->{time} %> UTC)</p></td>
     </tr>
   </table>
   <table class="team">
@@ -31,6 +33,7 @@
         <td class="team__cell team_logo">
           <div class="team__cell__inner ">
             % my $name = $team->{name}; $name =~ s/"/'/g;
+            % $name = url_escape $name;
             <img src="<%= Mojo::URL->new("http://ructf.org/e/2013/logos/$name") %>" width="64" height="64">
           </div>
         </td>
@@ -42,24 +45,24 @@
         </td>
         <td class="team__cell">
           <div class="team__cell__inner">
-            <%= sprintf '%.2f', $team->{fp} %>
+            <%= sprintf '%.3f', $team->{fp} %>
           </div>
         </td>
         <td class="team__cell">
           <div class="team__cell__inner">
-            <%= sprintf '%.2f', $team->{sla} %>
+            <%= sprintf '%.3f', $team->{sla} %>
           </div>
         </td>
         <td class="team__cell team_score">
           <div class="team__cell__inner">
-            <%= sprintf '%.2f', $team->{score} %>
+            <%= sprintf '%.3f', $team->{score} %>
           </div>
         </td>
 
         % for my $service (keys %$services) {
           % my $status = $services->{$service}{$team->{tid}}{status};
           % my $statuses = {101 => 'up', 102 => 'corrupt', 103 => 'mumble', 104 => 'down'};
-          % my $class = $statuses->{$status} // 'checker_error';
+          % my $class = $statuses->{$status} // '☺';
           % my $status_name = $class; $status_name =~ s/\_/ /g;
           <td class="team__cell service_status <%= $class %>">
             <div class="team__cell__inner">

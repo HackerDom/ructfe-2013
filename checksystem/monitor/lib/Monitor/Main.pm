@@ -26,7 +26,7 @@ sub index {
       score   => $fp * $sla
       };
   }
-  @teams = sort { $b->{score} <=> $a->{score} } @teams;
+  @teams = sort { $b->{score} + ($b->{sla} / 1000) <=> $a->{score} + ($a->{sla} / 1000) } @teams;
 
   $self->stash(teams    => \@teams);
   $self->stash(services => $self->_service_status);
@@ -37,7 +37,10 @@ sub index {
 sub flags {
   my $self = shift;
 
-  $self->stash(flags    => $self->_flags);
+  my ($flags, $fteams) = $self->_flags;
+
+  $self->stash(flags    => $flags);
+  $self->stash(fteams   => $fteams);
   $self->stash(services => $self->_services);
   $self->stash(teams    => $self->_teams);
   $self->stash(round    => $self->_round);
@@ -150,12 +153,13 @@ sub _service_status {
 
 sub _flags {
   my $self = shift;
-  my $flags;
+  my ($flags, $teams);
   my $db = $self->db;
 
   my $f = $self->app->cache->{f};
   if ($f && $f->{expires} > time) {
-    $flags = $f->{data};
+    $flags = $f->{data}{flags};
+    $teams = $f->{data}{teams};
   } else {
     my $stm = $db->prepare('SELECT * FROM services_flags_stolen score;');
     $stm->execute() or $self->app->log->warn("SQL error [$DBI::err]: $DBI::errstr");
@@ -163,12 +167,20 @@ sub _flags {
       $flags->{$row->{team}}{$row->{service}} = $row->{flags};
     }
 
+    for my $team (keys %$flags) {
+      my $total_flags = 0;
+      for my $p (keys %{$flags->{$team}}) {
+        $total_flags += $flags->{$team}{$p};
+      }
+      $teams->{$team} = $total_flags;
+    }
+
     my $cache = $self->app->cache;
-    $cache->{f} = {expires => 60 + time, data => $flags};
+    $cache->{f} = {expires => 60 + time, data => {flags => $flags, teams => $teams}};
     $self->app->cache($cache);
   }
 
-  return $flags;
+  return ($flags, $teams);
 }
 
 sub _services {

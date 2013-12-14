@@ -1,14 +1,16 @@
 % layout 'default';
 % title 'RuCTFE Monitor > Flags';
 
+% use Mojo::Util 'url_escape';
+
 <div class="content" style="width: 1230px">
   <table class="top">
     <tr>
       <td><p id="links"><a href="/">Scoreboard</a> | <span class="nonactive">Flags statistic</span></p></td>
-      <td><p id="round">Round <span id="round_number"><%= $round->{n} %></span> (started at <%= $round->{time} %>)</p></td>
+      <td><p id="round">Round <span id="round_number"><%= $round->{n} %></span> (started at <%= $round->{time} %> UTC)</p></td>
     </tr>
   </table>
-  <table class="team">
+  <table class="team tablesort">
     <tr id="teams_title">
       <th>Logo</th>
       <th class="team__cell__heading">Team</th>
@@ -16,23 +18,24 @@
       <th class="service_name"><%= $service %></th>
       % }
     </tr>
-    % for my $tid (keys %$teams) {
+    % for my $tname (sort { $fteams->{$b} <=> $fteams->{$a} } keys $fteams) {
       <tr>
         <td class="team__cell team_logo">
           <div class="team__cell__inner">
-            % my $name = $teams->{$tid}{name}; $name =~ s/"/'/g;
+            % my $name = $tname; $name =~ s/"/'/g;
+            % $name = url_escape $name;
             <img src="<%= Mojo::URL->new("http://ructf.org/e/2013/logos/$name") %>" width="64" height="64">
           </div>
         </td>
         <td class="team__cell team__cell__heading">
           <div class="team__cell__inner">
-            <h3 class="team__heading"><%= $teams->{$tid}{name} %></h3>
+            <h3 class="team__heading"><%= $tname %></h3>
           </div>
         </td>
         % for my $service (@$services) {
         <td class="team__cell service_status flags_count">
           <div class="team__cell__inner">
-            <%= $flags->{$teams->{$tid}{name}}{$service} // 0 %>
+            <%= $flags->{$tname}{$service} // 0 %>
           </div>
         </td>
         % }

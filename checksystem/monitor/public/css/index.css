@@ -414,7 +414,7 @@ table {
 
 .page__frame {
     width: 100%;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 .header {
