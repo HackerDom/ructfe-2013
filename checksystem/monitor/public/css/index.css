@@ -1069,12 +1069,33 @@ table {
 
 .team__cell {
     padding: 0;
-    vertical-align: top;
-    border-top: 1px solid #6f7a8e;
+    vertical-align: middle;
+    border-top: 1px solid #999; /*#6f7a8e;*/
 }
 
 .team__cell__inner {
     padding: 13px 12px;
+    text-align: center;
+}
+
+.up {
+    background: #55FF55;
+}
+
+.corrupt {
+    background: #FFFF99;
+}
+
+.mumble {
+    background-color: #E1F5FF;
+}
+
+.down {
+    background-color: #FF9090;
+}
+
+.checker_error {
+    background-color: #DFDFDF;
 }
 
 .team__flag {
@@ -1091,6 +1112,8 @@ table {
     margin: 0 0 5px;
     font-weight: 400;
     padding: 0;
+    /*max-width: 150px;
+    width: 150px;*/
 }
 
 .team__country {
@@ -1143,4 +1166,74 @@ table {
 
 #rules h4 {
     margin-bottom: 5px;
+}
+
+#round {
+    text-align: right;
+    color: #999;
+}
+
+#round_number {
+    font-weight: bold;
+    color: #6b7b90;
+}
+
+th.service_name {
+    font-weight: normal;
+}
+
+td.service_status {
+    width: 80px;
+    border-left: 1px solid #BBB;
+    color: #333;
+}
+
+tr#teams_title, tr#teams_footer {
+    min-height: 50px;
+    height: 50px;
+    background-color: #eef;
+    font-size: 11pt;
+}
+
+tr#teams_footer {
+    border-top: 1px solid #999;
+}
+
+
+.team_position {
+    color: #f77;
+}
+
+.team_score {
+    background-color: #cdf;
+}
+
+.content .top {
+    width: 100%;
+}
+
+#links .nonactive {
+    color: #999;
+}
+
+#links a {
+    color: #6b7b90;
+}
+
+#links a:hover {
+    text-decoration: none;
+}
+
+.team_logo {
+    max-width: 100px;
+    width: 100px;
+}
+
+.team__cell__heading {
+    width: 150px;
+    max-width: 150px;
+}
+
+.flags_count {
+    background-color: #cdf;
 }

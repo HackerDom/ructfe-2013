@@ -1,33 +1,84 @@
 % layout 'default';
 % title 'RuCTFE Monitor > Scoreboard';
 
-<div class="content" style="width: 830px">
-  Round #<%= $round->{n} %> started at <%= $round->{time} %>
-  <table border="1">
+<div class="content" style="width: 1230px">
+  <table class="top">
     <tr>
+      <td><p id="links"><span class="nonactive">Scoreboard</span> | <a href="/flags">Flags statistic</a></p></td>
+      <td><p id="round">Round <span id="round_number"><%= $round->{n} %></span> (started at <%= $round->{time} %>)</p></td>
+    </tr>
+  </table>
+  <table class="team">
+    <tr id="teams_title">
       <th>#</th>
       <th>Logo</th>
       <th>Team</th>
       <th>Flag Points</th>
       <th>SLA</th>
-      <th>SCORE</th>
+      <th>Score</th>
       % for my $service (keys %$services) {
-      <th><%= $service %></th>
+      <th class="service_name"><%= $service %></th>
       % }
     </tr>
     % my $pos = 0;
     % for my $team (@$teams) {
       <tr>
-        <td><%= ++$pos %></td>
-        <td>X</td>
-        <td><%= $team->{name} %></td>
-        <td><%= sprintf '%.2f', $team->{fp} %></td>
-        <td><%= sprintf '%.2f', $team->{sla} %></td>
-        <td><%= sprintf '%.2f', $team->{score} %></td>
+        <td class="team__cell">
+          <div class="team__cell__inner team_position">
+            <%= ++$pos %>.
+          </div>
+        </td>
+        <td class="team__cell team_logo">
+          <div class="team__cell__inner ">
+            % my $name = $team->{name}; $name =~ s/"/'/g;
+            <img src="<%= Mojo::URL->new("http://ructf.org/e/2013/logos/$name") %>" width="64" height="64">
+          </div>
+        </td>
+        <td class="team__cell team__cell__heading">
+          <div class="team__cell__inner">
+            <h3 class="team__heading"><%= $team->{name} %></h3>
+            <div class="team__country"><%= $team->{vuln_box} %></div>
+          </div>
+        </td>
+        <td class="team__cell">
+          <div class="team__cell__inner">
+            <%= sprintf '%.2f', $team->{fp} %>
+          </div>
+        </td>
+        <td class="team__cell">
+          <div class="team__cell__inner">
+            <%= sprintf '%.2f', $team->{sla} %>
+          </div>
+        </td>
+        <td class="team__cell team_score">
+          <div class="team__cell__inner">
+            <%= sprintf '%.2f', $team->{score} %>
+          </div>
+        </td>
+
         % for my $service (keys %$services) {
-        <td><%= $services->{$service}{$team->{tid}}{status} %></td>
+          % my $status = $services->{$service}{$team->{tid}}{status};
+          % my $statuses = {101 => 'up', 102 => 'corrupt', 103 => 'mumble', 104 => 'down'};
+          % my $class = $statuses->{$status} // 'checker_error';
+          % my $status_name = $class; $status_name =~ s/\_/ /g;
+          <td class="team__cell service_status <%= $class %>">
+            <div class="team__cell__inner">
+              <%= $status_name %>
+            </div>
+          </td>
         % }
       </tr>
     % }
+    <tr id="teams_footer">
+      <th>#</th>
+      <th>Logo</th>
+      <th>Team</th>
+      <th>Flag Points</th>
+      <th>SLA</th>
+      <th>Score</th>
+      % for my $service (keys %$services) {
+      <th class="service_name"><%= $service %></th>
+      % }
+    </tr>
   </table>
 </div>

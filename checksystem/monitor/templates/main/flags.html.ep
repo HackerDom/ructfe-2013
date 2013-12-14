@@ -1,22 +1,40 @@
 % layout 'default';
 % title 'RuCTFE Monitor > Flags';
 
-<div class="content" style="width: 830px">
-  Round #<%= $round->{n} %> started at <%= $round->{time} %>
-  <table border="1">
+<div class="content" style="width: 1230px">
+  <table class="top">
     <tr>
+      <td><p id="links"><a href="/">Scoreboard</a> | <span class="nonactive">Flags statistic</span></p></td>
+      <td><p id="round">Round <span id="round_number"><%= $round->{n} %></span> (started at <%= $round->{time} %>)</p></td>
+    </tr>
+  </table>
+  <table class="team">
+    <tr id="teams_title">
       <th>Logo</th>
-      <th>Team</th>
+      <th class="team__cell__heading">Team</th>
       % for my $service (@$services) {
-      <th><%= $service %></th>
+      <th class="service_name"><%= $service %></th>
       % }
     </tr>
     % for my $tid (keys %$teams) {
       <tr>
-        <td>X</td>
-        <td><%= $teams->{$tid}{name} %></td>
+        <td class="team__cell team_logo">
+          <div class="team__cell__inner">
+            % my $name = $teams->{$tid}{name}; $name =~ s/"/'/g;
+            <img src="<%= Mojo::URL->new("http://ructf.org/e/2013/logos/$name") %>" width="64" height="64">
+          </div>
+        </td>
+        <td class="team__cell team__cell__heading">
+          <div class="team__cell__inner">
+            <h3 class="team__heading"><%= $teams->{$tid}{name} %></h3>
+          </div>
+        </td>
         % for my $service (@$services) {
-        <td><%= $flags->{$teams->{$tid}{name}}{$service} // 0 %></td>
+        <td class="team__cell service_status flags_count">
+          <div class="team__cell__inner">
+            <%= $flags->{$teams->{$tid}{name}}{$service} // 0 %>
+          </div>
+        </td>
         % }
       </tr>
     % }

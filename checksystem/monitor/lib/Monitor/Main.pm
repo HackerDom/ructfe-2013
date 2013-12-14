@@ -20,7 +20,7 @@ sub index {
       {
       tid     => $tid,
       name    => $team->{name},
-      network => $team->{network},
+      vuln_box => $team->{vuln_box},
       fp      => $fp,
       sla     => $sla,
       score   => $fp * $sla
@@ -111,7 +111,7 @@ sub _teams {
   if ($t && $t->{expires} > time) {
     $teams = $t->{data};
   } else {
-    my $stm = $db->prepare('SELECT id, name, network FROM teams;');
+    my $stm = $db->prepare('SELECT id, name, vuln_box FROM teams;');
     $stm->execute() or $self->app->log->warn("SQL error [$DBI::err]: $DBI::errstr");
     while (my $row = $stm->fetchrow_hashref()) {
       $teams->{$row->{id}} = $row;
