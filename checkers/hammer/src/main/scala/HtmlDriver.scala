@@ -36,7 +36,7 @@ class HtmlDriver extends HtmlUnitDriver(BrowserVersion.FIREFOX_17) {
     client.getOptions.setJavaScriptEnabled(true)
     client.getOptions.setThrowExceptionOnScriptError(false)
     client.getOptions.setTimeout(7000)
-    client.setJavaScriptTimeout( 1000 );
+    client.setJavaScriptTimeout( 2000 );
     new RequestFilter(client)
     client
 

@@ -25,7 +25,7 @@ public class Main {
 	
 	private static String sqlGetLastScores = "SELECT score.team, score.score, score.time FROM (SELECT team,MAX(time) AS time FROM score GROUP BY team) qqq INNER JOIN score ON qqq.time=score.time AND qqq.team=score.team";
 	private static String sqlCreateInitState = "INSERT INTO score SELECT 0, '2009-01-01', teams.id, (select 100 * count(*) FROM teams) FROM teams";
-	private static String sqlGetStealsOfRottenFlags = "SELECT flags.flag_data,flags.time,stolen_flags.victim_team_id,stolen_flags.team_id FROM flags INNER JOIN stolen_flags ON flags.flag_data=stolen_flags.flag_data WHERE flags.time>?";
+	private static String sqlGetStealsOfRottenFlags = "SELECT flags.flag_data,flags.time,stolen_flags.victim_team_id,stolen_flags.team_id FROM flags INNER JOIN stolen_flags ON flags.flag_data=stolen_flags.flag_data WHERE flags.time > ? AND extract(epoch FROM now() - flags.time) > ?";
 	private static String sqlInsertScore = "INSERT INTO score (round, time, team, score) VALUES (?,?,?,?)";
 		
 	private static PreparedStatement stGetLastScores;	
@@ -73,8 +73,9 @@ public class Main {
 	private static List<RottenStolenFlag> GetRottenStolenFlags(Timestamp ts) throws SQLException {
 		List<RottenStolenFlag> result = new LinkedList<RottenStolenFlag>();
 		
-		logger.info(String.format("Getting new score data from time %s", ts.toString()));
+		logger.info(String.format("Getting new score data from time %s with with rottenTime %d", ts.toString(), Constants.flagExpireInterval));
 		stGetStealsOfRottenFlags.setTimestamp(1, ts);
+		stGetStealsOfRottenFlags.setDouble(2, Constants.flagExpireInterval);
 		ResultSet res = stGetStealsOfRottenFlags.executeQuery();
 		
 		while (res.next()) {
@@ -95,7 +96,6 @@ public class Main {
 		
 		int totalTeamsCount = DatabaseManager.getTeams().size();
 		
-		conn.setAutoCommit(false);
 		while (true) {
 			List<RottenStolenFlag> flags = GetRottenStolenFlags(lastCreationTime);
 			
@@ -132,6 +132,7 @@ public class Main {
 				rottenTime.setNanos(flag.time.getNanos());				
 				
 				try {
+					conn.setAutoCommit(false);
 					for (RottenStolenFlag attackerFlag : list) {
 						int attacker = attackerFlag.attacker;
 						
@@ -157,6 +158,15 @@ public class Main {
 						logger.error("Failed to rollback score transaction", rollbackException);
 					}
 					logger.error("Failed to insert score data in database", exception);
+				}
+				finally
+				{
+					try {
+						conn.setAutoCommit(true);
+					} catch (SQLException e) {
+						logger.error("Failed to set autoCommit in database to true", e);
+						throw e;
+					}
 				}
 			}
 			
