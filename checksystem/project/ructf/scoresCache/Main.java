@@ -73,7 +73,7 @@ public class Main {
 	private static List<RottenStolenFlag> GetRottenStolenFlags(Timestamp ts) throws SQLException {
 		List<RottenStolenFlag> result = new LinkedList<RottenStolenFlag>();
 		
-		logger.info(String.format("Getting new score data from time %s", ts.toString()));
+		logger.info(String.format("Getting new score data from time %s with with rottenTime %d", ts.toString(), Constants.flagExpireInterval));
 		stGetStealsOfRottenFlags.setTimestamp(1, ts);
 		stGetStealsOfRottenFlags.setDouble(2, Constants.flagExpireInterval);
 		ResultSet res = stGetStealsOfRottenFlags.executeQuery();
@@ -96,7 +96,6 @@ public class Main {
 		
 		int totalTeamsCount = DatabaseManager.getTeams().size();
 		
-		conn.setAutoCommit(false);
 		while (true) {
 			List<RottenStolenFlag> flags = GetRottenStolenFlags(lastCreationTime);
 			
@@ -133,6 +132,7 @@ public class Main {
 				rottenTime.setNanos(flag.time.getNanos());				
 				
 				try {
+					conn.setAutoCommit(false);
 					for (RottenStolenFlag attackerFlag : list) {
 						int attacker = attackerFlag.attacker;
 						
@@ -158,6 +158,15 @@ public class Main {
 						logger.error("Failed to rollback score transaction", rollbackException);
 					}
 					logger.error("Failed to insert score data in database", exception);
+				}
+				finally
+				{
+					try {
+						conn.setAutoCommit(true);
+					} catch (SQLException e) {
+						logger.error("Failed to set autoCommit in database to true", e);
+						throw e;
+					}
 				}
 			}
 			
