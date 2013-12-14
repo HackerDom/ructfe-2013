@@ -115,7 +115,7 @@ abstract class SeleniumChecker(host: String,port:Int) extends Checker(host, port
 
   def getInnerHtml(id: String) = {
     val script = s"x=document.getElementById('${id}'); return x ? x.innerHTML : '';"
-    System.err.println(script)
+//    System.err.println(script)
     executeScript(script).asInstanceOf[String]
   }
 
@@ -250,7 +250,7 @@ abstract class SeleniumChecker(host: String,port:Int) extends Checker(host, port
     val links = getUnreadMessagesLinks
     walkAllLinks(links) {
       val extLinks = findAll(cssSelector(s"#warp-public a")).toArray.map({_.attribute("href")}).flatten
-      System.err.println(extLinks.mkString(" "))
+      System.err.println( "Checking links: " + extLinks.mkString(" "))
       walkAllLinks(extLinks) {
         Thread.sleep(10)
       }
