@@ -700,9 +700,12 @@ try:
     sys.exit(ret)
 except socket.error as E:
     if E.errno == errno.ECONNRESET:
-        sys.stderr.write( "connection reset by peer" )
+        sys.stderr.write( "connection reset by peer\n" )
         sys.exit(MUMBLE)
     else:
+        sys.exit(NOCONNECT)
+except requests.exceptions.ConnectionError as E:
+        sys.stderr.write( "connection refused\n" )
         sys.exit(NOCONNECT)
 except ValueError as E:
     print("WRONG ARGS")
@@ -711,5 +714,6 @@ except IndexError as E:
     print("WRONG ARGS")
     sys.exit(INTERNALERROR)
 except Exception as E:
+    print(type(E))
     sys.stderr.write( str(E) )
     sys.exit(MUMBLE)
