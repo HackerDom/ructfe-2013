@@ -62,6 +62,11 @@ object Checker {
         System.err.println("./checker {mode} {host} [{id} {flag}]")
         System.exit(ERROR)
       }
+      case error:org.openqa.selenium.WebDriverException => {
+        System.out.println("You do it wrong, son")
+        error.printStackTrace(System.err)
+        System.exit(MUMBLE)
+      }
       case error:Throwable => {
         System.err.println("Unknown error in checker, please talk to  orgs")
         error.printStackTrace(System.err)

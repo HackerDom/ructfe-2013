@@ -1,0 +1,5 @@
+% layout 'default';
+
+<div class="error" style="text-align: center ; font-size: 600%;">
+  Oops, sorry.
+</div>
