@@ -6,6 +6,8 @@ import java.util.logging.Level
 
 object CheckUsage extends Exception
 
+case class CheckerException(message: String, code: Int = Checker.ERROR, cause: Throwable) extends Exception(message, cause)
+
 object Checker {
   val OK = 101
   val CORRUPT = 102
@@ -56,6 +58,11 @@ object Checker {
       System.exit(OK)
     }
     catch {
+      case err@CheckerException(msg, code, _) => {
+        println(msg)
+        err.getCause.printStackTrace(System.err)
+        System.exit(code)
+      }
       case CheckUsage|(_:ArrayIndexOutOfBoundsException) => {
 
         System.err.println("Please check usage of this checker")

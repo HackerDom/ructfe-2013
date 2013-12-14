@@ -28,9 +28,12 @@ abstract class SeleniumChecker(host: String,port:Int) extends Checker(host, port
     }
     catch {
       case e:exceptions.TestFailedException => {
-        // Rethrowing original exception if any
         System.err.println("Repacking exception")
-        throw e.cause.getOrElse(e)
+        if (pageTitle contains("Error")) {
+          throw new CheckerException("Got Error from your service", Checker.DOWN, e.cause.getOrElse(e))
+        } else {
+          throw e.cause.getOrElse(e)
+        }
       }
     }
     finally {
