@@ -93,6 +93,7 @@ abstract class Checker (host:String, port:Int)  {
       case "put" => put(args(0), args(1))
       case "get" => get(args(0), args(1))
       case "check" => check()
+      case "password" => password(args(0), args(1))
       case _ => throw CheckUsage
     }
   }
@@ -100,5 +101,11 @@ abstract class Checker (host:String, port:Int)  {
   def put(id: String, flag: String)
   def get(id: String, flag: String)
   def check()
+
+  def password(id: String, flag: String ) = {
+    println(s"Admin: ${adminLogin}:${adminPassword}")
+    println(s"User: ${Checker.userLogin(id)}:${Checker.userPass(id)}")
+  }
+
 
 }

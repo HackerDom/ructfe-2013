@@ -166,7 +166,11 @@ abstract class SeleniumChecker(host: String,port:Int) extends Checker(host, port
 
     option should not be('empty)
 
-    singleSel("warp-sender-select").value = option.get.attribute("value").get
+    val newVal = option.get.attribute("value").get
+
+    executeScript("$(\"#warp-sender-select\").select2(\"val\", \"" + newVal + "\");")
+    singleSel("warp-sender-select").value = newVal
+
     click on partialLinkText("Send")
 
     eventually {
@@ -179,14 +183,12 @@ abstract class SeleniumChecker(host: String,port:Int) extends Checker(host, port
     click on partialLinkText("Incoming")
     click on partialLinkText("All")
 
-    eventually {
-      val messages = findAll(cssSelector(".warp-td-author")).toArray
-      System.err.println("Unread messages: " + messages.mkString(", "))
-      val messagesFrom = messages.filter(_.text === name)
+    val messages = findAll(cssSelector(".warp-td-author")).toArray
+    System.err.println("Unread messages: " + messages.mkString(", "))
+    val messagesFrom = messages.filter(_.text === name)
 
-      messagesFrom.length should be > (0)
-    }
-    val messagesFrom = findAll(cssSelector(".warp-td-author")).toArray.filter(_.text === name)
+    messagesFrom.length should be > (0)
+
     messagesFrom.map({ message =>
       val id = Integer.parseInt(message.attribute("data-id").get)
 

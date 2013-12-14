@@ -11,6 +11,7 @@ class RequestFilter(client:WebClient) extends WebConnectionWrapper(client) {
       url.contains("wysihtml5") ||
       url.contains("googleusercontent") ||
       url.contains("googleapis") ||
+//      url.contains("select2") ||
       url.endsWith("woff") ||
       url.endsWith("png")  ||
       url.endsWith("jpg")
