@@ -83,9 +83,10 @@ object Messages extends Table[Message]("MESSAGES") {
     case user:User => canRead(user)
     case _ => public
   }
-  def canRead(implicit user: User) = canSend union public union all.innerJoin(SentMessages).filter(_._2.user_id === user.id).map(_._1)
+
+  def canRead(implicit user: User) = canSend union public union all.innerJoin(SentMessages).on(_.id === _.message_id).filter(_._2.user_id === user.id).map(_._1)
   def canSend(implicit user: User) = all.filter(_.author_id === user.id)
 
-  def haveRead(implicit user: User) = canRead.innerJoin(SentMessages).filter(_._2.read === true).map(_._1)
-  def unread(implicit user: User) = canRead.innerJoin(SentMessages)
+  def haveRead(implicit user: User) = canRead.innerJoin(SentMessages).on(_.id === _.message_id).filter(_._2.read === true).map(_._1)
+  def unread(implicit user: User) = canRead.innerJoin(SentMessages).on(_.id === _.message_id)
 }

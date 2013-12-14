@@ -1,7 +1,7 @@
 import java.util.logging.Level
 import org.apache.commons.codec.digest.DigestUtils
 import org.openqa.selenium.htmlunit.HtmlUnitDriver
-import org.openqa.selenium.WebDriver
+import org.openqa.selenium.{WebElement, WebDriver}
 import org.scalatest.concurrent.AbstractPatienceConfiguration
 import org.scalatest.OptionValues._
 import org.scalatest.concurrent.Eventually._
@@ -28,9 +28,12 @@ abstract class SeleniumChecker(host: String,port:Int) extends Checker(host, port
     }
     catch {
       case e:exceptions.TestFailedException => {
-        // Rethrowing original exception if any
         System.err.println("Repacking exception")
-        throw e.cause.getOrElse(e)
+        if (pageTitle contains("Error")) {
+          throw new CheckerException("Got Error from your service", Checker.DOWN, e.cause.getOrElse(e))
+        } else {
+          throw e.cause.getOrElse(e)
+        }
       }
     }
     finally {
@@ -166,7 +169,11 @@ abstract class SeleniumChecker(host: String,port:Int) extends Checker(host, port
 
     option should not be('empty)
 
-    singleSel("warp-sender-select").value = option.get.attribute("value").get
+    val newVal = option.get.attribute("value").get
+
+    executeScript("$(\"#warp-sender-select\").select2(\"val\", \"" + newVal + "\");")
+    singleSel("warp-sender-select").value = newVal
+
     click on partialLinkText("Send")
 
     eventually {
@@ -179,7 +186,9 @@ abstract class SeleniumChecker(host: String,port:Int) extends Checker(host, port
     click on partialLinkText("Incoming")
     click on partialLinkText("All")
 
-    val messagesFrom = findAll(cssSelector(".warp-td-author")).toArray.filter(_.text === name)
+    val messages = findAll(cssSelector(".warp-td-author")).toArray
+    System.err.println("Unread messages: " + messages.mkString(", "))
+    val messagesFrom = messages.filter(_.text === name)
 
     messagesFrom.length should be > (0)
 
@@ -239,7 +248,8 @@ abstract class SeleniumChecker(host: String,port:Int) extends Checker(host, port
     doLogin(login, password)
 
     doCheckMessageFrom(adminName, flag)
-    doCreate("We've got your message, check out " + generateReference(id) + System.currentTimeMillis, None)
+    val msgId = doCreate("We've got your message, check out " + generateReference(id) + System.currentTimeMillis, None)
+    doSend(msgId, adminName)
   }
 
   def check() = {

@@ -49,6 +49,7 @@ sub do_exit {
 }
 
 sub check {
+=pod
 	send $S, "list\n", 0;
 
 	my @list = split /\s+/, &get_all;
@@ -60,6 +61,7 @@ sub check {
 	my $data = &get_all;
 
 	do_exit (CHECKER_MUMBLE, CANNOT_GET_PICTURE) if $data =~ /^ERROR/ && !($data =~ /^ERROR\(PASSWORD\)/);
+=cut
 	do_exit (CHECKER_OK);
 }
 
