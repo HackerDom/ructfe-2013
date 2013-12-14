@@ -1,7 +1,7 @@
 import java.util.logging.Level
 import org.apache.commons.codec.digest.DigestUtils
 import org.openqa.selenium.htmlunit.HtmlUnitDriver
-import org.openqa.selenium.WebDriver
+import org.openqa.selenium.{WebElement, WebDriver}
 import org.scalatest.concurrent.AbstractPatienceConfiguration
 import org.scalatest.OptionValues._
 import org.scalatest.concurrent.Eventually._
@@ -179,10 +179,14 @@ abstract class SeleniumChecker(host: String,port:Int) extends Checker(host, port
     click on partialLinkText("Incoming")
     click on partialLinkText("All")
 
+    eventually {
+      val messages = findAll(cssSelector(".warp-td-author")).toArray
+      System.err.println("Unread messages: " + messages.mkString(", "))
+      val messagesFrom = messages.filter(_.text === name)
+
+      messagesFrom.length should be > (0)
+    }
     val messagesFrom = findAll(cssSelector(".warp-td-author")).toArray.filter(_.text === name)
-
-    messagesFrom.length should be > (0)
-
     messagesFrom.map({ message =>
       val id = Integer.parseInt(message.attribute("data-id").get)
 
