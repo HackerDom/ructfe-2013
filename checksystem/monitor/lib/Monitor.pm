@@ -3,6 +3,8 @@ use Mojo::Base 'Mojolicious';
 
 use DBI;
 
+has cache => sub { +{} };
+
 sub startup {
   my $self = shift;
 
@@ -14,13 +16,13 @@ sub startup {
   $r->get('/flags')->to('main#flags');
 
   $self->helper(
-  db => sub {
-    DBI->connect_cached(
-      $self->config->{db}->{source},
-      $self->config->{db}->{user},
-      $self->config->{db}->{pass},
-      {RaiseError => 1, AutoCommit => 1, pg_enable_utf8 => 1});
-  });
+    db => sub {
+      DBI->connect_cached(
+        $self->config->{db}->{source},
+        $self->config->{db}->{user},
+        $self->config->{db}->{pass},
+        {RaiseError => 1, AutoCommit => 1, pg_enable_utf8 => 1});
+    });
 }
 
 1;
