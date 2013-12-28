@@ -10,14 +10,13 @@ PACKER=packer
 COMMON=strlib.cpp sng.cpp stego.cpp
 
 CHECKER_SRC=extract.cpp
-SERVICE_SRC=steng.cpp storage.cpp sockets.cpp excHandler.cpp
+SERVICE_SRC=steng.cpp storage.cpp sockets.cpp
 PACKER_SRC=packer.cpp
 
 all: $(CHECKER) $(SERVICE) $(PACKER)
 
 $(CHECKER): Makefile $(CHECKER_SRC) $(COMMON)
 	$(CXX) $(OPTS) -o $(CHECKER) $(COMMON) $(CHECKER_SRC)
-	cp $(CHECKER) ./checker/
 
 $(SERVICE): Makefile $(SERVICE_SRC) $(COMMON)
 	$(CXX) $(OPTS) -pthread -o $(SERVICE) $(COMMON) $(SERVICE_SRC)

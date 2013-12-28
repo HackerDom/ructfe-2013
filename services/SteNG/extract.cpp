@@ -30,7 +30,7 @@ int main (int argc, char ** argv) {
 	try {
 		std::cout << stego::get (sng (s), v);
 	}
-	catch (sng::parse_error &) { }
+	catch (const sng::parse_error &) { }
 	catch (...) { }
 
 	return 0;
