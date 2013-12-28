@@ -3,7 +3,6 @@
 #include "storage.h"
 #include "stego.h"
 #include "sng.h"
-#include "excHandler.h"
 
 #include <string>
 #include <vector>
@@ -14,6 +13,7 @@
 #include <ctime>
 #include <thread>
 #include <algorithm>
+#include <functional>
 #include <signal.h>
 
 std::ostream & operator << (std::ostream & os, const pixel & p) {
@@ -32,12 +32,12 @@ int string_to_int (const std::string & s) {
 	return std::atoi (s.c_str ());
 }
 
-void send_list (std::shared_ptr <client> & c) {
+void send_list (std::shared_ptr <tcp_client> & c) {
 	auto items = sng_storage::instance ()->get_all_items ();
 
-	c->sendStringEndl (int_to_string (items.size ()));
+	c->send_line (int_to_string (items.size ()));
 	for (const auto & it : items)
-		c->sendStringEndl (it);
+		c->send_line (it);
 }
 
 void init (const std::string & s, const std::string & p) {
@@ -67,9 +67,9 @@ bool check_psw (const std::string & s, const std::string & p) {
 	return 4 * l [m][n] >= 3 * n;
 }
 
-void get_picture (std::shared_ptr <client> & c, const std::vector <std::string> & op) {
+void get_picture (std::shared_ptr <tcp_client> & c, const std::vector <std::string> & op) {
 	if (op.size () < 2) {
-		c->sendStringEndl ("ERROR(ARG)");
+		c->send_line ("ERROR(ARG)");
 		return;
 	}
 
@@ -79,7 +79,7 @@ void get_picture (std::shared_ptr <client> & c, const std::vector <std::string> 
 		auto password = pic.private_ ("PASW");
 		if (! password.empty ()) {
 			if (op.size () < 3) {
-				c->sendStringEndl ("ERROR(PASSWORD)");
+				c->send_line ("ERROR(PASSWORD)");
 				return;
 			}
 
@@ -100,23 +100,23 @@ void get_picture (std::shared_ptr <client> & c, const std::vector <std::string> 
 				}
 
 			if (! found) {
-				c->sendStringEndl ("ERROR(PASSWORD)");
+				c->send_line ("ERROR(PASSWORD)");
 				return;
 			}
 		}
 
 		auto p = pic.to_raw_string ();
-		c->sendStringEndl (int_to_string (count_lines (p)));
-		c->sendString (p);
+		c->send_line (int_to_string (count_lines (p)));
+		c->send (p);
 	}
-	catch (sng_storage::not_found_error &) {
-		c->sendStringEndl ("ERROR(NOTFOUND)");
+	catch (const sng_storage::not_found_error &) {
+		c->send_line ("ERROR(NOTFOUND)");
 	}
-	catch (sng_storage::read_error &) {
-		c->sendStringEndl ("ERROR(DBREAD)");
+	catch (const sng_storage::read_error &) {
+		c->send_line ("ERROR(DBREAD)");
 	}
-	catch (sng::parse_error &) {
-		c->sendStringEndl ("ERROR(PARSE)");
+	catch (const sng::parse_error &) {
+		c->send_line ("ERROR(PARSE)");
 	}
 }
 
@@ -127,10 +127,10 @@ void init_time (sng & pic) {
 	pic.time (1900 + t_->tm_year, 1 + t_->tm_mon, t_->tm_mday, t_->tm_hour, t_->tm_min, t_->tm_sec);
 }
 
-void put_picture (std::shared_ptr <client> & c, const std::vector <std::string> & op) {
+void put_picture (std::shared_ptr <tcp_client> & c, const std::vector <std::string> & op) {
 	try {
-		auto s = string_to_int (c->receiveString ());
-		sng pic (c->receiveAll (s));
+		auto s = string_to_int (c->receive_line ());
+		sng pic (c->receive_lines (s));
 
 		switch (op.size ()) {
 		case 2: {
@@ -138,16 +138,16 @@ void put_picture (std::shared_ptr <client> & c, const std::vector <std::string> 
 
 			auto v = stego::put (pic, op [1]);
 			if (v.empty ()) {
-				c->sendStringEndl ("ERROR(STEGO)");
+				c->send_line ("ERROR(STEGO)");
 				return;
 			}
 
 			try {
-				c->sendString (sng_storage::instance ()->put_item (pic));
-				c->sendStringEndl (std::string (";") + join (v, " "));
+				c->send (sng_storage::instance ()->put_item (pic));
+				c->send_line (std::string (";") + join (v, " "));
 			}
-			catch (sng_storage::write_error &) {
-				c->sendStringEndl ("ERROR(DBWRITE)");
+			catch (const sng_storage::write_error &) {
+				c->send_line ("ERROR(DBWRITE)");
 			}
 
 			break;
@@ -159,29 +159,32 @@ void put_picture (std::shared_ptr <client> & c, const std::vector <std::string> 
 			pic.text (op [1]);
 
 			try {
-				c->sendStringEndl (sng_storage::instance ()->put_item (pic));
+				c->send_line (sng_storage::instance ()->put_item (pic));
 			}
-			catch (sng_storage::write_error &) {
-				c->sendStringEndl ("ERROR(DBWRITE)");
+			catch (const sng_storage::write_error &) {
+				c->send_line ("ERROR(DBWRITE)");
 			}
 
 			break;
 		}
 
 		default:
-			c->sendStringEndl ("ERROR(ARG)");
+			c->send_line ("ERROR(ARG)");
 			break;
 		}
 	}
-	catch (sng::parse_error &) {
-		c->sendStringEndl ("ERROR(PARSE)");
+	catch (const sng::parse_error &) {
+		c->send_line ("ERROR(PARSE)");
 	}
 }
 
-void client_thread (std::shared_ptr <client> c) {
+void client_thread (std::shared_ptr <tcp_client> c) {
 	try {
-		while (! c->isClosed ()) {
-			auto s = c->receiveString ();
+		c->buffer_size (8192);
+		c->read_timeout (100);
+
+		while (c->is_alive ()) {
+			auto s = c->receive_line ();
 			if (s.empty ())
 				break;
 
@@ -198,10 +201,12 @@ void client_thread (std::shared_ptr <client> c) {
 			else if (op [0] == "exit")
 				break;
 			else
-				c->sendStringEndl ("Unknown command");
+				c->send_line ("Unknown command");
 		}
 	}
-	catch (excHandler &) { }
+	catch (const tcp_socket::socket_error &) {
+		std::cerr << "socket error" << std::endl;
+	}
 	catch (...) { }
 }
 
@@ -209,15 +214,15 @@ int main () {
 	signal (SIGPIPE, SIG_IGN);
 
 	try {
-		server s (18360, SOMAXCONN);
+		tcp_server s (18360);
 
 		while (true) {
-			auto c = s.acceptConnection ();
+			auto c = s.accept ();
 			std::thread (client_thread, c).detach ();
 		}
 	}
-	catch (excHandler & e) {
-		std::cerr << "Socket error: " << e.getFuncName () << std::endl;
+	catch (const tcp_socket::socket_error &) {
+		std::cerr << "Socket error" << std::endl;
 		return 1;
 	}
 
